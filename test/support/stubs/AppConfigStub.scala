@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package support.stubs
 
-object CodeCoverageSettings {
+import config.AppConfig
+import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+class AppConfigStub extends MockFactory {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  def config(): AppConfig = new AppConfig(mock[ServicesConfig]) {
+    private val wireMockPort = 11111
+
+    private lazy val authorisationToken: String = "secret"
+
+    override lazy val ifBaseUrl: String = s"http://localhost:$wireMockPort"
+    override lazy val ifEnvironment: String = "test"
+
+    override def authorisationTokenFor(apiVersion: String): String = authorisationToken + s".$apiVersion"
+  }
 }

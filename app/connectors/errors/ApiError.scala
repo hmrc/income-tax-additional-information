@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package connectors.errors
 
-object CodeCoverageSettings {
+import play.api.libs.json.{JsValue, Json}
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+case class ApiError(status: Int, body: ApiErrorBody) {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  def toJson: JsValue = body match {
+    case error: SingleErrorBody => Json.toJson(error)
+    case errors: MultiErrorsBody => Json.toJson(errors)
+  }
 }
