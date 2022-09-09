@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package support.providers
+package connectors.errors
 
-import support.utils.TaxYearUtils
+import play.api.libs.json.{JsValue, Json}
 
-trait TaxYearProvider {
+case class DesError(status: Int, body: DesErrorBody) {
 
-  protected val taxYear: Int = TaxYearUtils.taxYear
-  protected val taxYearEOY: Int = TaxYearUtils.taxYearEOY
-
-  protected val taxYearEndOfYearMinusOne: Int = taxYearEOY - 1
-
-  protected val validTaxYearListSingle: Seq[Int] = Seq(taxYear)
-  protected val validTaxYearList: Seq[Int] = Seq(taxYearEndOfYearMinusOne, taxYearEOY, taxYear)
+  def toJson: JsValue = body match {
+    case error: DesSingleErrorBody => Json.toJson(error)
+    case errors: DesMultiErrorsBody => Json.toJson(errors)
+  }
 }

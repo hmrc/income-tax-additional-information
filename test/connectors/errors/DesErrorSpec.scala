@@ -16,12 +16,11 @@
 
 package connectors.errors
 
-import connectors.errors
 import play.api.http.Status.SERVICE_UNAVAILABLE
 import play.api.libs.json.{JsObject, Json}
 import support.UnitTest
 
-class ApiErrorSpec extends UnitTest {
+class DesErrorSpec extends UnitTest {
 
   private val jsonModel: JsObject = Json.obj(
     "code" -> "SERVER_ERROR",
@@ -34,17 +33,17 @@ class ApiErrorSpec extends UnitTest {
     )
   )
 
-  "The Error" should {
+  "The DesError" should {
     "parse to Json" in {
-      val underTest = ApiError(SERVICE_UNAVAILABLE, SingleErrorBody("SERVER_ERROR", "Service is unavailable"))
+      val underTest = DesError(SERVICE_UNAVAILABLE, DesSingleErrorBody("SERVER_ERROR", "Service is unavailable"))
 
       underTest.toJson shouldBe jsonModel
     }
 
     "parse to Json for multiple errors" in {
-      val underTest = errors.ApiError(SERVICE_UNAVAILABLE, MultiErrorsBody(Seq(
-        SingleErrorBody("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
-        SingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
+      val underTest = DesError(SERVICE_UNAVAILABLE, DesMultiErrorsBody(Seq(
+        DesSingleErrorBody("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
+        DesSingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
       )))
 
       underTest.toJson shouldBe errorsJsModel
