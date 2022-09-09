@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package support.builders
 
-object CodeCoverageSettings {
+import models.User
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
+object UserBuilder {
+
+  val aUser: User = User(
+    mtditid = "1234567890",
+    arn = None
   )
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  val anAgentUser: User = aUser.copy(arn = Some("0987654321"))
 }

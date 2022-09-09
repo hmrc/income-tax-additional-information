@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package models
 
-object CodeCoverageSettings {
+case class User(mtditid: String, arn: Option[String]) {
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
-
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  def isAgent: Boolean = arn.nonEmpty
 }

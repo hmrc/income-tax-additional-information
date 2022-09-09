@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package config
 
-object CodeCoverageSettings {
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+import javax.inject.{Inject, Singleton}
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+@Singleton
+class AppConfig @Inject()(servicesConfig: ServicesConfig) {
+
+  lazy val desBaseUrl: String = servicesConfig.baseUrl("des")
+
+  lazy val environment: String = servicesConfig.getString("microservice.services.des.environment")
+  lazy val authorisationToken: String = servicesConfig.getString("microservice.services.des.authorisation-token")
 }

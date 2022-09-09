@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package support.stubs
 
-object CodeCoverageSettings {
+import config.AppConfig
+import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+class AppConfigStub extends MockFactory {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 100,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  def config(): AppConfig = new AppConfig(mock[ServicesConfig]) {
+    override lazy val desBaseUrl: String = s"http://localhost:9303"
+
+    override lazy val environment: String = "test"
+    override lazy val authorisationToken: String = "secret"
+  }
 }
