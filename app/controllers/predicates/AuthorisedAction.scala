@@ -132,4 +132,8 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
     }
   }.flatten
 
+<<<<<<<< HEAD:app/controllers/predicates/AuthorisedAction.scala
 }
+========
+}
+>>>>>>>> 869df41 (SASS-3848 Additional Info (Gains) - 1616 DELETE Insurance Policies Income Data API):app/controleers/predicates/AuthorisedAction.scala
