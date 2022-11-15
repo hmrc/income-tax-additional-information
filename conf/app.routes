@@ -1,1 +1,2 @@
 # microservice specific routes
+PUT        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.PutInsurancePoliciesController.putInsurancePolicies(nino:String, taxYear: Int)

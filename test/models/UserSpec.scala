@@ -1,36 +1,31 @@
-/*
- * Copyright 2022 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 package models
 
-import support.UnitTest
+import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
+import testUtils.TestSuite
 
-class UserSpec extends UnitTest {
+class UserSpec extends TestSuite {
 
   ".isAgent" should {
-    "return true when user arn non empty" in {
-      val underTest = User(mtditid = "any-mtditid", arn = Some("any-arn"))
 
-      underTest.isAgent shouldBe true
+    "return true" when {
+
+      "user has an arn" in {
+        User[AnyContent]("23456789", Some("123456789"))(FakeRequest()).isAgent mustBe true
+      }
+
     }
 
-    "return false when user arn is None" in {
-      val underTest = User(mtditid = "any-mtditid", arn = None)
+    "return false" when {
 
-      underTest.isAgent shouldBe false
+      "user does not have an arn" in {
+        User[AnyContent]("23456789", None)(FakeRequest()).isAgent mustBe false
+      }
+
     }
+
   }
+
 }

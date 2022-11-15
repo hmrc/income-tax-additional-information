@@ -23,3 +23,4 @@ trait AppConfigStubProvider {
 
   lazy val appConfigStub: AppConfig = new AppConfigStub().config()
 }
+

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package support.builders
+package connectors.errors
 
-import models.User
+import play.api.libs.json.{JsValue, Json}
 
-object UserBuilder {
+case class Error(status: Int, body: ErrorBody) {
 
-  val aUser: User = User(
-    mtditid = "1234567890",
-    arn = None
-  )
-
-  val anAgentUser: User = aUser.copy(arn = Some("0987654321"))
+  def toJson: JsValue = body match {
+    case error: SingleErrorBody => Json.toJson(error)
+    case errors: MultiErrorsBody => Json.toJson(errors)
+  }
 }

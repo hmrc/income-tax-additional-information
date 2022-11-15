@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package actions
+package controllers.predicates
 
 import models.User
 import models.authorisation.{AgentEnrolment, IndividualEnrolment, NinoEnrolment}
