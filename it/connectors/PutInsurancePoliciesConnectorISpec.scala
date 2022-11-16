@@ -1,10 +1,24 @@
-
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import support.helpers.WiremockSpec
+import helpers.WiremockSpec
 import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
@@ -29,22 +43,22 @@ class PutInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
   def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
   }
 
-  val ifReturned: InsurancePoliciesModel = InsurancePoliciesModel(
-    submittedOn = "2020-01-04T05:01:01Z",
+  val model: CreateOrAmendInsurancePoliciesModel = CreateOrAmendInsurancePoliciesModel(
     lifeInsurance = Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45))),
-    capitalRedemption = Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), 123.45, Some(true), Some(3), Some(2), Some(0))),
-    lifeAnnuity = Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), 0, Some(true), Some(2), Some(22), Some(123.45))),
-    voidedIsa = Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), 123.45, Some(123.45), Some(5), Some(6))),
-    foreign = Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3)))
+    capitalRedemption = Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), 123.45, Some(true), Some(3), Some(2), Some(0)))),
+    lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), 0, Some(true), Some(2), Some(22), Some(123.45)))),
+    voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), 123.45, Some(123.45), Some(5), Some(6)))),
+    foreign = Some(Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3))))
   )
 
-  val ifReturnedEmpty: JsObject = Json.obj()
+  val modelEmpty: JsObject = Json.obj()
 
   " PutInsurancePoliciesConnector" should {
 
     "include internal headers" when {
+      val requestBody = Json.toJson(model).toString()
 
-      val headersSentToIf = Seq(
+      val headersSentToDes = Seq(
         new HttpHeader(HeaderNames.authorisation, "Bearer secret"),
         new HttpHeader(HeaderNames.xSessionId, "sessionIdValue")
       )
@@ -53,119 +67,162 @@ class PutInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
       "the host for IF is 'Internal'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
+        val expectedResult = true
 
-        stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
+        stubPostWithoutResponseBody(url, OK, requestBody, headersSentToDes)
 
-        val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
-        result mustBe Right(ifReturned)
+        result mustBe Right(expectedResult)
       }
 
       "the host for IF is 'External'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-
-        stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString,headersSentToIf)
+        val expectedResult = true
 
         val connector = new PutInsurancePoliciesConnector(httpClient, appConfig(externalHost))
 
-        val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        stubPostWithoutResponseBody(url, OK, requestBody, headersSentToDes)
 
-        result mustBe Right(ifReturned)
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
+
+        result mustBe Right(expectedResult)
       }
     }
 
     "return a success result" when {
+      "IF Returns a 200" in {
+        val expectedResult = true
 
-      "DES returns a 200" in {
-        stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
-        val result = await(connector.putInsurancePolicies(nino, taxYear))
+        stubPostWithoutResponseBody(url, OK, Json.toJson(model).toString())
 
-        result mustBe Right(ifReturned)
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
+        result mustBe Right(expectedResult)
       }
     }
+    "return a InternalServerError parsing error when incorrectly parsed" in {
 
-    "return an error" when {
-
-      "DES returns an empty 200" in {
-        stubGetWithResponseBody(url, OK, ifReturnedEmpty.toString())
-        val result = await(connector.putInsurancePolicies(nino, taxYear))
-        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
-
-        result mustBe Left(expectedResult)
-
-      }
-    }
-
-    "return a NoContent response" in {
+      val invalidJson = Json.obj(
+        "notErrormodel" -> "test"
+      )
 
       val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
-      stubGetWithResponseBody(url, NO_CONTENT, "{}")
 
+      stubPostWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), invalidJson.toString)
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
       result mustBe Left(expectedResult)
     }
+    "return a failed result" when {
+      "IF Returns a BAD_REQUEST" in {
+        val expectedResult = ErrorModel(BAD_REQUEST, ErrorBodyModel("INVALID_IDTYPE", "ID is invalid"))
 
-    "return a BadRequest response" in {
+        val responseBody = Json.obj(
+          "code" -> "INVALID_IDTYPE",
+          "reason" -> "ID is invalid"
+        )
+        stubPostWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
-      val responseBody = Json.obj(
-        "code" -> "INVALID_NINO",
-        "reason" -> "NINO is invalid"
-      )
-      val expectedResult = ErrorModel(BAD_REQUEST, ErrorBodyModel("INVALID_NINO","NINO is invalid"))
-      stubGetWithResponseBody(url, BAD_REQUEST, responseBody.toString())
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        result mustBe Left(expectedResult)
+      }
 
-      result mustBe Left(expectedResult)
-    }
+      "IF Returns multiple errors" in {
+        val expectedResult = ErrorModel(BAD_REQUEST, ErrorsBodyModel(Seq(
+          ErrorBodyModel("INVALID_IDTYPE", "ID is invalid"),
+          ErrorBodyModel("INVALID_IDTYPE_2", "ID 2 is invalid"))))
 
-    "return a NotFound response" in {
+        val responseBody = Json.obj(
+          "failures" -> Json.arr(
+            Json.obj("code" -> "INVALID_IDTYPE",
+              "reason" -> "ID is invalid"),
+            Json.obj("code" -> "INVALID_IDTYPE_2",
+              "reason" -> "ID 2 is invalid")
+          )
+        )
+        stubPostWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
-      val responseBody = Json.obj(
-        "code" -> "NOT_FOUND_INCOME_SOURCE",
-        "reason" -> "Can't find the income source"
-      )
-      val expectedResult = ErrorModel(NOT_FOUND, ErrorBodyModel("NOT_FOUND_INCOME_SOURCE", "Can't find the income source"))
-      stubGetWithResponseBody(url, NOT_FOUND, responseBody.toString())
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        result mustBe Left(expectedResult)
+      }
 
-      result mustBe Left(expectedResult)
-    }
+      "IF Returns a SERVICE_UNAVAILABLE" in {
+        val expectedResult = ErrorModel(SERVICE_UNAVAILABLE, ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"))
 
-    "return an InternalServerError response" in {
+        val responseBody = Json.obj(
+          "code" -> "SERVICE_UNAVAILABLE",
+          "reason" -> "The service is currently unavailable"
+        )
+        stubPostWithResponseBody(url, SERVICE_UNAVAILABLE, Json.toJson(model).toString(), responseBody.toString)
 
-      val responseBody = Json.obj(
-        "code" -> "SERVER_ERROR",
-        "reason" -> "Internal Server Error"
-      )
-      val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("SERVER_ERROR", "Internal Server Error"))
-      stubGetWithResponseBody(url, INTERNAL_SERVER_ERROR, responseBody.toString())
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        result mustBe Left(expectedResult)
+      }
 
-      result mustBe Left(expectedResult)
-    }
+      "IF Returns a NOT_FOUND" in {
+        val expectedResult = ErrorModel(NOT_FOUND, ErrorBodyModel("NOT_FOUND", "Submission Period not found"))
 
-    "return a ServiceUnavailable response" in {
+        val responseBody = Json.obj(
+          "code" -> "NOT_FOUND",
+          "reason" -> "Submission Period not found"
+        )
+        stubPostWithResponseBody(url, NOT_FOUND, Json.toJson(model).toString(), responseBody.toString)
 
-      val responseBody = Json.obj(
-        "code" -> "SERVICE_UNAVAILABLE",
-        "reason" -> "The service is currently unavailable"
-      )
-      val expectedResult = ErrorModel(SERVICE_UNAVAILABLE, ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"))
-      stubGetWithResponseBody(url, SERVICE_UNAVAILABLE, responseBody.toString())
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
 
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.putInsurancePolicies(nino, taxYear)(hc))
+        result mustBe Left(expectedResult)
+      }
 
-      result mustBe Left(expectedResult)
+      "IF Returns a UNPROCESSABLE_ENTITY" in {
+        val expectedResult = ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
+
+        val responseBody = Json.obj(
+          "code" -> "UNPROCESSABLE_ENTITY",
+          "reason" -> "The remote endpoint has indicated that for given income source type, message payload is incorrect."
+        )
+        stubPostWithResponseBody(url, UNPROCESSABLE_ENTITY, Json.toJson(model).toString(), responseBody.toString)
+
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
+
+        result mustBe Left(expectedResult)
+      }
+
+      "IF Returns a INTERNAL_SERVER_ERROR" in {
+        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("SERVER_ERROR", "Internal Server Error"))
+
+        val responseBody = Json.obj(
+          "code" -> "SERVER_ERROR",
+          "reason" -> "Internal Server Error"
+        )
+        stubPostWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), responseBody.toString())
+
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
+
+        result mustBe Left(expectedResult)
+      }
+
+      "IF Returns a unexpected response" in {
+        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
+
+        stubPostWithoutResponseBody(url, GONE, Json.toJson(model).toString())
+
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+        val result = await(connector.putInsurancePolicies(nino, taxYear, model)(hc))
+
+        result mustBe Left(expectedResult)
+      }
     }
   }
 
