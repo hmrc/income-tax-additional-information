@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package support.builders
+package models
 
-import models.User
+import play.api.libs.json.{Json, OFormat}
 
-object UserBuilder {
+case class VoidedIsaModel(
+                           customerReference: Option[String],
+                           event: Option[String],
+                           gainAmount: BigDecimal,
+                           taxPaidAmount: Option[BigDecimal],
+                           yearsHeld: Option[Int],
+                           yearsHeldSinceLastGain: Option[Int]
+                         )
 
-  val aUser: User = User(
-    mtditid = "1234567890",
-    arn = None
-  )
-
-  val anAgentUser: User = aUser.copy(arn = Some("0987654321"))
+object VoidedIsaModel {
+  implicit val formats: OFormat[VoidedIsaModel] = Json.format[VoidedIsaModel]
 }

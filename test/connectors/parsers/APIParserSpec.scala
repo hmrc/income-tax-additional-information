@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package connectors.parsers
+package connectors.httpParsers
 
-import connectors.errors.{DesError, DesMultiErrorsBody, DesSingleErrorBody}
+
+import connectors.parsers.APIParser
+import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel}
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.libs.json.{JsValue, Json}
-import support.UnitTest
+import testUtils.TestSuite
 import uk.gov.hmrc.http.HttpResponse
 
-class DESParserSpec extends UnitTest {
+class APIParserSpec extends TestSuite {
 
-  private val underTest = new DESParser {
-    override val parserName: String = "TestParser"
+  object FakeParser extends APIParser {
   }
 
   def httpResponse(json: JsValue =
@@ -40,9 +41,9 @@ class DESParserSpec extends UnitTest {
 
   "FakeParser" should {
     "log the correct message" in {
-      val result = underTest.logMessage(httpResponse())
-      result shouldBe
-        """[TestParser][read] Received 500 from DES. Body:{
+      val result = FakeParser.logMessage(httpResponse())
+      result mustBe (
+        """[APIParser][read] Received 500 status code. Body:{
           |  "failures" : [ {
           |    "code" : "SERVICE_UNAVAILABLE",
           |    "reason" : "The service is currently unavailable"
@@ -50,36 +51,24 @@ class DESParserSpec extends UnitTest {
           |    "code" : "INTERNAL_SERVER_ERROR",
           |    "reason" : "The service is currently facing issues."
           |  } ]
-          |} CorrelationId: 1234645654645""".stripMargin
+          |} CorrelationId: 1234645654645""".stripMargin)
     }
-
     "return the the correct error" in {
-      val result = underTest.badSuccessJsonFromDES
-      result shouldBe Left(DesError(INTERNAL_SERVER_ERROR, DesSingleErrorBody("PARSING_ERROR", "Error parsing response from DES")))
+      val result = FakeParser.badSuccessJsonFromAPI
+      result mustBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("PARSING_ERROR", "Error parsing response from API")))
     }
-
     "handle multiple errors" in {
-      val result = underTest.handleDESError(httpResponse())
-      result shouldBe Left(DesError(INTERNAL_SERVER_ERROR, DesMultiErrorsBody(Seq(
-        DesSingleErrorBody("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
-        DesSingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
+      val result = FakeParser.handleAPIError(httpResponse())
+      result mustBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorsBodyModel(Seq(
+        ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
+        ErrorBodyModel("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
       ))))
     }
-
     "handle single errors" in {
-      val result = underTest.handleDESError(httpResponse(Json.parse(
+      val result = FakeParser.handleAPIError(httpResponse(Json.parse(
         """{"code":"INTERNAL_SERVER_ERROR","reason":"The service is currently facing issues."}""".stripMargin)))
-      result shouldBe Left(DesError(INTERNAL_SERVER_ERROR, DesSingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")))
-    }
-
-    "handle response that is neither a single error or multiple errors" in {
-      val result = underTest.handleDESError(httpResponse(Json.obj()))
-      result shouldBe Left(DesError(INTERNAL_SERVER_ERROR, DesSingleErrorBody("PARSING_ERROR", "Error parsing response from DES")))
-    }
-
-    "handle response when the response body is not json" in {
-      val result = underTest.handleDESError(HttpResponse(INTERNAL_SERVER_ERROR, "", Map("CorrelationId" -> Seq("1234645654645"))))
-      result shouldBe Left(DesError(INTERNAL_SERVER_ERROR, DesSingleErrorBody("PARSING_ERROR", "Error parsing response from DES")))
+      result mustBe Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")))
     }
   }
+
 }

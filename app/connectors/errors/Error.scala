@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package models.requests
+package connectors.errors
 
-import models.User
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.libs.json.{JsValue, Json}
 
-case class AuthorisationRequest[T](user: User, request: Request[T]) extends WrappedRequest[T](request)
+case class Error(status: Int, body: ErrorBody) {
+
+  def toJson: JsValue = body match {
+    case error: SingleErrorBody => Json.toJson(error)
+    case errors: MultiErrorsBody => Json.toJson(errors)
+  }
+}

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.Logging
 
-case class User[T](mtditid: String, arn: Option[String])(implicit val request: Request[T]) extends WrappedRequest[T](request) {
+object TaxYearUtils extends Logging {
 
-  def isAgent: Boolean = arn.nonEmpty
+  def convertStringTaxYear(taxYear: Int): String = {
+    s"${taxYear - 1}-${taxYear.toString takeRight 2}"
+  }
 }

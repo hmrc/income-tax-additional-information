@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package connectors.errors
+package models
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{Json, OFormat}
 
-case class DesError(status: Int, body: DesErrorBody) {
+case class ForeignModel(
+                         customerReference: Option[String],
+                         gainAmount: BigDecimal,
+                         taxPaidAmount: Option[BigDecimal],
+                         yearsHeld: Option[Int]
+                       )
 
-  def toJson: JsValue = body match {
-    case error: DesSingleErrorBody => Json.toJson(error)
-    case errors: DesMultiErrorsBody => Json.toJson(errors)
-  }
+object ForeignModel {
+  implicit val formats: OFormat[ForeignModel] = Json.format[ForeignModel]
 }
