@@ -34,9 +34,8 @@ class PutInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: A
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
 
     def ifCall(implicit hc: HeaderCarrier): Future[PutInsurancePoliciesResponse] = {
-      http.PUT[CreateOrAmendInsurancePoliciesModel, PutInsurancePoliciesResponse](insurancePoliciesUrl, insurancePoliciesModel)
-    }
+      http.PUT[CreateOrAmendInsurancePoliciesModel, PutInsurancePoliciesResponse](insurancePoliciesUrl, insurancePoliciesModel)(
+        CreateOrAmendInsurancePoliciesModel.formats.writes, InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePolicies), ec)    }
     ifCall(ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePolicies))
   }
 }
-
