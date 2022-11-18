@@ -107,4 +107,3 @@ trait TestSuite extends AnyWordSpec with Matchers with MockFactory with BeforeAn
       .returning(Future.failed(exception))
   }
 }
-
