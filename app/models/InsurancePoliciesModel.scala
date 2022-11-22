@@ -16,9 +16,15 @@
 
 package models
 
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.libs.json.{Json, OFormat}
 
-case class User[T](mtditid: String, arn: Option[String])(implicit val request: Request[T]) extends WrappedRequest[T](request) {
+case class InsurancePoliciesModel(submittedOn: String,
+                                  lifeInsurance: Seq[LifeInsuranceModel],
+                                  capitalRedemption: Option[Seq[CapitalRedemptionModel]],
+                                  lifeAnnuity: Option[Seq[LifeAnnuityModel]],
+                                  voidedIsa: Option[Seq[VoidedIsaModel]],
+                                  foreign: Option[Seq[ForeignModel]])
 
-  def isAgent: Boolean = arn.nonEmpty
+object InsurancePoliciesModel {
+  implicit val formats: OFormat[InsurancePoliciesModel] = Json.format[InsurancePoliciesModel]
 }

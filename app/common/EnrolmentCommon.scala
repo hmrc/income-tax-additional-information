@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package common
 
-import play.api.mvc.{Request, WrappedRequest}
+object EnrolmentKeys {
+  val Individual = "HMRC-MTD-IT"
+  val Agent = "HMRC-AS-AGENT"
+  val nino = "HMRC-NI"
+}
 
-case class User[T](mtditid: String, arn: Option[String])(implicit val request: Request[T]) extends WrappedRequest[T](request) {
-
-  def isAgent: Boolean = arn.nonEmpty
+object EnrolmentIdentifiers {
+  val individualId = "MTDITID"
+  val agentReference = "AgentReferenceNumber"
+  val nino = "NINO"
 }

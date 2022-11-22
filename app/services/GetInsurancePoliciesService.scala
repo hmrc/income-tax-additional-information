@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package support.providers
+package services
 
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import connectors.GetInsurancePoliciesConnector
 
-trait FakeRequestProvider {
+import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.http.HeaderCarrier
+import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesResponse
 
-  protected val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+import scala.concurrent.Future
+
+@Singleton
+class GetInsurancePoliciesService @Inject()(getInsurancePoliciesConnector: GetInsurancePoliciesConnector) {
+
+  def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
+    getInsurancePoliciesConnector.getInsurancePolicies(nino, taxYear)
+  }
+
 }

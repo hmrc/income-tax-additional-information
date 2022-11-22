@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package support
+package testUtils
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import play.api.Logging
 
-trait UnitTest extends AnyWordSpec
-  with FutureAwaits with DefaultAwaitTimeout
-  with Matchers
+object TaxYearUtils extends Logging {
+
+  def convertStringTaxYear(taxYear: Int): String = {
+    s"${taxYear - 1}-${taxYear.toString takeRight 2}"
+  }
+}

@@ -16,22 +16,18 @@
 
 package utils
 
-import support.UnitTest
-import uk.gov.hmrc.http.HttpResponse
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PagerDutyHelperSpec extends UnitTest {
+class TaxYearUtilsSpec extends AnyWordSpec with Matchers {
 
-  private val status = 200
+  "IFTaxYearHelper" should {
 
-  "PagerDutyHelper" should {
-    "return string containing correlationId when response contains correlationId" in {
-      val result = PagerDutyHelper.getCorrelationId(HttpResponse(status, "", Map("CorrelationId" -> Seq("some_correlation_id"))))
-      result shouldBe " CorrelationId: some_correlation_id"
+    "return a string containing the last year and the last two digits of this year" in {
+      val taxYear = 2024
+      val result = TaxYearUtils.convertStringTaxYear(taxYear)
+      result mustBe "2023-24"
     }
 
-    "return empty string when response does not contain correlationId" in {
-      val result = PagerDutyHelper.getCorrelationId(HttpResponse(status, ""))
-      result shouldBe ""
-    }
   }
 }
