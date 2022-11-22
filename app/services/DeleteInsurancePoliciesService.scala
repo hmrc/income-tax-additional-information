@@ -16,9 +16,15 @@
 
 package services
 
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import connectors.DeleteInsurancePoliciesConnector
+import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
+import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import scala.concurrent.Future
 
-@Singleton
-class AuthService @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions
+class DeleteInsurancePoliciesService @Inject()(deleteInsurancePoliciesConnector:DeleteInsurancePoliciesConnector){
+  def deleteInsurancePoliciesData (nino: String, taxYear: Int) (implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] = {
+    deleteInsurancePoliciesConnector.deleteInsurancePoliciesData(nino, taxYear)
+  }
+}
