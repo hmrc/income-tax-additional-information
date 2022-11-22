@@ -1,2 +1,3 @@
 # microservice specific routes
 GET        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.GetInsurancePoliciesController.getInsurancePolicies(nino:String, taxYear: Int)
+PUT        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.CreateOrAmendInsurancePoliciesController.createOrAmendInsurancePolicies(nino:String, taxYear: Int)

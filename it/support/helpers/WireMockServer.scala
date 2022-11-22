@@ -29,7 +29,7 @@ trait WireMockServer {
 
   private lazy val wireMockServer = new wiremock.WireMockServer(wireMockConfig().port(wiremockPort))
 
-  private lazy val connectedServices: Seq[String] = Seq("dividends")
+  private lazy val connectedServices: Seq[String] = Seq("integration-framework")
 
   def servicesToUrlConfig: Seq[(String, String)] = connectedServices
     .map(service => s"microservice.services.$service.base-url" -> s"http://localhost:$wiremockPort")
