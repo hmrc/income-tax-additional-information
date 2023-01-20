@@ -2,3 +2,6 @@
 GET        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.GetInsurancePoliciesController.getInsurancePolicies(nino:String, taxYear: Int)
 PUT        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.CreateOrAmendInsurancePoliciesController.createOrAmendInsurancePolicies(nino:String, taxYear: Int)
 DELETE    /income-tax/insurance-policies/income/:nino/:taxYear               controllers.DeleteInsurancePoliciesController.deleteInsurancePoliciesData(nino: String, taxYear: Int)
+
+### IF #1795 - v9.1.0 ###
+DELETE    /income-tax/income/other/employments/:taxYear/:nino                controllers.DeleteOtherEmploymentsIncomeController.deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)

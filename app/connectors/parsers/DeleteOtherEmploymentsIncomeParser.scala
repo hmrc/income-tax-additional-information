@@ -16,7 +16,6 @@
 
 package connectors.parsers
 
-
 import models.ErrorModel
 import play.api.Logging
 import play.api.http.Status._
@@ -24,23 +23,20 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.PagerDutyHelper.PagerDutyKeys._
 import utils.PagerDutyHelper._
 
-object DeleteInsurancePoliciesParser extends APIParser with Logging {
-  type DeleteInsurancePoliciesResponse = Either[ErrorModel, Boolean]
+object DeleteOtherEmploymentsIncomeParser extends APIParser with Logging {
+  type DeleteOtherEmploymentsIncomeResponse = Either[ErrorModel, Boolean]
 
-  implicit object DeleteInsurancePoliciesHttpReads extends HttpReads[DeleteInsurancePoliciesResponse] {
-    override def read(method: String, url: String, response: HttpResponse): DeleteInsurancePoliciesResponse = response.status match {
+  implicit object DeleteOtherEmploymentsIncomeHttpReads extends HttpReads[DeleteOtherEmploymentsIncomeResponse] {
+    override def read(method: String, url: String, response: HttpResponse): DeleteOtherEmploymentsIncomeResponse = response.status match {
 
       case NO_CONTENT => Right(true)
-      case NOT_FOUND =>
-        logger.info(logMessage(response))
-        handleAPIError(response)
       case INTERNAL_SERVER_ERROR =>
         pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
         handleAPIError(response)
       case SERVICE_UNAVAILABLE =>
         pagerDutyLog(SERVICE_UNAVAILABLE_FROM_API, logMessage(response))
         handleAPIError(response)
-      case BAD_REQUEST | NOT_FOUND =>
+      case BAD_REQUEST | NOT_FOUND | UNPROCESSABLE_ENTITY =>
         pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response)
       case _ =>

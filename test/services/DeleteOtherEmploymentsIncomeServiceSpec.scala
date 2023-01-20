@@ -16,16 +16,16 @@
 
 package services
 
-import connectors.DeleteInsurancePoliciesConnector
+import connectors.DeleteOtherEmploymentsIncomeConnector
 import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class DeleteInsurancePoliciesSpec extends TestSuite{
-  val connector: DeleteInsurancePoliciesConnector = mock[DeleteInsurancePoliciesConnector]
-  val service: DeleteInsurancePoliciesService = new DeleteInsurancePoliciesService(connector)
+class DeleteOtherEmploymentsIncomeServiceSpec extends TestSuite {
+  val connector: DeleteOtherEmploymentsIncomeConnector = mock[DeleteOtherEmploymentsIncomeConnector]
+  val service: DeleteOtherEmploymentsIncomeService = new DeleteOtherEmploymentsIncomeService(connector)
 
   "DeleteInsurancePoliciesData" should {
 
@@ -33,11 +33,11 @@ class DeleteInsurancePoliciesSpec extends TestSuite{
 
       val expectedResult: DeleteInsurancePoliciesResponse = Right(true)
 
-      (connector.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
+      (connector.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
         .expects("12345678", 1234, *)
         .returning(Future.successful(expectedResult))
 
-      val result = await(service.deleteInsurancePoliciesData("12345678", 1234))
+      val result = await(service.deleteOtherEmploymentsIncomeData("12345678", 1234))
 
       result mustBe expectedResult
 
