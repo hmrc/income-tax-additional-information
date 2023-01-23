@@ -20,16 +20,16 @@ import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesR
 import models.{ErrorBodyModel, ErrorModel}
 import org.scalamock.handlers.CallHandler3
 import play.api.http.Status._
-import services.DeleteInsurancePoliciesService
+import services.DeleteOtherEmploymentsIncomeService
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class DeleteinsurancePoliciesControllerSpec extends TestSuite{
-  val serviceMock: DeleteInsurancePoliciesService = mock[DeleteInsurancePoliciesService]
+class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
+  val serviceMock: DeleteOtherEmploymentsIncomeService = mock[DeleteOtherEmploymentsIncomeService]
 
-  val controller = new DeleteInsurancePoliciesController(serviceMock, mockControllerComponents, authorisedAction)
+  val controller = new DeleteOtherEmploymentsIncomeController(serviceMock, mockControllerComponents, authorisedAction)
 
   val notFoundModel: ErrorModel = ErrorModel(NOT_FOUND, ErrorBodyModel("NotFound", "Unable to find source"))
   val serviceUnavailableModel: ErrorModel =
@@ -41,21 +41,21 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
   val nino = "nino"
   val taxYear = 2021
 
-  "DeleteInsurancePoliciesData" should {
+  "DeleteOtherEmploymentsIncome" should {
 
-    "Return a NO CONTENT if deletes insurance policies data successful" in {
+    "Return a NO CONTENT if deletes other employments income data successful" in {
 
       val serviceResult = Right(true)
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse] ]=
-        (serviceMock.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
+      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] =
+        (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
           .expects(nino, taxYear, *)
           .returning(Future.successful(serviceResult))
 
       val result = {
         mockAuth()
         serviceCallMock()
-        controller.deleteInsurancePoliciesData(nino, taxYear)(fakeRequest)
+        controller.deleteOtherEmploymentsIncomeData(nino, taxYear)(fakeRequest)
       }
 
       status(result) mustBe NO_CONTENT
@@ -64,8 +64,9 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
 
     "return a Left response" when {
 
-      def mockDeleteSavingIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] = {
-        (serviceMock.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
+      def mockDeleteOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String,
+        Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] = {
+        (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
           .expects(nino, taxYear, *)
           .returning(Future.successful(Left(errorModel)))
       }
@@ -73,8 +74,8 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
       "the service returns a NO_CONTENT" in {
         val result = {
           mockAuth()
-          mockDeleteSavingIncomeDataWithError(notFoundModel)
-          controller.deleteInsurancePoliciesData(nino, taxYear)(fakeRequest)
+          mockDeleteOtherEmploymentsIncomeDataWithError(notFoundModel)
+          controller.deleteOtherEmploymentsIncomeData(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe NOT_FOUND
       }
@@ -82,24 +83,24 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
       "the service returns a SERVICE_UNAVAILABLE" in {
         val result = {
           mockAuth()
-          mockDeleteSavingIncomeDataWithError(serviceUnavailableModel)
-          controller.deleteInsurancePoliciesData(nino, taxYear)(fakeRequest)
+          mockDeleteOtherEmploymentsIncomeDataWithError(serviceUnavailableModel)
+          controller.deleteOtherEmploymentsIncomeData(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe SERVICE_UNAVAILABLE
       }
       "the service returns a BAD_REQUEST" in {
         val result = {
           mockAuth()
-          mockDeleteSavingIncomeDataWithError(badRequestModel)
-          controller.deleteInsurancePoliciesData(nino, taxYear)(fakeRequest)
+          mockDeleteOtherEmploymentsIncomeDataWithError(badRequestModel)
+          controller.deleteOtherEmploymentsIncomeData(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe BAD_REQUEST
       }
       "the service returns a INTERNAL_SERVER_ERROR" in {
         val result = {
           mockAuth()
-          mockDeleteSavingIncomeDataWithError(internalServerErrorModel)
-          controller.deleteInsurancePoliciesData(nino, taxYear)(fakeRequest)
+          mockDeleteOtherEmploymentsIncomeDataWithError(internalServerErrorModel)
+          controller.deleteOtherEmploymentsIncomeData(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe INTERNAL_SERVER_ERROR
       }

@@ -16,19 +16,15 @@
 
 package services
 
-import connectors.GetInsurancePoliciesConnector
-
-import javax.inject.{Inject, Singleton}
+import connectors.DeleteOtherEmploymentsIncomeConnector
+import connectors.parsers.DeleteOtherEmploymentsIncomeParser.DeleteOtherEmploymentsIncomeResponse
 import uk.gov.hmrc.http.HeaderCarrier
-import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesResponse
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
-@Singleton
-class GetInsurancePoliciesService @Inject()(getInsurancePoliciesConnector: GetInsurancePoliciesConnector) {
-
-  def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
-    getInsurancePoliciesConnector.getInsurancePolicies(nino, taxYear)
+class DeleteOtherEmploymentsIncomeService @Inject()(deleteOtherEmploymentIncomeConnector: DeleteOtherEmploymentsIncomeConnector){
+  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] = {
+    deleteOtherEmploymentIncomeConnector.deleteOtherEmploymentsIncomeData(nino, taxYear)
   }
-
 }

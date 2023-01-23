@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ trait IFConnector {
   val GetInsurancePolicies = "1615"
   val PutInsurancePolicies = "1614"
   val DeleteInsurancePolicies = "1616"
+  val DeleteOtherEmploymentsIncome = "1795"
 
   protected val headerCarrierConfig: Config = HeaderCarrier.Config.fromConfig(ConfigFactory.load())
 

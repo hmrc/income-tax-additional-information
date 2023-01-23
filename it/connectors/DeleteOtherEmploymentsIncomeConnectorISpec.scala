@@ -25,18 +25,16 @@ import play.api.Configuration
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.TaxYearUtils.convertStringTaxYear
 
-class DeleteInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec{
+class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec {
 
-  lazy val connector: DeleteInsurancePoliciesConnector = app.injector.instanceOf[DeleteInsurancePoliciesConnector]
+  lazy val connector: DeleteOtherEmploymentsIncomeConnector = app.injector.instanceOf[DeleteOtherEmploymentsIncomeConnector]
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val nino = "nino"
   val taxYear = 2023
 
-  def mkTaxYear(taxYear: Int): String = {
-    s"${taxYear - 1}-${taxYear.toString takeRight 2}"
-  }
-  val ifUrl = s"/income-tax/insurance-policies/income/$nino/${mkTaxYear(taxYear)}"
+  val ifUrl = s"/income-tax/income/other/employments/${convertStringTaxYear(taxYear)}/$nino"
 
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
@@ -57,22 +55,22 @@ class DeleteInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec{
 
       "the host for IF is 'Internal'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-        val connector = new DeleteInsurancePoliciesConnector(httpClient, appConfig(internalHost))
+        val connector = new DeleteOtherEmploymentsIncomeConnector(httpClient, appConfig(internalHost))
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
         result mustBe Right(true)
       }
 
       "the host for IF is 'External'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-        val connector = new DeleteInsurancePoliciesConnector(httpClient, appConfig(externalHost))
+        val connector = new DeleteOtherEmploymentsIncomeConnector(httpClient, appConfig(externalHost))
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
         result mustBe Right(true)
       }
@@ -90,7 +88,7 @@ class DeleteInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec{
 
           stubDeleteWithResponseBody(ifUrl, status, ifError.toJson.toString())
 
-          val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+          val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
           result mustBe Left(ifError)
         }
@@ -102,7 +100,7 @@ class DeleteInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec{
 
         stubDeleteWithResponseBody(ifUrl, BAD_GATEWAY, ifError.toJson.toString())
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
         result mustBe Left(ifError)
       }
