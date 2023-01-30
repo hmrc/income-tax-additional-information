@@ -79,7 +79,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockGetSavingIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[GetInsurancePoliciesResponse]] = {
+      def mockGetInsurancePoliciesDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[GetInsurancePoliciesResponse]] = {
         (serviceMock.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
           .expects(nino, taxYear, *)
           .returning(Future.successful(Left(errorModel)))
@@ -88,7 +88,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
       "the service returns a NO_CONTENT" in {
         val result = {
           mockAuth()
-          mockGetSavingIncomeDataWithError(notFoundModel)
+          mockGetInsurancePoliciesDataWithError(notFoundModel)
           controller.getInsurancePolicies(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe NOT_FOUND
@@ -97,7 +97,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
       "the service returns a SERVICE_UNAVAILABLE" in {
         val result = {
           mockAuth()
-          mockGetSavingIncomeDataWithError(serviceUnavailableModel)
+          mockGetInsurancePoliciesDataWithError(serviceUnavailableModel)
           controller.getInsurancePolicies(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe SERVICE_UNAVAILABLE
@@ -105,7 +105,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
       "the service returns a BAD_REQUEST" in {
         val result = {
           mockAuth()
-          mockGetSavingIncomeDataWithError(badRequestModel)
+          mockGetInsurancePoliciesDataWithError(badRequestModel)
           controller.getInsurancePolicies(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe BAD_REQUEST
@@ -113,7 +113,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
       "the service returns a INTERNAL_SERVER_ERROR" in {
         val result = {
           mockAuth()
-          mockGetSavingIncomeDataWithError(internalServerErrorModel)
+          mockGetInsurancePoliciesDataWithError(internalServerErrorModel)
           controller.getInsurancePolicies(nino, taxYear)(fakeRequest)
         }
         status(result) mustBe INTERNAL_SERVER_ERROR
