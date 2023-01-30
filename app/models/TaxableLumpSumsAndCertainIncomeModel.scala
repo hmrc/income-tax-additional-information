@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package utils
+package models
 
-import play.api.Logging
+import play.api.libs.json.{Json, OFormat}
 
-object TaxYearUtils extends Logging {
+case class TaxableLumpSumsAndCertainIncomeModel(
+                                                 amount: BigDecimal,
+                                                 taxPaid: Option[BigDecimal],
+                                                 taxTakenOffInEmployment: Option[Boolean]
+                                               )
 
-  def convertStringTaxYear(taxYear: Int): String = {
-    s"${taxYear - 1}-${taxYear.toString takeRight 2}"
-  }
-
-  def convertSpecificTaxYear(taxYear: Int): String = {
-    s"${(taxYear - 1).toString takeRight 2}-${taxYear.toString takeRight 2}"
-  }
+object TaxableLumpSumsAndCertainIncomeModel {
+  implicit val formats: OFormat[TaxableLumpSumsAndCertainIncomeModel] = Json.format[TaxableLumpSumsAndCertainIncomeModel]
 }

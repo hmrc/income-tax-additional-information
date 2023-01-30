@@ -29,5 +29,10 @@ class TaxYearUtilsSpec extends AnyWordSpec with Matchers {
       result mustBe "2023-24"
     }
 
+    "return a string containing the two digits of last year and this year when input taxYear is int" in {
+      val taxYear: Int = 2024
+      val result = TaxYearUtils.convertSpecificTaxYear(taxYear)
+      result mustBe "23-24"
+    }
   }
 }
