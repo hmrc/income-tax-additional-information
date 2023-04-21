@@ -69,7 +69,7 @@ class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with Wiremoc
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
         val expectedResult = true
 
-        stubPutWithoutResponseBody(url, OK, requestBody, headersSentToIf)
+        stubPutWithoutResponseBody(url, CREATED, requestBody, headersSentToIf)
 
         val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
@@ -82,7 +82,7 @@ class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with Wiremoc
 
         val connector = new CreateOrAmendInsurancePoliciesConnector(httpClient, appConfig(externalHost))
 
-        stubPutWithoutResponseBody(url, OK, requestBody, headersSentToIf)
+        stubPutWithoutResponseBody(url, CREATED, requestBody, headersSentToIf)
 
         val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
@@ -94,7 +94,7 @@ class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with Wiremoc
       "IF Returns a 200" in {
         val expectedResult = true
 
-        stubPutWithoutResponseBody(url, OK, Json.toJson(model).toString())
+        stubPutWithoutResponseBody(url, CREATED, Json.toJson(model).toString())
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
         val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
