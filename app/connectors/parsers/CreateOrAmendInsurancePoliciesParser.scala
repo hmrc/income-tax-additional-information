@@ -29,7 +29,7 @@ object CreateOrAmendInsurancePoliciesParser extends APIParser with Logging {
   implicit object InsurancePoliciesHttpReads extends HttpReads[CreateOrAmendInsurancePoliciesResponse] {
     override def read(method: String, url: String, response: HttpResponse): CreateOrAmendInsurancePoliciesResponse = {
       response.status match {
-        case OK => Right(true)
+        case CREATED => Right(true)
         case INTERNAL_SERVER_ERROR =>
           logger.error(logMessage(response))
           handleAPIError(response)
