@@ -19,7 +19,7 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class InsurancePoliciesModel(submittedOn: String,
-                                  lifeInsurance: Seq[LifeInsuranceModel],
+                                  lifeInsurance: Option[Seq[LifeInsuranceModel]],
                                   capitalRedemption: Option[Seq[CapitalRedemptionModel]],
                                   lifeAnnuity: Option[Seq[LifeAnnuityModel]],
                                   voidedIsa: Option[Seq[VoidedIsaModel]],
