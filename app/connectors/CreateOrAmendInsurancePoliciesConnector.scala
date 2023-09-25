@@ -17,8 +17,9 @@
 package connectors
 
 import config.AppConfig
-import connectors.parsers.CreateOrAmendInsurancePoliciesParser.{InsurancePoliciesHttpReads, CreateOrAmendInsurancePoliciesResponse}
+import connectors.parsers.CreateOrAmendInsurancePoliciesParser.{CreateOrAmendInsurancePoliciesResponse, InsurancePoliciesHttpReads}
 import models.CreateOrAmendInsurancePoliciesModel
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.TaxYearUtils.convertStringTaxYear
 
@@ -32,8 +33,8 @@ class CreateOrAmendInsurancePoliciesConnector @Inject()(http: HttpClient, val ap
                                      createOrAmendinsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)(implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
     val taxYearParameter = convertStringTaxYear(taxYear)
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
-
-      http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl, createOrAmendinsurancePoliciesModel)(
+      http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl,
+        createOrAmendinsurancePoliciesModel.clearModel)(
         CreateOrAmendInsurancePoliciesModel.formats.writes, InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePolicies), ec)    }
 
 }
