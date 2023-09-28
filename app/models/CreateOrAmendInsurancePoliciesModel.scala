@@ -18,11 +18,22 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CreateOrAmendInsurancePoliciesModel(lifeInsurance: Seq[LifeInsuranceModel],
+case class CreateOrAmendInsurancePoliciesModel(lifeInsurance: Option[Seq[LifeInsuranceModel]],
                                                capitalRedemption: Option[Seq[CapitalRedemptionModel]],
                                                lifeAnnuity: Option[Seq[LifeAnnuityModel]],
                                                voidedIsa: Option[Seq[VoidedIsaModel]],
-                                               foreign: Option[Seq[ForeignModel]])
+                                               foreign: Option[Seq[ForeignModel]]){
+
+  def clearModel: CreateOrAmendInsurancePoliciesModel ={
+    CreateOrAmendInsurancePoliciesModel(
+      lifeInsurance = if (lifeInsurance.exists(_.isEmpty)) None else lifeInsurance,
+      capitalRedemption = if (capitalRedemption.exists(_.isEmpty)) None else capitalRedemption,
+      lifeAnnuity = if (lifeAnnuity.exists(_.isEmpty)) None else lifeAnnuity,
+      voidedIsa = if (voidedIsa.exists(_.isEmpty)) None else voidedIsa,
+      foreign = if (foreign.exists(_.isEmpty)) None else foreign
+    )
+  }
+}
 
 object CreateOrAmendInsurancePoliciesModel {
   implicit val formats: OFormat[CreateOrAmendInsurancePoliciesModel] = Json.format[CreateOrAmendInsurancePoliciesModel]
