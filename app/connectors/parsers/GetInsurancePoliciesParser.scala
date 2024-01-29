@@ -33,7 +33,7 @@ object GetInsurancePoliciesParser extends APIParser with Logging{
         jsonErrors => badSuccessJsonFromAPI,
         parserModel => Right(parserModel)
       )
-      case BAD_REQUEST =>
+      case BAD_REQUEST | UNPROCESSABLE_ENTITY =>
         pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response)
       case NOT_FOUND =>

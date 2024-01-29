@@ -16,19 +16,25 @@
 
 package services
 
-import connectors.GetInsurancePoliciesConnector
+import connectors.{GetInsurancePoliciesConnector, GetInsurancePoliciesTYSConnector}
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesResponse
+import utils.TaxYearUtils.specificTaxYear
 
 import scala.concurrent.Future
 
 @Singleton
-class GetInsurancePoliciesService @Inject()(getInsurancePoliciesConnector: GetInsurancePoliciesConnector) {
+class GetInsurancePoliciesService @Inject()(getInsurancePoliciesConnector: GetInsurancePoliciesConnector,
+                                            getInsurancePoliciesTYSConnector: GetInsurancePoliciesTYSConnector) {
 
   def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
-    getInsurancePoliciesConnector.getInsurancePolicies(nino, taxYear)
+    if(taxYear >= specificTaxYear) {
+      getInsurancePoliciesTYSConnector.getInsurancePolicies(nino, taxYear)
+    } else {
+      getInsurancePoliciesConnector.getInsurancePolicies(nino, taxYear)
+    }
   }
 
 }
