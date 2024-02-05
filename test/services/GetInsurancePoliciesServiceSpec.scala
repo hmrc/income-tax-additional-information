@@ -19,9 +19,9 @@ package services
 import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesResponse
 import connectors.{GetInsurancePoliciesConnector, GetInsurancePoliciesTYSConnector}
 import models._
-import testUtils.TaxYearUtils.specificTaxYear
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.TaxYearUtils.specificTaxYear
 
 import scala.concurrent.Future
 
