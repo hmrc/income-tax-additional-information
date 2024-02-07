@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import utils.TaxYearUtils.{convertSpecificTaxYear, convertStringTaxYear}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeleteInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class DeleteInsurancePoliciesTysConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
   def deleteInsurancePoliciesData(nino: String,
                                   taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] = {
 
-    val taxYearParameter = convertStringTaxYear(taxYear)
-    val deleteInsurancePoliciesUrl: String = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
+    val taxYearParameter = convertSpecificTaxYear(taxYear)
+    val deleteInsurancePoliciesUrl: String = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$taxYearParameter/$nino"
 
-    http.DELETE[DeleteInsurancePoliciesResponse](deleteInsurancePoliciesUrl)(DeleteInsurancePoliciesHttpReads, ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePolicies), ec)
+    http.DELETE[DeleteInsurancePoliciesResponse](deleteInsurancePoliciesUrl)(DeleteInsurancePoliciesHttpReads, ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePoliciesTys), ec)
   }
 }

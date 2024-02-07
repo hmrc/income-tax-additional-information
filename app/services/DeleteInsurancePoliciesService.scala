@@ -16,15 +16,21 @@
 
 package services
 
-import connectors.DeleteInsurancePoliciesConnector
+import connectors.{DeleteInsurancePoliciesConnector, DeleteInsurancePoliciesTysConnector}
 import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.TaxYearUtils.specificTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DeleteInsurancePoliciesService @Inject()(deleteInsurancePoliciesConnector:DeleteInsurancePoliciesConnector){
+class DeleteInsurancePoliciesService @Inject()(deleteInsurancePoliciesConnector:DeleteInsurancePoliciesConnector,
+                                               deleteInsurancePoliciesTysConnector: DeleteInsurancePoliciesTysConnector){
   def deleteInsurancePoliciesData (nino: String, taxYear: Int) (implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] = {
-    deleteInsurancePoliciesConnector.deleteInsurancePoliciesData(nino, taxYear)
+    if (taxYear < specificTaxYear) {
+      deleteInsurancePoliciesConnector.deleteInsurancePoliciesData(nino, taxYear)
+    } else {
+      deleteInsurancePoliciesTysConnector.deleteInsurancePoliciesData(nino, taxYear)
+    }
   }
 }
