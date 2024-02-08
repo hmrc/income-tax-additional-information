@@ -30,6 +30,7 @@ trait IFConnector {
   protected[connectors] lazy val baseUrl: String = if (appConfig.ifEnvironment == "test") appConfig.ifBaseUrl + "/if" else appConfig.ifBaseUrl
   val GetInsurancePolicies = "1615"
   val PutInsurancePolicies = "1614"
+  val PutInsurancePoliciesTys = "1911"
   val DeleteInsurancePolicies = "1616"
   val DeleteOtherEmploymentsIncome = "1795"
   val GetInsurancePoliciesTYS = "1912"
