@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.CreateOrAmendInsurancePoliciesConnector
+import connectors.{CreateOrAmendInsurancePoliciesConnector, CreateOrAmendInsurancePoliciesTysConnector}
 import connectors.parsers.CreateOrAmendInsurancePoliciesParser.CreateOrAmendInsurancePoliciesResponse
 import models._
 import testUtils.TestSuite
@@ -27,7 +27,8 @@ import scala.concurrent.Future
 class CreateOrAmendInsurancePoliciesServiceSpec extends TestSuite {
 
   val connector: CreateOrAmendInsurancePoliciesConnector = mock[CreateOrAmendInsurancePoliciesConnector]
-  val service: CreateOrAmendInsurancePoliciesService = new CreateOrAmendInsurancePoliciesService(connector)
+  val tysConnector: CreateOrAmendInsurancePoliciesTysConnector = mock[CreateOrAmendInsurancePoliciesTysConnector]
+  val service: CreateOrAmendInsurancePoliciesService = new CreateOrAmendInsurancePoliciesService(connector, tysConnector)
 
   val model: CreateOrAmendInsurancePoliciesModel = CreateOrAmendInsurancePoliciesModel(
     lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
@@ -44,12 +45,25 @@ class CreateOrAmendInsurancePoliciesServiceSpec extends TestSuite {
       val expectedResult: CreateOrAmendInsurancePoliciesResponse = Right(true)
 
       (connector.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-        .expects("12345678", 1234, model, *)
+        .expects("12345678", 2023, model, *)
         .returning(Future.successful(expectedResult))
 
-      val result = await(service.createOrAmendInsurancePolicies("12345678", 1234, model))
+      val result = await(service.createOrAmendInsurancePolicies("12345678", 2023, model))
 
       result mustBe expectedResult
+    }
+
+    "return the tysConnector response" in {
+      val expectedResult: CreateOrAmendInsurancePoliciesResponse = Right(true)
+
+      (tysConnector.createOrAmendInsurancePoliciesTys(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
+        .expects("12345678", 2024, model, *)
+        .returning(Future.successful(expectedResult))
+
+      val result = await(service.createOrAmendInsurancePolicies("12345678", 2024, model))
+
+      result mustBe expectedResult
+
     }
   }
 }

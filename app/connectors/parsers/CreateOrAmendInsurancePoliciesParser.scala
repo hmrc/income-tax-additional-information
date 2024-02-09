@@ -30,15 +30,23 @@ object CreateOrAmendInsurancePoliciesParser extends APIParser with Logging {
     override def read(method: String, url: String, response: HttpResponse): CreateOrAmendInsurancePoliciesResponse = {
       response.status match {
         case CREATED => Right(true)
+
         case INTERNAL_SERVER_ERROR =>
           logger.error(logMessage(response))
           handleAPIError(response)
+
+        case UNPROCESSABLE_ENTITY =>
+          logger.info(logMessage(response))
+          handleAPIError(response, Some(BAD_REQUEST))
+
         case SERVICE_UNAVAILABLE =>
           logger.error(logMessage(response))
-          handleAPIError(response)
-        case BAD_REQUEST | FORBIDDEN | NOT_FOUND | UNPROCESSABLE_ENTITY =>
+          handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
+
+        case BAD_REQUEST | FORBIDDEN | NOT_FOUND =>
           logger.error(logMessage(response))
           handleAPIError(response)
+
         case _ =>
           logger.error(logMessage(response))
           handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
