@@ -25,16 +25,15 @@ import play.api.Configuration
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TaxYearUtils.convertSpecificTaxYear
+import utils.TaxYearUtils.{convertSpecificTaxYear, specificTaxYear}
 
 class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpec{
 
   lazy val connector: DeleteInsurancePoliciesTysConnector = app.injector.instanceOf[DeleteInsurancePoliciesTysConnector]
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val nino = "nino"
-  val taxYear = 2024
 
-  val ifUrl = s"/income-tax/insurance-policies/income/${convertSpecificTaxYear(taxYear)}/$nino"
+  val ifUrl = s"/income-tax/insurance-policies/income/${convertSpecificTaxYear(specificTaxYear)}/$nino"
 
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
@@ -59,7 +58,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Right(true)
       }
@@ -70,7 +69,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Right(true)
       }
@@ -88,7 +87,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
           stubDeleteWithResponseBody(ifUrl, status, ifError.toJson.toString())
 
-          val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+          val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
           result mustBe Left(ifError)
         }
@@ -100,7 +99,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
         stubDeleteWithResponseBody(ifUrl, BAD_GATEWAY, ifError.toJson.toString())
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Left(ifError)
       }
@@ -111,7 +110,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
         stubDeleteWithResponseBody(ifUrl, SERVICE_UNAVAILABLE, ifError.toJson.toString())
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Left(ifError)
       }
@@ -122,7 +121,7 @@ class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpe
 
         stubDeleteWithResponseBody(ifUrl, UNPROCESSABLE_ENTITY, ifError.toJson.toString())
 
-        val result = await(connector.deleteInsurancePoliciesData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Left(ifError)
       }

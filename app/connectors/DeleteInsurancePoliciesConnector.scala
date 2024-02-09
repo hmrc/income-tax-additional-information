@@ -19,7 +19,7 @@ package connectors
 import config.AppConfig
 import connectors.parsers.DeleteInsurancePoliciesParser.{DeleteInsurancePoliciesHttpReads, DeleteInsurancePoliciesResponse}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.TaxYearUtils.{convertSpecificTaxYear, convertStringTaxYear}
+import utils.TaxYearUtils.convertStringTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,6 +31,7 @@ class DeleteInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig
     val taxYearParameter = convertStringTaxYear(taxYear)
     val deleteInsurancePoliciesUrl: String = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
 
-    http.DELETE[DeleteInsurancePoliciesResponse](deleteInsurancePoliciesUrl)(DeleteInsurancePoliciesHttpReads, ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePolicies), ec)
+    http.DELETE[DeleteInsurancePoliciesResponse](deleteInsurancePoliciesUrl)(DeleteInsurancePoliciesHttpReads,
+      ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePolicies), ec)
   }
 }
