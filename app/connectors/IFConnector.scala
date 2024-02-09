@@ -32,6 +32,7 @@ trait IFConnector {
   val PutInsurancePolicies = "1614"
   val DeleteInsurancePolicies = "1616"
   val DeleteOtherEmploymentsIncome = "1795"
+  val GetInsurancePoliciesTYS = "1912"
 
   protected val headerCarrierConfig: Config = HeaderCarrier.Config.fromConfig(ConfigFactory.load())
 
