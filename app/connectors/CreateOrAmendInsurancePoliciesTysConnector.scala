@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
-  def createOrAmendInsurancePoliciesTys(nino: String,
+  def createOrAmendInsurancePolicies(nino: String,
                                      taxYear: Int,
                                      createOrAmendinsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)(implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
     val taxYearParameter = convertSpecificTaxYear(taxYear)

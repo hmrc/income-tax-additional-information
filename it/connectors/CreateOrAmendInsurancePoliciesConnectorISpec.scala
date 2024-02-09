@@ -154,13 +154,13 @@ class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with Wiremoc
       }
 
       "IF Returns a SERVICE_UNAVAILABLE" in {
-        val expectedResult = ErrorModel(SERVICE_UNAVAILABLE, ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"))
+        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"))
 
         val responseBody = Json.obj(
           "code" -> "SERVICE_UNAVAILABLE",
           "reason" -> "The service is currently unavailable"
         )
-        stubPutWithResponseBody(url, SERVICE_UNAVAILABLE, Json.toJson(model).toString(), responseBody.toString)
+        stubPutWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
         val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
@@ -184,13 +184,13 @@ class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with Wiremoc
       }
 
       "IF Returns a UNPROCESSABLE_ENTITY" in {
-        val expectedResult = ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
+        val expectedResult = ErrorModel(BAD_REQUEST, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
 
         val responseBody = Json.obj(
           "code" -> "UNPROCESSABLE_ENTITY",
           "reason" -> "The remote endpoint has indicated that for given income source type, message payload is incorrect."
         )
-        stubPutWithResponseBody(url, UNPROCESSABLE_ENTITY, Json.toJson(model).toString(), responseBody.toString)
+        stubPutWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
         val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))

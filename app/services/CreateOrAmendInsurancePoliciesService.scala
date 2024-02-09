@@ -32,10 +32,10 @@ class CreateOrAmendInsurancePoliciesService @Inject()(createOrAmendInsurancePoli
 
   def createOrAmendInsurancePolicies(nino: String, taxYear: Int, createOrAmendInsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)
                                     (implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
-    if (taxYear < specificTaxYear) {
-      createOrAmendInsurancePoliciesConnector.createOrAmendInsurancePolicies(nino, taxYear, createOrAmendInsurancePoliciesModel)
+    if (taxYear >= specificTaxYear) {
+        createOrAmendInsurancePoliciesTysConnector.createOrAmendInsurancePolicies(nino, taxYear, createOrAmendInsurancePoliciesModel)
     } else {
-      createOrAmendInsurancePoliciesTysConnector.createOrAmendInsurancePoliciesTys(nino, taxYear, createOrAmendInsurancePoliciesModel)
+      createOrAmendInsurancePoliciesConnector.createOrAmendInsurancePolicies(nino, taxYear, createOrAmendInsurancePoliciesModel)
     }
   }
 
