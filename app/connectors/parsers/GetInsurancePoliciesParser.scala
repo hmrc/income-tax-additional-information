@@ -30,7 +30,7 @@ object GetInsurancePoliciesParser extends APIParser with Logging{
   implicit object InsurancePoliciesHttpReads extends HttpReads[GetInsurancePoliciesResponse] {
     override def read(method: String, url: String, response: HttpResponse): GetInsurancePoliciesResponse = response.status match{
       case OK => response.json.validate[InsurancePoliciesModel].fold[GetInsurancePoliciesResponse](
-        jsonErrors => badSuccessJsonFromAPI,
+        errors => badSuccessJsonFromAPIWithErrors(errors),
         parserModel => Right(parserModel)
       )
       case BAD_REQUEST | UNPROCESSABLE_ENTITY =>
