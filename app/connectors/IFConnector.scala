@@ -32,6 +32,7 @@ trait IFConnector {
   val PutInsurancePolicies = "1614"
   val PutInsurancePoliciesTys = "1911"
   val DeleteInsurancePolicies = "1616"
+  val DeleteInsurancePoliciesTys = "1913"
   val DeleteOtherEmploymentsIncome = "1795"
   val GetInsurancePoliciesTYS = "1912"
 
