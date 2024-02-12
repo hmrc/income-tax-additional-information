@@ -26,7 +26,9 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolment
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.HMRCHeaderNames.CorrelationId
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,7 +43,7 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   def async(block: User[AnyContent] => Future[Result]): Action[AnyContent] = defaultActionBuilder.async { implicit request =>
 
     implicit lazy val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-
+      .withExtraHeaders(CorrelationId->correlationId(request.headers.get(CorrelationId)))
     request.headers.get("mtditid").fold {
       logger.warn("[AuthorisedAction][async] - No MTDITID in the header. Returning unauthorised.")
       unauthorized
@@ -61,6 +63,17 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
     )
   }
 
+  private def correlationId(correlationIdHeader: Option[String]): String = {
+
+    if (correlationIdHeader.isDefined) {
+      logger.info("[AuthorisedAction]Valid CorrelationId header found.")
+      correlationIdHeader.get
+    } else {
+      lazy val id = UUID.randomUUID().toString
+      logger.info(s"[AuthorisedAction]No valid CorrelationId found in headers. Defaulting Correlation Id. $id")
+      id
+    }
+  }
   val minimumConfidenceLevel: Int = ConfidenceLevel.L250.level
 
   private[predicates] def individualAuthentication[A](block: User[A] => Future[Result], requestMtdItId: String)

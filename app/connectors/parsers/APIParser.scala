@@ -17,12 +17,14 @@
 package connectors.parsers
 
 import models.{ErrorBodyModel, ErrorModel, ErrorsBodyModel}
+import play.api.Logging
 import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.libs.json.{JsPath, JsonValidationError}
 import uk.gov.hmrc.http.HttpResponse
 import utils.PagerDutyHelper.PagerDutyKeys.{BAD_SUCCESS_JSON_FROM_API, UNEXPECTED_RESPONSE_FROM_API}
 import utils.PagerDutyHelper.{getCorrelationId, pagerDutyLog}
 
-trait APIParser {
+trait APIParser extends Logging{
 
   def logMessage(response: HttpResponse): String = {
     s"[APIParser][read] Received ${response.status} status code. Body:${response.body}" + getCorrelationId(response)
@@ -30,6 +32,13 @@ trait APIParser {
 
   def badSuccessJsonFromAPI[Response]: Either[ErrorModel, Response] = {
     pagerDutyLog(BAD_SUCCESS_JSON_FROM_API, s"[APIParser][read] Invalid Json response.")
+    Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError))
+  }
+
+  def badSuccessJsonFromAPIWithErrors[Response](
+                                                 validationErrors: scala.collection.Seq[(JsPath,
+                                                   scala.collection.Seq[JsonValidationError])]): Either[ErrorModel, Response] = {
+    pagerDutyLog(BAD_SUCCESS_JSON_FROM_API, s"[APIParser][badSuccessJsonFromAPIWithErrors] Invalid Json response. " + validationErrors)
     Left(ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError))
   }
 
