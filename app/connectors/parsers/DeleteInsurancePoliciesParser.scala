@@ -36,13 +36,16 @@ object DeleteInsurancePoliciesParser extends APIParser with Logging {
         handleAPIError(response)
       case INTERNAL_SERVER_ERROR =>
         pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
-        handleAPIError(response)
+        handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
       case SERVICE_UNAVAILABLE =>
         pagerDutyLog(SERVICE_UNAVAILABLE_FROM_API, logMessage(response))
-        handleAPIError(response)
+        handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
       case BAD_REQUEST | NOT_FOUND =>
         pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response)
+      case UNPROCESSABLE_ENTITY =>
+        pagerDutyLog(TAX_YEAR_NOT_SUPPORTED_FROM_API, logMessage(response))
+        handleAPIError(response, Some(BAD_REQUEST))
       case _ =>
         pagerDutyLog(UNEXPECTED_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response, Some(INTERNAL_SERVER_ERROR))

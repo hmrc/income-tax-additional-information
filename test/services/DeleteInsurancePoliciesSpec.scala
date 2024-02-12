@@ -16,18 +16,19 @@
 
 package services
 
-import connectors.DeleteInsurancePoliciesConnector
+import connectors.{DeleteInsurancePoliciesConnector, DeleteInsurancePoliciesTysConnector}
 import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class DeleteInsurancePoliciesSpec extends TestSuite{
+class DeleteInsurancePoliciesSpec extends TestSuite {
   val connector: DeleteInsurancePoliciesConnector = mock[DeleteInsurancePoliciesConnector]
-  val service: DeleteInsurancePoliciesService = new DeleteInsurancePoliciesService(connector)
+  val tysConnector: DeleteInsurancePoliciesTysConnector = mock[DeleteInsurancePoliciesTysConnector]
+  val service: DeleteInsurancePoliciesService = new DeleteInsurancePoliciesService(connector, tysConnector)
 
-  "DeleteInsurancePoliciesData" should {
+  "DeleteInsurancePoliciesConnector.deleteInsurancePolicies" should {
 
     "return the connector response" in {
 
@@ -38,6 +39,23 @@ class DeleteInsurancePoliciesSpec extends TestSuite{
         .returning(Future.successful(expectedResult))
 
       val result = await(service.deleteInsurancePoliciesData("12345678", 1234))
+
+      result mustBe expectedResult
+
+    }
+  }
+
+  "DeleteInsurancePoliciesTysConnector.deleteInsurancePolicies" should {
+
+    "return the connector response" in {
+
+      val expectedResult: DeleteInsurancePoliciesResponse = Right(true)
+
+      (tysConnector.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
+        .expects("12345678", 2024, *)
+        .returning(Future.successful(expectedResult))
+
+      val result = await(service.deleteInsurancePoliciesData("12345678", 2024))
 
       result mustBe expectedResult
 
