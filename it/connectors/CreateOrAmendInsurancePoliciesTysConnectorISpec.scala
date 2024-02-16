@@ -46,7 +46,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
   val nino = "nino"
-  val url = s"/income-tax/insurance-policies/income/$nino/${convertSpecificTaxYear(specificTaxYear)}"
+  val url = s"/income-tax/insurance-policies/income/${convertSpecificTaxYear(specificTaxYear)}/$nino"
 
   def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
   }
