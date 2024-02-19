@@ -32,7 +32,7 @@ class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClient, val
                                      createOrAmendinsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)(implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
     val taxYearParameter = convertSpecificTaxYear(taxYear)
 
-    val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
+    val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$taxYearParameter/$nino"
       http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl,
         createOrAmendinsurancePoliciesModel.clearModel)(
         CreateOrAmendInsurancePoliciesModel.formats.writes, InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePoliciesTys), ec)    }
