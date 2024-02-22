@@ -19,11 +19,11 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class InsurancePoliciesModel(submittedOn: String,
-                                  lifeInsurance: Option[Seq[LifeInsuranceModel]],
-                                  capitalRedemption: Option[Seq[CapitalRedemptionModel]],
-                                  lifeAnnuity: Option[Seq[LifeAnnuityModel]],
-                                  voidedIsa: Option[Seq[VoidedIsaModel]],
-                                  foreign: Option[Seq[ForeignModel]])
+                                  lifeInsurance: Option[Seq[LifeInsuranceModel]] = None,
+                                  capitalRedemption: Option[Seq[CapitalRedemptionModel]] = None,
+                                  lifeAnnuity: Option[Seq[LifeAnnuityModel]] = None,
+                                  voidedIsa: Option[Seq[VoidedIsaModel]] = None,
+                                  foreign: Option[Seq[ForeignModel]] = None)
 
 object InsurancePoliciesModel {
   implicit val formats: OFormat[InsurancePoliciesModel] = Json.format[InsurancePoliciesModel]
