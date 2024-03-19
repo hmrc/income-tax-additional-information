@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import helpers.WiremockSpec
+import test.helpers.WiremockSpec
 import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
@@ -26,9 +26,22 @@ import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TaxYearUtils.{convertSpecificTaxYear, specificTaxYear}
+import utils.TaxYearUtils.convertStringTaxYear
 
-class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpec {
+class CreateOrAmendInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
+
+  lazy val connector: CreateOrAmendInsurancePoliciesConnector = app.injector.instanceOf[CreateOrAmendInsurancePoliciesConnector]
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  val nino = "nino"
+  val taxYear = 2023
+  val taxYearParameter = convertStringTaxYear(taxYear)
+
+  val url = s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
+
+  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+
+  def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
+  }
 
   val model: CreateOrAmendInsurancePoliciesModel = CreateOrAmendInsurancePoliciesModel(
     lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
@@ -40,18 +53,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
 
   val modelEmpty: JsObject = Json.obj()
 
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  lazy val connector: CreateOrAmendInsurancePoliciesTysConnector = app.injector.instanceOf[CreateOrAmendInsurancePoliciesTysConnector]
-  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
-
-  val nino = "nino"
-  val url = s"/income-tax/insurance-policies/income/${convertSpecificTaxYear(specificTaxYear)}/$nino"
-
-  def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
-  }
-
-  " PutInsurancePoliciesTysConnector" should {
+  " PutInsurancePoliciesConnector" should {
 
     "include internal headers" when {
       val requestBody = Json.toJson(model).toString()
@@ -69,7 +71,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
 
         stubPutWithoutResponseBody(url, CREATED, requestBody, headersSentToIf)
 
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Right(expectedResult)
       }
@@ -78,11 +80,11 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
         val expectedResult = true
 
-        val connector = new CreateOrAmendInsurancePoliciesTysConnector(httpClient, appConfig(externalHost))
+        val connector = new CreateOrAmendInsurancePoliciesConnector(httpClient, appConfig(externalHost))
 
         stubPutWithoutResponseBody(url, CREATED, requestBody, headersSentToIf)
 
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Right(expectedResult)
       }
@@ -95,7 +97,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithoutResponseBody(url, CREATED, Json.toJson(model).toString())
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Right(expectedResult)
       }
@@ -110,7 +112,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
 
       stubPutWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), invalidJson.toString)
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+      val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -125,7 +127,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
@@ -146,7 +148,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
@@ -158,10 +160,10 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
           "code" -> "SERVICE_UNAVAILABLE",
           "reason" -> "The service is currently unavailable"
         )
-        stubPutWithResponseBody(url, SERVICE_UNAVAILABLE, Json.toJson(model).toString(), responseBody.toString)
+        stubPutWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
@@ -176,23 +178,22 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithResponseBody(url, NOT_FOUND, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
 
       "IF Returns a UNPROCESSABLE_ENTITY" in {
-        val expectedResult = ErrorModel(BAD_REQUEST, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has " +
-          "indicated that for given income source type, message payload is incorrect."))
+        val expectedResult = ErrorModel(BAD_REQUEST, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
 
         val responseBody = Json.obj(
           "code" -> "UNPROCESSABLE_ENTITY",
           "reason" -> "The remote endpoint has indicated that for given income source type, message payload is incorrect."
         )
-        stubPutWithResponseBody(url, UNPROCESSABLE_ENTITY, Json.toJson(model).toString(), responseBody.toString)
+        stubPutWithResponseBody(url, BAD_REQUEST, Json.toJson(model).toString(), responseBody.toString)
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
@@ -207,7 +208,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithResponseBody(url, INTERNAL_SERVER_ERROR, Json.toJson(model).toString(), responseBody.toString())
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
@@ -218,7 +219,7 @@ class CreateOrAmendInsurancePoliciesTysConnectorISpec extends PlaySpec with Wire
         stubPutWithoutResponseBody(url, GONE, Json.toJson(model).toString())
 
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val result = await(connector.createOrAmendInsurancePolicies(nino, specificTaxYear, model)(hc))
+        val result = await(connector.createOrAmendInsurancePolicies(nino, taxYear, model)(hc))
 
         result mustBe Left(expectedResult)
       }
