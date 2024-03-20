@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.connectors
+package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
