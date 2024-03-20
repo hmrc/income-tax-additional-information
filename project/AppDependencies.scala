@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import play.core.PlayVersion.current
 import sbt._
 
 
@@ -28,11 +27,8 @@ object AppDependencies {
   )
 
   val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapBackendPlay30Version % "test",
-    "org.scalamock"           %% "scalamock"                  % "5.2.0"                       % Test,
-    "org.scalatest"           %% "scalatest"                  % "3.2.17"                      % Test,
-    "com.vladsch.flexmark"     %  "flexmark-all"              % "0.64.8"                    % "test",
-    "com.github.tomakehurst"  %  "wiremock-jre8"              % "2.35.1"                      % "test"
+    "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapBackendPlay30Version % Test,
+    "org.scalamock"           %% "scalamock"                  % "5.2.0"                       % Test
   )
 
   def apply(): Seq[ModuleID] = compile ++ test

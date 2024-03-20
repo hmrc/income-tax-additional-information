@@ -15,7 +15,11 @@
  */
 
 import uk.gov.hmrc.DefaultBuildSettings
+
 val appName = "income-tax-additional-information"
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
 
 lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
@@ -44,34 +48,22 @@ lazy val coverageSettings: Seq[Setting[?]] = {
 }
 
 lazy val microservice = Project(appName, file("."))
-  .settings(
-    majorVersion                     := 0,
-    scalaVersion                     := "2.13.12",
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test
-  )
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .configs(Test)
+  .settings(
+    libraryDependencies ++= AppDependencies(),
+    scalacOptions ++= Seq(
+      "-Wconf:cat=unused-imports&src=.*routes.*:s",
+      "-Wconf:cat=unused&src=.*routes.*:s"
+    )
+  )
   .settings(resolvers += Resolver.jcenterRepo)
-  .settings(PlayKeys.playDefaultPort := 10004)
+  .settings(PlayKeys.playDefaultPort.withRank(KeyRanks.Invisible) := 10004)
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(coverageSettings: _*)
 
-
-lazy val testSettings: Seq[Def.Setting[?]] = Seq(
-  fork := true,
-  javaOptions ++= Seq("-Dapplication.router=testOnlyDoNotUseInAppConf.Routes"),
-  unmanagedSourceDirectories.withRank(KeyRanks.Invisible) += baseDirectory.value / "test-utils"
-)
-
-lazy val itSettings = DefaultBuildSettings.itSettings() ++ Seq(
-  unmanagedSourceDirectories.withRank(KeyRanks.Invisible) := Seq(
-    baseDirectory.value / "it"
-  )
-)
 
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
-  .settings(testSettings ++ itSettings)
-  .settings(scalaVersion := "2.13.12")
-  .settings(majorVersion := 0)
+  .settings(DefaultBuildSettings.itSettings())

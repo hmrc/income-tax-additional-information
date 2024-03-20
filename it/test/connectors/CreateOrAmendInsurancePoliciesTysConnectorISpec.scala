@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import test.helpers.WiremockSpec
+import helpers.WiremockSpec
 import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
