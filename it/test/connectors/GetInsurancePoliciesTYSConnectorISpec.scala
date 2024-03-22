@@ -18,24 +18,24 @@ package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import helpers.WiremockSpec
+import connectors.GetInsurancePoliciesTYSConnector
 import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
+import test.helpers.WiremockSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TaxYearUtils.convertStringTaxYear
+import utils.TaxYearUtils.{convertSpecificTaxYear, specificTaxYear}
 
-class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
+class GetInsurancePoliciesTYSConnectorISpec extends PlaySpec with WiremockSpec {
 
-  lazy val connector: GetInsurancePoliciesConnector = app.injector.instanceOf[GetInsurancePoliciesConnector]
+  lazy val connector: GetInsurancePoliciesTYSConnector = app.injector.instanceOf[GetInsurancePoliciesTYSConnector]
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val nino = "nino"
-  val taxYear = 2023
-  val taxYearParameter = convertStringTaxYear(taxYear)
-  val url = s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
+  val taxYearParameter = convertSpecificTaxYear(specificTaxYear)
+  val url = s"/income-tax/insurance-policies/income/$taxYearParameter/$nino"
 
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
@@ -53,7 +53,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
   val ifReturnedEmpty: JsObject = Json.obj()
 
-  " GetInsurancePoliciesConnector" should {
+  " GetInsurancePoliciesTYSConnector" should {
 
     "include internal headers" when {
 
@@ -69,7 +69,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
 
-        val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+        val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
         result mustBe Right(ifReturned)
       }
@@ -79,9 +79,9 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString, headersSentToDes)
 
-        val connector = new GetInsurancePoliciesConnector(httpClient, appConfig(externalHost))
+        val connector = new GetInsurancePoliciesTYSConnector(httpClient, appConfig(externalHost))
 
-        val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+        val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
         result mustBe Right(ifReturned)
       }
@@ -91,7 +91,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
       "IF returns a 200" in {
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
-        val result = await(connector.getInsurancePolicies(nino, taxYear))
+        val result = await(connector.getInsurancePolicies(nino, specificTaxYear))
 
         result mustBe Right(ifReturned)
 
@@ -102,7 +102,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
       "IF returns an empty 200" in {
         stubGetWithResponseBody(url, OK, ifReturnedEmpty.toString())
-        val result = await(connector.getInsurancePolicies(nino, taxYear))
+        val result = await(connector.getInsurancePolicies(nino, specificTaxYear))
         val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
 
         result mustBe Left(expectedResult)
@@ -116,7 +116,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
       stubGetWithResponseBody(url, NO_CONTENT, "{}")
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -131,7 +131,22 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
       stubGetWithResponseBody(url, BAD_REQUEST, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
+
+      result mustBe Left(expectedResult)
+    }
+
+    "return a UnprocessableEntity response" in {
+
+      val responseBody = Json.obj(
+        "code" -> "TAX_YEAR_NOT_SUPPORTED",
+        "reason" -> "Tax year is not supported"
+      )
+      val expectedResult = ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("TAX_YEAR_NOT_SUPPORTED", "Tax year is not supported"))
+      stubGetWithResponseBody(url, UNPROCESSABLE_ENTITY, responseBody.toString())
+
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -146,7 +161,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
       stubGetWithResponseBody(url, NOT_FOUND, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -161,7 +176,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
       stubGetWithResponseBody(url, INTERNAL_SERVER_ERROR, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -176,7 +191,7 @@ class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
       stubGetWithResponseBody(url, SERVICE_UNAVAILABLE, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, specificTaxYear)(hc))
 
       result mustBe Left(expectedResult)
     }

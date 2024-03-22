@@ -18,48 +18,43 @@ package connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import helpers.WiremockSpec
+import connectors.GetInsurancePoliciesConnector
 import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.http.Status._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
+import test.helpers.WiremockSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TaxYearUtils.convertSpecificTaxYear
+import utils.TaxYearUtils.convertStringTaxYear
 
-class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec {
+class GetInsurancePoliciesConnectorISpec extends PlaySpec with WiremockSpec {
 
-  lazy val connector: GetOtherEmploymentsIncomeConnector = app.injector.instanceOf[GetOtherEmploymentsIncomeConnector]
+  lazy val connector: GetInsurancePoliciesConnector = app.injector.instanceOf[GetInsurancePoliciesConnector]
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val nino = "nino"
-  val taxYear = 2024
-  val taxYearParameter = convertSpecificTaxYear(taxYear)
-  val url = s"/income-tax/income/other/employments/$taxYearParameter/$nino"
+  val taxYear = 2023
+  val taxYearParameter = convertStringTaxYear(taxYear)
+  val url = s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
 
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
   def appConfig(ifHost: String): AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig]) {
   }
 
-  val ifReturned: OtherEmploymentsIncomeModel = OtherEmploymentsIncomeModel(
-    submittedOn = "2019-08-24T14:15:22Z",
-    shareOption = Some(Seq(ShareOptionModel("string", Some("123/abc 001<Q>"), "EMI", "2019-08-24", "2019-08-24", Some(true),
-      99999999999.99, 0, Some("string"), 99999999999.99, 99999999999.99, 99999999999.99, 99999999999.99,
-      99999999999.99, 99999999999.99))),
-    sharesAwardedOrReceived = Some(Seq(SharesAwardedOrReceivedModel("string", Some("123/abc 001<Q>"), "SIP", "2019-08-24", 0, "string",
-      "2019-08-24", true, true, 99999999999.99, 99999999999.99, 99999999999.99,
-      99999999999.99, 99999999999.99))),
-    disability = Some(DisabilityModel(Some("string"), 99999999999.99)),
-    foreignService = Some(ForeignServiceModel(Some("string"), 99999999999.99)),
-    lumpSums = Some(Seq(LumpSumsModel("string", "123/abc 001<Q>",
-      Some(TaxableLumpSumsAndCertainIncomeModel(99999999999.99, Some(99999999999.99), Some(true))),
-      Some(BenefitFromEmployerFinancedRetirementSchemeModel(99999999999.99, Some(99999999999.99), Some(99999999999.99), Some(true))),
-      Some(RedundancyCompensationPaymentsOverExemptionModel(99999999999.99, Some(99999999999.99), Some(true))),
-      Some(RedundancyCompensationPaymentsUnderExemptionModel(99999999999.99)))))
+  val ifReturned: InsurancePoliciesModel = InsurancePoliciesModel(
+    submittedOn = "2020-01-04T05:01:01Z",
+    lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
+    capitalRedemption = Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), 123.45, Some(true), Some(3), Some(2), Some(0)))),
+    lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), 0, Some(true), Some(2), Some(22), Some(123.45)))),
+    voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), 123.45, Some(123.45), Some(5), Some(6)))),
+    foreign = Some(Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3))))
   )
 
-  " GetOtherEmploymentsIncomeConnector" should {
+  val ifReturnedEmpty: JsObject = Json.obj()
+
+  " GetInsurancePoliciesConnector" should {
 
     "include internal headers" when {
 
@@ -75,7 +70,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
 
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
 
-        val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+        val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
         result mustBe Right(ifReturned)
       }
@@ -85,9 +80,9 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
 
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString, headersSentToDes)
 
-        val connector = new GetOtherEmploymentsIncomeConnector(httpClient, appConfig(externalHost))
+        val connector = new GetInsurancePoliciesConnector(httpClient, appConfig(externalHost))
 
-        val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+        val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
         result mustBe Right(ifReturned)
       }
@@ -97,9 +92,21 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
 
       "IF returns a 200" in {
         stubGetWithResponseBody(url, OK, Json.toJson(ifReturned).toString)
-        val result = await(connector.getOtherEmploymentsIncome(nino, taxYear))
+        val result = await(connector.getInsurancePolicies(nino, taxYear))
 
         result mustBe Right(ifReturned)
+
+      }
+    }
+
+    "return an error" when {
+
+      "IF returns an empty 200" in {
+        stubGetWithResponseBody(url, OK, ifReturnedEmpty.toString())
+        val result = await(connector.getInsurancePolicies(nino, taxYear))
+        val expectedResult = ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel.parsingError)
+
+        result mustBe Left(expectedResult)
 
       }
     }
@@ -110,7 +117,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
       stubGetWithResponseBody(url, NO_CONTENT, "{}")
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -125,22 +132,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
       stubGetWithResponseBody(url, BAD_REQUEST, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
-
-      result mustBe Left(expectedResult)
-    }
-
-    "return a UnprocessableEntity response" in {
-
-      val responseBody = Json.obj(
-        "code" -> "TAX_YEAR_NOT_SUPPORTED",
-        "reason" -> "Tax year is not supported"
-      )
-      val expectedResult = ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("TAX_YEAR_NOT_SUPPORTED", "Tax year is not supported"))
-      stubGetWithResponseBody(url, UNPROCESSABLE_ENTITY, responseBody.toString())
-
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -155,7 +147,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
       stubGetWithResponseBody(url, NOT_FOUND, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -170,7 +162,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
       stubGetWithResponseBody(url, INTERNAL_SERVER_ERROR, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
       result mustBe Left(expectedResult)
     }
@@ -185,7 +177,7 @@ class GetOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec
       stubGetWithResponseBody(url, SERVICE_UNAVAILABLE, responseBody.toString())
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      val result = await(connector.getOtherEmploymentsIncome(nino, taxYear)(hc))
+      val result = await(connector.getInsurancePolicies(nino, taxYear)(hc))
 
       result mustBe Left(expectedResult)
     }

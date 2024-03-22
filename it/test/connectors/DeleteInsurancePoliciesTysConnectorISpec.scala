@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import com.github.tomakehurst.wiremock.http.HttpHeader
 import config.{AppConfig, BackendAppConfig}
-import helpers.WiremockSpec
+import connectors.DeleteInsurancePoliciesTysConnector
 import models.{ErrorBodyModel, ErrorModel}
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.http.Status._
+import test.helpers.WiremockSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TaxYearUtils.convertStringTaxYear
+import utils.TaxYearUtils.{convertSpecificTaxYear, specificTaxYear}
 
-class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockSpec {
+class DeleteInsurancePoliciesTysConnectorISpec extends PlaySpec with WiremockSpec{
 
-  lazy val connector: DeleteOtherEmploymentsIncomeConnector = app.injector.instanceOf[DeleteOtherEmploymentsIncomeConnector]
+  lazy val connector: DeleteInsurancePoliciesTysConnector = app.injector.instanceOf[DeleteInsurancePoliciesTysConnector]
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val nino = "nino"
-  val taxYear = 2023
 
-  val ifUrl = s"/income-tax/income/other/employments/${convertStringTaxYear(taxYear)}/$nino"
+  val ifUrl = s"/income-tax/insurance-policies/income/${convertSpecificTaxYear(specificTaxYear)}/$nino"
 
   lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
@@ -42,7 +42,7 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
     override lazy val ifBaseUrl: String = s"http://$ifHost:$wireMockPort"
   }
 
-  "DeleteInsurancePoliciesConnector " should {
+  "DeleteInsurancePoliciesTysConnector " should {
 
     "include internal headers" when {
       val headersSentToIF = Seq(
@@ -55,22 +55,22 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
       "the host for IF is 'Internal'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-        val connector = new DeleteOtherEmploymentsIncomeConnector(httpClient, appConfig(internalHost))
+        val connector = new DeleteInsurancePoliciesTysConnector(httpClient, appConfig(internalHost))
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Right(true)
       }
 
       "the host for IF is 'External'" in {
         implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionIdValue")))
-        val connector = new DeleteOtherEmploymentsIncomeConnector(httpClient, appConfig(externalHost))
+        val connector = new DeleteInsurancePoliciesTysConnector(httpClient, appConfig(externalHost))
 
         stubDeleteWithoutResponseBody(ifUrl, NO_CONTENT, headersSentToIF)
 
-        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Right(true)
       }
@@ -80,7 +80,7 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
       val errorBodyModel = ErrorBodyModel("IF_CODE", "IF_REASON")
 
-      Seq(INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE, NOT_FOUND, BAD_REQUEST).foreach { status =>
+      Seq(BAD_REQUEST).foreach { status =>
 
         s"If returns $status" in {
           val ifError = ErrorModel(status, errorBodyModel)
@@ -88,7 +88,7 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
           stubDeleteWithResponseBody(ifUrl, status, ifError.toJson.toString())
 
-          val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
+          val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
           result mustBe Left(ifError)
         }
@@ -100,7 +100,29 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
         stubDeleteWithResponseBody(ifUrl, BAD_GATEWAY, ifError.toJson.toString())
 
-        val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
+
+        result mustBe Left(ifError)
+      }
+
+      "IF returns error code - 503 ServiceUnavailable" in{
+        val ifError = ErrorModel(INTERNAL_SERVER_ERROR, errorBodyModel)
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+
+        stubDeleteWithResponseBody(ifUrl, SERVICE_UNAVAILABLE, ifError.toJson.toString())
+
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
+
+        result mustBe Left(ifError)
+      }
+
+      "IF returns error code - 422 UnprocessableEntity" in {
+        val ifError = ErrorModel(BAD_REQUEST, errorBodyModel)
+        implicit val hc: HeaderCarrier = HeaderCarrier()
+
+        stubDeleteWithResponseBody(ifUrl, UNPROCESSABLE_ENTITY, ifError.toJson.toString())
+
+        val result = await(connector.deleteInsurancePoliciesData(nino, specificTaxYear)(hc))
 
         result mustBe Left(ifError)
       }

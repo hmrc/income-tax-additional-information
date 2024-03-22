@@ -8,17 +8,24 @@ or submit a completed Submission.
 
 You will need to have the following:
 - Installed [MongoDB](https://docs.mongodb.com/manual/installation/)
-- Installed/configured [service manager](https://github.com/hmrc/service-manager).
+- Installed/configured [service manager V2](https://github.com/hmrc/sm2).
 
 The service manager profile for this service is:
 
-    sm --start INCOME_TAX_ADDITIONAL_INFO
+    sm2 --start INCOME_TAX_ADDITIONAL_INFO
 Run the following command to start the remaining services locally:
 
     sudo mongod (If not already running)
-    sm --start INCOME_TAX_SUBMISSION_ALL -r
+    sm2 --start INCOME_TAX_SUBMISSION_ALL -r
 
 This service runs on port: `localhost:10004`
+
+### Running Tests
+- Run Unit Tests:  `sbt test`
+- Run Integration Tests: `sbt it/test`
+- Run Unit and Integration Tests: `sbt test it/test`
+- Run Unit and Integration Tests with coverage report: `sbt runAllChecks`<br/>
+  which runs `clean compile scalastyle coverage test it/test coverageReport`
 
 ### Feature Switches
 
@@ -45,16 +52,16 @@ auth-wizard - http://localhost:9949/auth-login-stub/gg-sign-in
 
 ### Example Auth Setup - Individual
 
-| FieldName            | Value                                                                |
-|----------------------|----------------------------------------------------------------------|
-| Redirect url         | http://localhost:9302/update-and-submit-income-tax-return/2022/start |
-| Credential Strength  | strong                                                               |
-| Confidence Level      | 250                                                                  |
-| Affinity Group        | Individual                                                           |
-| Nino                 | AA123456A                                                            |
-| Enrolment Key 1      | HMRC-MTD-IT                                                          |
-| Identifier Name 1     | MTDITID                                                              |
-| Identifier Value 1    | 1234567890                                                           |
+| FieldName           | Value                                                                |
+|---------------------|----------------------------------------------------------------------|
+| Redirect url        | http://localhost:9302/update-and-submit-income-tax-return/2022/start |
+| Credential Strength | strong                                                               |
+| Confidence Level    | 250                                                                  |
+| Affinity Group      | Individual                                                           |
+| Nino                | AA123456A                                                            |
+| Enrolment Key 1     | HMRC-MTD-IT                                                          |
+| Identifier Name 1   | MTDITID                                                              |
+| Identifier Value 1  | 1234567890                                                           |
 
 ### Example Auth Setup - Agent
 
@@ -62,18 +69,18 @@ if running locally outside service manager ensure service is ran including testO
 
     sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes
 
-| FieldName            | Value                                                                             |
-|----------------------|-----------------------------------------------------------------------------------|
-| Redirect url         | /test-only/2022/additional-parameters?ClientNino=AA123457A&ClientMTDID=1234567890 |
-| Credential Strength  | weak                                                                              |
-| Confidence Level      | 250                                                                               |
-| Affinity Group        | Agent                                                                             |
-| Enrolment Key 1      | HMRC-MTD-IT                                                                       |
-| Identifier Name 1     | MTDITID                                                                           |
-| Identifier Value 1    | 1234567890                                                                        |
-| Enrolment Key 2      | HMRC-AS-AGENT                                                                     |
-| Identifier Name 2     | AgentReferenceNumber                                                              |
-| Identifier Value 2    | XARN1234567                                                                       |
+| FieldName           | Value                                                                             |
+|---------------------|-----------------------------------------------------------------------------------|
+| Redirect url        | /test-only/2022/additional-parameters?ClientNino=AA123457A&ClientMTDID=1234567890 |
+| Credential Strength | weak                                                                              |
+| Confidence Level    | 250                                                                               |
+| Affinity Group      | Agent                                                                             |
+| Enrolment Key 1     | HMRC-MTD-IT                                                                       |
+| Identifier Name 1   | MTDITID                                                                           |
+| Identifier Value 1  | 1234567890                                                                        |
+| Enrolment Key 2     | HMRC-AS-AGENT                                                                     |
+| Identifier Name 2   | AgentReferenceNumber                                                              |
+| Identifier Value 2  | XARN1234567                                                                       |
 
 ## Income Sources
 Income-Tax-Submission-Frontend is the root of the users journey and links outward to all income sources
@@ -554,7 +561,7 @@ It must be the end of the tax year for a user to submit for crystallisation.
 The user also requires the following extra enrollment:
 
 | IR-SA | UTR | Identifier Value, e.g. 1234567890 |
-|-------|-----|----------------------------------|
+|-------|-----|-----------------------------------|
 
 ### Crystallisation in Staging
 Currently, the crystallisation journey and tax account in staging can only be accessed using the following:
