@@ -35,6 +35,11 @@ class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClient, val
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$taxYearParameter/$nino"
       http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl,
         createOrAmendinsurancePoliciesModel.clearModel)(
-        CreateOrAmendInsurancePoliciesModel.formats.writes, InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePoliciesTys), ec)    }
+        CreateOrAmendInsurancePoliciesModel.formats.writes(_),
+        InsurancePoliciesHttpReads,
+        ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePoliciesTys),
+        ec
+      )
+  }
 
 }

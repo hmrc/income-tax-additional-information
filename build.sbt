@@ -59,6 +59,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(PlayKeys.playDefaultPort.withRank(KeyRanks.Invisible) := 10004)
+  .settings(coverageSettings *)
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
 
