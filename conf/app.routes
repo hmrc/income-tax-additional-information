@@ -10,3 +10,8 @@ GET        /income-tax/income/other/employments/:taxYear/:nino               con
 
 ### IF #1795 - v9.1.0 ###
 DELETE    /income-tax/income/other/employments/:taxYear/:nino                controllers.DeleteOtherEmploymentsIncomeController.deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)
+
+POST      /income-tax/income/insurance-policies/:taxYear/session             controllers.CreateGainsSessionDataController.createSession(taxYear: Int)
+PUT       /income-tax/income/insurance-policies/:taxYear/session             controllers.UpdateGainsSessionDataController.updateSession(taxYear: Int)
+GET       /income-tax/income/insurance-policies/:taxYear/session             controllers.GetGainsSessionDataController.getSession(taxYear: Int)
+DELETE    /income-tax/income/insurance-policies/:taxYear/session             controllers.DeleteGainsSessionDataController.deleteSession(taxYear: Int)

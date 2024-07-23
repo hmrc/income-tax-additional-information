@@ -41,6 +41,7 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   val unauthorized: Future[Result] = Future(Unauthorized)
 
   def async(block: User[AnyContent] => Future[Result]): Action[AnyContent] = defaultActionBuilder.async { implicit request =>
+    val hd: Request[AnyContent] = request.withHeaders(Headers("mtditid" -> "1234567890", "X-CorrelationId" -> "743f925d-69a9-4fbf-8730-c0aecc21c06c"))
 
     implicit lazy val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
       .withExtraHeaders(CorrelationId->correlationId(request.headers.get(CorrelationId)))
@@ -82,13 +83,14 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
       case enrolments ~ userConfidence if userConfidence.level >= minimumConfidenceLevel =>
         val optionalMtdItId: Option[String] = enrolmentGetIdentifierValue(EnrolmentKeys.Individual, EnrolmentIdentifiers.individualId, enrolments)
         val optionalNino: Option[String] = enrolmentGetIdentifierValue(EnrolmentKeys.nino, EnrolmentIdentifiers.nino, enrolments)
+        val optionalSessionId: String = request.headers.get("X-Session-ID").getOrElse("")
 
         (optionalMtdItId, optionalNino) match {
           case (Some(authMTDITID), Some(_)) =>
             enrolments.enrolments.collectFirst {
               case Enrolment(EnrolmentKeys.Individual, enrolmentIdentifiers, _, _)
                 if enrolmentIdentifiers.exists(identifier => identifier.key == EnrolmentIdentifiers.individualId && identifier.value == requestMtdItId) =>
-                block(User(requestMtdItId, None))
+                block(User(requestMtdItId, None, optionalNino.getOrElse(""), "", optionalSessionId))
             } getOrElse {
               logger.info(s"[AuthorisedAction][individualAuthentication] Non-agent with an invalid MTDITID. " +
                 s"MTDITID in auth matches MTDITID in request: ${authMTDITID == requestMtdItId}")
@@ -110,6 +112,8 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   private[predicates] def agentAuthentication[A](block: User[A] => Future[Result], mtdItId: String)
                                                 (implicit request: Request[A], hc: HeaderCarrier): Future[Result] = {
 
+    val optionalSessionId: String = request.headers.get("sessionId").getOrElse("")
+
     lazy val agentDelegatedAuthRuleKey = "mtd-it-auth"
 
     lazy val agentAuthPredicate: String => Enrolment = identifierId =>
@@ -122,7 +126,7 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
 
         enrolmentGetIdentifierValue(EnrolmentKeys.Agent, EnrolmentIdentifiers.agentReference, enrolments) match {
           case Some(arn) =>
-            block(User(mtdItId, Some(arn)))
+            block(User(mtdItId, Some(arn), "", "", optionalSessionId))
           case None =>
             logger.info("[AuthorisedAction][agentAuthentication] Agent with no HMRC-AS-AGENT enrolment.")
             unauthorized

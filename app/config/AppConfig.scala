@@ -17,9 +17,12 @@
 package config
 
 import com.google.inject.ImplementedBy
+
 import javax.inject.Inject
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import scala.concurrent.duration.Duration
 
 
 @ImplementedBy(classOf[BackendAppConfig])
@@ -34,6 +37,10 @@ trait AppConfig {
 
   val addInfoFEBaseUrl: String
 
+  val useEncryption: Boolean
+  val encryptionKey: String
+  val mongoTTL: Int
+
   def authorisationTokenFor(apiVersion: String): String
 }
 
@@ -41,6 +48,12 @@ trait AppConfig {
 class BackendAppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
 
   val authBaseUrl: String = servicesConfig.baseUrl("auth")
+
+  lazy val useEncryption: Boolean = servicesConfig.getBoolean("useEncryption")
+
+  // Mongo config
+  lazy val encryptionKey: String = servicesConfig.getString("mongodb.encryption.key")
+  lazy val mongoTTL: Int = Duration(servicesConfig.getString("mongodb.timeToLive")).toDays.toInt
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
   val graphiteHost: String = config.get[String]("microservice.metrics.graphite.host")

@@ -14,32 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package support.builders.requests
 
-import play.api.mvc.AnyContent
+import models.requests.AuthorisationRequest
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import testUtils.TestSuite
+import support.builders.UserBuilder.aUser
 
-class UserSpec extends TestSuite {
+object AuthorisationRequestBuilder {
 
-  ".isAgent" should {
-
-    "return true" when {
-
-      "user has an arn" in {
-        User[AnyContent]("23456789", Some("123456789"), "AA123456A", "", "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe")(FakeRequest()).isAgent mustBe true
-      }
-
-    }
-
-    "return false" when {
-
-      "user does not have an arn" in {
-        User[AnyContent]("23456789", None, "AA123456A", "Individual", "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe")(FakeRequest()).isAgent mustBe false
-      }
-
-    }
-
-  }
-
+  val anAuthorisationRequest: AuthorisationRequest[AnyContentAsEmpty.type] = AuthorisationRequest(
+    user = aUser,
+    request = FakeRequest()
+  )
 }

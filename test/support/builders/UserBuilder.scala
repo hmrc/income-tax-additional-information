@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-package models
+package support.builders
 
+import models.User
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import testUtils.TestSuite
+import uk.gov.hmrc.auth.core.AffinityGroup
 
-class UserSpec extends TestSuite {
+object UserBuilder {
 
-  ".isAgent" should {
+  val aUser: User[AnyContent] = User[AnyContent](
+    mtditid = "1234567890",
+    arn = None,
+    nino = "AA123456A",
+    sessionId = "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe",
+    affinityGroup = AffinityGroup.Individual.toString
+  )(FakeRequest())
 
-    "return true" when {
-
-      "user has an arn" in {
-        User[AnyContent]("23456789", Some("123456789"), "AA123456A", "", "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe")(FakeRequest()).isAgent mustBe true
-      }
-
-    }
-
-    "return false" when {
-
-      "user does not have an arn" in {
-        User[AnyContent]("23456789", None, "AA123456A", "Individual", "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe")(FakeRequest()).isAgent mustBe false
-      }
-
-    }
-
-  }
-
+  val anAgentUser: User[AnyContent] = aUser.copy(arn = Some("0987654321"), affinityGroup = AffinityGroup.Agent.toString)(FakeRequest())
 }

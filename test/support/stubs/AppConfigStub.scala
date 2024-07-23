@@ -19,6 +19,8 @@ package support.stubs
 import config.AppConfig
 import org.scalamock.scalatest.MockFactory
 
+import scala.concurrent.duration.Duration
+
 class AppConfigStub extends MockFactory {
 
   def config(environment: String = "test"): AppConfig = new AppConfig() {
@@ -36,5 +38,30 @@ class AppConfigStub extends MockFactory {
     override val addInfoFEBaseUrl: String = s"http://localhost:10007"
 
     override def authorisationTokenFor(apiVersion: String): String = ifAuthorisationToken + s".$apiVersion"
+
+    override lazy val useEncryption: Boolean = true
+    override val encryptionKey: String = "1234556"
+    override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
+  }
+
+  def noEncryptionConfig(): AppConfig = new AppConfig() {
+    private val wireMockPort = 11111
+    override val authBaseUrl: String = "/auth"
+
+    override val auditingEnabled: Boolean = true
+    override val graphiteHost: String = "/graphite"
+
+    override lazy val ifAuthorisationToken: String = ""
+
+    override lazy val ifBaseUrl: String = s"http://localhost:$wireMockPort"
+    override lazy val ifEnvironment: String = "test"
+
+    override val addInfoFEBaseUrl: String = s"http://localhost:10007"
+
+    override def authorisationTokenFor(apiVersion: String): String = ifAuthorisationToken + s".$apiVersion"
+
+    override lazy val useEncryption: Boolean = false
+    override lazy val encryptionKey: String = "1234556"
+    override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
   }
 }
