@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package support.providers
 
-import play.api.mvc.{Request, WrappedRequest}
+import support.utils.TaxYearUtils
 
-case class User[T](mtditid: String, arn: Option[String], nino: String, affinityGroup: String, sessionId: String)
-                  (implicit val request: Request[T]) extends WrappedRequest[T](request) {
+trait TaxYearProvider {
 
-  def isAgent: Boolean = arn.nonEmpty
+  protected val taxYear: Int = TaxYearUtils.taxYear
+  protected val taxYearEOY: Int = TaxYearUtils.taxYearEOY
+
+  protected val taxYearEndOfYearMinusOne: Int = taxYearEOY - 1
+
+  protected val validTaxYearListSingle: Seq[Int] = Seq(taxYear)
+  protected val validTaxYearList: Seq[Int] = Seq(taxYearEndOfYearMinusOne, taxYearEOY, taxYear)
 }

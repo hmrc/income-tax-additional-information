@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package support
 
-import play.api.mvc.{Request, WrappedRequest}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import uk.gov.hmrc.http.HeaderCarrier
 
-case class User[T](mtditid: String, arn: Option[String], nino: String, affinityGroup: String, sessionId: String)
-                  (implicit val request: Request[T]) extends WrappedRequest[T](request) {
+trait UnitTest extends AnyWordSpec with Matchers with MockFactory with BeforeAndAfterEach
+  with FutureAwaits with DefaultAwaitTimeout {
 
-  def isAgent: Boolean = arn.nonEmpty
+  implicit val emptyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 }

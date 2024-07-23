@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package models.gains
 
-import play.api.mvc.{Request, WrappedRequest}
+import models.gains.prior.GainsPriorDataModel
+import play.api.libs.json.{Json, OWrites}
 
-case class User[T](mtditid: String, arn: Option[String], nino: String, affinityGroup: String, sessionId: String)
-                  (implicit val request: Request[T]) extends WrappedRequest[T](request) {
+case class DecodedGainsSubmissionPayload(body: Option[GainsSubmissionModel], prior: Option[GainsPriorDataModel])
 
-  def isAgent: Boolean = arn.nonEmpty
+object DecodedGainsSubmissionPayload {
+  implicit def writes: OWrites[DecodedGainsSubmissionPayload] = Json.writes[DecodedGainsSubmissionPayload]
 }

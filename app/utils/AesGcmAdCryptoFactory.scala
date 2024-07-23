@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.mvc.{Request, WrappedRequest}
+import config.AppConfig
+import uk.gov.hmrc.crypto.{AdDecrypter, AdEncrypter, SymmetricCryptoFactory}
 
-case class User[T](mtditid: String, arn: Option[String], nino: String, affinityGroup: String, sessionId: String)
-                  (implicit val request: Request[T]) extends WrappedRequest[T](request) {
+import javax.inject.{Inject, Singleton}
 
-  def isAgent: Boolean = arn.nonEmpty
+@Singleton
+class AesGcmAdCryptoFactory @Inject()(appConfig: AppConfig) {
+
+  private lazy val aesGcmAdCrypto = SymmetricCryptoFactory.aesGcmAdCrypto(appConfig.encryptionKey)
+
+  def instance(): AdEncrypter with AdDecrypter = aesGcmAdCrypto
 }

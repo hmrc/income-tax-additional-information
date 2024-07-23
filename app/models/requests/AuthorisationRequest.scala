@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package models
+package models.requests
 
+import models.User
 import play.api.mvc.{Request, WrappedRequest}
 
-case class User[T](mtditid: String, arn: Option[String], nino: String, affinityGroup: String, sessionId: String)
-                  (implicit val request: Request[T]) extends WrappedRequest[T](request) {
-
-  def isAgent: Boolean = arn.nonEmpty
-}
+case class AuthorisationRequest[T](user: User[_], request: Request[T]) extends WrappedRequest[T](request)
