@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-import sbt._
+import AppDependencies.jacksonAndPlayExclusions
+import sbt.*
 
 
 object AppDependencies {
 
   private val bootstrapBackendPlay30Version = "8.5.0"
 
+  private val jacksonAndPlayExclusions: Seq[InclusionRule] = Seq(
+    ExclusionRule(organization = "com.fasterxml.jackson.core"),
+    ExclusionRule(organization = "com.fasterxml.jackson.datatype"),
+    ExclusionRule(organization = "com.fasterxml.jackson.module"),
+    ExclusionRule(organization = "com.fasterxml.jackson.core:jackson-annotations"),
+    ExclusionRule(organization = "com.typesafe.play")
+  )
+
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"                   %% "bootstrap-backend-play-30"  % bootstrapBackendPlay30Version,
-    "com.fasterxml.jackson.module"  %% "jackson-module-scala"       % "2.16.1"
+    "uk.gov.hmrc"                   %% "bootstrap-backend-play-30"              % bootstrapBackendPlay30Version,
+    "com.fasterxml.jackson.module"  %% "jackson-module-scala"                   % "2.17.0",
+    "com.beachape"                  %% "enumeratum"                             % "1.7.3",
+    "com.beachape"                  %% "enumeratum-play-json"                   % "1.7.3" excludeAll (jacksonAndPlayExclusions *)
   )
 
   val test: Seq[ModuleID] = Seq(
