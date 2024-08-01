@@ -28,61 +28,32 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
                                       service: GetInsurancePoliciesService) {
 
   def get(taxYear: Int, nino: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[TaskListSection] = {
-
-    val gains: Future[InsurancePoliciesModel] = service.getInsurancePolicies(nino, taxYear).map {
-      case Left(_) => InsurancePoliciesModel("")
-      case Right(value) => value
-    }
-
-    gains.map { g =>
-
-      val tasks: Option[Seq[TaskListSectionItem]] = {
-
-        val optionalTasks: Seq[TaskListSectionItem] = getTasks(g, taxYear)
-
-        if (optionalTasks.nonEmpty) {
-          Some(optionalTasks)
-        } else {
-          None
-        }
-      }
-
-      TaskListSection(SectionTitle.InsuranceGainsTitle, tasks)
+    service.getInsurancePolicies(nino, taxYear).map {
+      case Left(_) => None
+      case Right(policies) => Some(policies)
+    }.map {
+      case Some(policies) =>
+        val tasks: Seq[TaskListSectionItem] = getTasks(policies, taxYear)
+        TaskListSection(SectionTitle.InsuranceGainsTitle, Some(tasks))
+      case None => TaskListSection(SectionTitle.InsuranceGainsTitle, None)
     }
   }
 
-  private def getTasks(g: InsurancePoliciesModel, taxYear: Int): Seq[TaskListSectionItem] = {
+  private def getTasks(insurancePolicies: InsurancePoliciesModel, taxYear: Int): Seq[TaskListSectionItem] = {
+    val urlBase = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
 
     // TODO: these will be links to the new individual CYA pages when they are made
-    val lifeInsuranceUrl: String = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val lifeAnnuityUrl: String = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val capitalRedemptionUrl: String = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val voidedUrl: String = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-
-    val lifeInsurance: Option[TaskListSectionItem] = if (g.lifeInsurance.isDefined) {
-      Some(TaskListSectionItem(TaskTitle.LifeInsurance, TaskStatus.Completed, Some(lifeInsuranceUrl)))
-    } else {
-      None
-    }
-
-    val lifeAnnuity: Option[TaskListSectionItem] = if (g.lifeAnnuity.isDefined) {
-      Some(TaskListSectionItem(TaskTitle.LifeAnnuity, TaskStatus.Completed, Some(lifeAnnuityUrl)))
-    } else {
-      None
-    }
-
-    val capitalRedemption: Option[TaskListSectionItem] = if (g.capitalRedemption.isDefined) {
-      Some(TaskListSectionItem(TaskTitle.CapitalRedemption, TaskStatus.Completed, Some(capitalRedemptionUrl)))
-    } else {
-      None
-    }
-
-    val voided: Option[TaskListSectionItem] = if (g.voidedIsa.isDefined) {
-      Some(TaskListSectionItem(TaskTitle.VoidedISA, TaskStatus.Completed, Some(voidedUrl)))
-    } else {
-      None
-    }
-
-    Seq[Option[TaskListSectionItem]](lifeInsurance, lifeAnnuity, capitalRedemption, voided).flatten
+    val taskItems = Seq(
+      createTaskListItem(insurancePolicies.lifeInsurance, TaskTitle.LifeInsurance, urlBase),
+      createTaskListItem(insurancePolicies.lifeAnnuity, TaskTitle.LifeAnnuity, urlBase),
+      createTaskListItem(insurancePolicies.capitalRedemption, TaskTitle.CapitalRedemption, urlBase),
+      createTaskListItem(insurancePolicies.voidedIsa, TaskTitle.VoidedISA, urlBase)
+    )
+    taskItems.flatten
   }
+
+  private def createTaskListItem(optItems: Option[Seq[_]], taskTitle: TaskTitle, url: String): Option[TaskListSectionItem] = {
+    optItems.map(_ => TaskListSectionItem(taskTitle, TaskStatus.Completed, Some(url)))
+  }
+
 }
