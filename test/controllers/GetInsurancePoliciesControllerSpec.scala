@@ -74,7 +74,6 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
 
       status(result) mustBe OK
       bodyOf(result) mustBe finalResult
-
     }
 
     "return a Left response" when {

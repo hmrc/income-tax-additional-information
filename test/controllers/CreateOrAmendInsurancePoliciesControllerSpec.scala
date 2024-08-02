@@ -21,7 +21,7 @@ import models._
 import org.scalamock.handlers.CallHandler4
 import play.api.http.Status._
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import services.CreateOrAmendInsurancePoliciesService
 import testUtils.TestSuite
@@ -59,16 +59,14 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
   ".putInsurancePolicies" should {
 
     "Return a 204 NO Content response with valid putInsurancePolicies" in {
-
       val serviceResult = Right(true)
-      val finalResult = Json.toJson(model).toString()
 
       def serviceCallMock(): CallHandler4[String, Int, CreateOrAmendInsurancePoliciesModel, HeaderCarrier, Future[CreateOrAmendInsurancePoliciesResponse]] =
         (serviceMock.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
           .expects(nino, taxYear, model, *)
           .returning(Future.successful(serviceResult))
 
-      val result = {
+      val result: Future[Result] = {
         mockAuth()
         serviceCallMock()
         controller.createOrAmendInsurancePolicies(nino, taxYear)(fakeRequestWithMtditid.withJsonBody(Json.toJson(model)))
@@ -76,12 +74,22 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
       status(result) mustBe NO_CONTENT
     }
 
+    "Return a 400 BAD_REQUEST response with invalid putInsurancePolicies" in {
+      val result = {
+        mockAuth()
+        controller.createOrAmendInsurancePolicies(nino, taxYear)()(fakeRequestWithMtditid.withJsonBody(Json.toJson("InvalidInsurancePoliciesModel")))
+      }
+
+      status(result) mustBe BAD_REQUEST
+    }
+
     "return a Left response" when {
 
-      def mockCreateOrAmendInsurancePoliciesWithError(errorModel: ErrorModel): CallHandler4[String, Int, CreateOrAmendInsurancePoliciesModel, HeaderCarrier, Future[CreateOrAmendInsurancePoliciesResponse]] = {
-        (serviceMock.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-          .expects(nino, taxYear, *, *)
-          .returning(Future.successful(Left(errorModel)))
+      def mockCreateOrAmendInsurancePoliciesWithError(errorModel: ErrorModel):
+        CallHandler4[String, Int, CreateOrAmendInsurancePoliciesModel, HeaderCarrier, Future[CreateOrAmendInsurancePoliciesResponse]] = {
+          (serviceMock.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
+            .expects(nino, taxYear, *, *)
+            .returning(Future.successful(Left(errorModel)))
       }
 
       "the service returns a NO_CONTENT" in {
@@ -101,6 +109,7 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
         }
         status(result) mustBe SERVICE_UNAVAILABLE
       }
+
       "the service returns a BAD_REQUEST" in {
         val result = {
           mockAuth()
@@ -109,6 +118,7 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
         }
         status(result) mustBe BAD_REQUEST
       }
+
       "the service returns a INTERNAL_SERVER_ERROR" in {
         val result = {
           mockAuth()

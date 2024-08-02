@@ -39,10 +39,11 @@ class CreateOrAmendInsurancePoliciesController @Inject()(createOrAmendInsuranceP
       case _ => Future.successful(BadRequest)
     }
   }
-    def responseHandler(serviceResponse: Future[CreateOrAmendInsurancePoliciesResponse]): Future[Result] = {
-      serviceResponse.map {
-        case Right(responseModel) => NoContent
-        case Left(errorModel) => Status(errorModel.status)(Json.toJson(errorModel.toJson))
-      }
+
+  def responseHandler(serviceResponse: Future[CreateOrAmendInsurancePoliciesResponse]): Future[Result] = {
+    serviceResponse.map {
+      case Right(_) => NoContent
+      case Left(errorModel) => Status(errorModel.status)(Json.toJson(errorModel.toJson))
     }
+  }
 }
