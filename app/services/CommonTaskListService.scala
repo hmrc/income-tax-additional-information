@@ -40,16 +40,18 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
   }
 
   private def getTasks(insurancePolicies: InsurancePoliciesModel, taxYear: Int): Seq[TaskListSectionItem] = {
-    val urlBase = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-
     // TODO: these will be links to the new individual CYA pages when they are made
-    val taskItems = Seq(
-      createTaskListItem(insurancePolicies.lifeInsurance, TaskTitle.LifeInsurance, urlBase),
-      createTaskListItem(insurancePolicies.lifeAnnuity, TaskTitle.LifeAnnuity, urlBase),
-      createTaskListItem(insurancePolicies.capitalRedemption, TaskTitle.CapitalRedemption, urlBase),
-      createTaskListItem(insurancePolicies.voidedIsa, TaskTitle.VoidedISA, urlBase)
-    )
-    taskItems.flatten
+    val lifeInsuranceUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
+    val lifeAnnuityUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
+    val capitalRedemptionUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
+    val voidedIsaBaseUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
+
+    Seq(
+      createTaskListItem(insurancePolicies.lifeInsurance, TaskTitle.LifeInsurance, lifeInsuranceUrl),
+      createTaskListItem(insurancePolicies.lifeAnnuity, TaskTitle.LifeAnnuity, lifeAnnuityUrl),
+      createTaskListItem(insurancePolicies.capitalRedemption, TaskTitle.CapitalRedemption, capitalRedemptionUrl),
+      createTaskListItem(insurancePolicies.voidedIsa, TaskTitle.VoidedISA, voidedIsaBaseUrl)
+    ).flatten
   }
 
   private def createTaskListItem(optItems: Option[Seq[_]], taskTitle: TaskTitle, url: String): Option[TaskListSectionItem] = {
