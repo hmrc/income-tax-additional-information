@@ -18,10 +18,8 @@ package services
 
 import models.AllGainsSessionModel
 import models.gains.PolicyCyaModel
-import models.mongo.{DatabaseError, GainsUserDataModel, MongoError}
+import models.mongo.MongoError
 import support.IntegrationTest
-
-import java.time.Instant
 
 
 class GainsSessionServiceISpec extends IntegrationTest {

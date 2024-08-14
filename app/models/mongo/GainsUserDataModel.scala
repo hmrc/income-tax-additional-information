@@ -18,6 +18,7 @@ package models.mongo
 
 import models.{AllGainsSessionModel, EncryptedAllGainsSessionModel}
 import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
@@ -31,7 +32,7 @@ case class GainsUserDataModel(
                              ) extends UserDataTemplate
 
 object GainsUserDataModel {
-
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   implicit val format: OFormat[GainsUserDataModel] = Json.format[GainsUserDataModel]
 }
 
@@ -45,6 +46,6 @@ case class EncryptedGainsUserDataModel(
                                       ) extends UserDataTemplate
 
 object EncryptedGainsUserDataModel {
-
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   implicit val format: Format[EncryptedGainsUserDataModel] = Json.format[EncryptedGainsUserDataModel]
 }

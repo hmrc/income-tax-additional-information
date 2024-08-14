@@ -41,8 +41,5 @@ class GainsUserDataRepository @Inject()(
   override type UserData = GainsUserDataModel
 
   override def encryptionMethod: GainsUserDataModel => EncryptedGainsUserDataModel = encryptionService.encryptGainsUserData
-
   override def decryptionMethod: EncryptedGainsUserDataModel => GainsUserDataModel = encryptionService.decryptGainsUserData
-
 }
-
