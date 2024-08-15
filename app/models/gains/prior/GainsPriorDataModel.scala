@@ -29,10 +29,10 @@ case class GainsPriorDataModel(
                               ) {
   def toPolicyCya: Seq[PolicyCyaModel] = {
     val lifeInsuranceConverted = lifeInsurance.toSeq.flatMap(_.map(_.toPolicyCya))
-    val capitalRedemptionConverted = capitalRedemption.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
-    val lifeAnnuityConverted = lifeAnnuity.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
-    val voidedIsaConverted = voidedIsa.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
-    val foreignConverted = foreign.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
+    val capitalRedemptionConverted = capitalRedemption.toSeq.flatMap(_.map(_.toPolicyCya))
+    val lifeAnnuityConverted = lifeAnnuity.toSeq.flatMap(_.map(_.toPolicyCya))
+    val voidedIsaConverted = voidedIsa.toSeq.flatMap(_.map(_.toPolicyCya))
+    val foreignConverted = foreign.toSeq.flatMap(_.map(_.toPolicyCya))
     lifeInsuranceConverted ++ capitalRedemptionConverted ++ lifeAnnuityConverted ++ voidedIsaConverted ++ foreignConverted
   }
 }

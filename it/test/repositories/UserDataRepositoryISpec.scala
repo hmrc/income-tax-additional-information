@@ -80,16 +80,12 @@ class UserDataRepositoryISpec extends IntegrationTest with FutureAwaits with Def
       await(gainsRepo.create(initialData))
       count mustBe 1
 
-      val res: Boolean = await(gainsRepo.update(newUserData).map {
-        case Right(value) => value
-        case Left(_) => false
-      })
-
-      res mustBe true
+      val res: Either[DatabaseError, Unit] = await(gainsRepo.update(newUserData))
+      res mustBe Right(())
       count mustBe 1
 
       val data: Option[GainsUserDataModel] = await(gainsRepo.find(taxYear)(testUser).map {
-        case Right(value) => value
+        case Right(gainsUserDataModel) => gainsUserDataModel
         case Left(_) => None
       })
 

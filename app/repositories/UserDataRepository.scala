@@ -96,7 +96,7 @@ trait UserDataRepository[C <: UserDataTemplate] {
 
   }
 
-  def update(userData: UserData): Future[Either[DatabaseError, Boolean]] = {
+  def update(userData: UserData): Future[Either[DatabaseError, Unit]] = {
     lazy val start = s"[$repoName][update]"
 
     Try {
@@ -109,7 +109,7 @@ trait UserDataRepository[C <: UserDataTemplate] {
           replacement = encryptedData,
           options = FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER)
         ).toFutureOption().map {
-          case Some(_) => Right(true)
+          case Some(_) => Right(())
           case None => Left(DataNotUpdated)
         }.recover {
           case exception: Exception =>
