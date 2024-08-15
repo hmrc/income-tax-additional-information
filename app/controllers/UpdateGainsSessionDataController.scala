@@ -37,7 +37,7 @@ class UpdateGainsSessionDataController @Inject()(gainsSessionService: GainsSessi
       case Some(JsSuccess(model, _)) =>
         gainsSessionService.updateSessionData(model, taxYear).map {
           case Right(_) => NoContent
-          case Left(databaseError) => Status(INTERNAL_SERVER_ERROR)(Json.toJson(databaseError.message))
+          case Left(databaseError) => InternalServerError(Json.toJson(databaseError.message))
         }
       case _ => Future.successful(BadRequest)
     }

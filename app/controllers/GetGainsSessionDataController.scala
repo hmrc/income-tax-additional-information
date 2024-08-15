@@ -37,7 +37,7 @@ class GetGainsSessionDataController @Inject()(gainsSessionService: GainsSessionS
         case _ => NoContent
       }
       case Left(error) =>
-        Status(NOT_FOUND)(Json.toJson(error.message))
+        NotFound(Json.toJson(error.message))
     }
   }
 }

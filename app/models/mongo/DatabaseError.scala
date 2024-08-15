@@ -19,7 +19,8 @@ package models.mongo
 import play.api.libs.json.{Json, OFormat}
 
 trait DatabaseError {
-  val message: String
+  def message: String
+  implicit val formats: OFormat[MongoError] = Json.format[MongoError]
 }
 
 case object DataNotUpdated extends DatabaseError {
@@ -37,8 +38,4 @@ case class EncryptionDecryptionError(error: String) extends DatabaseError {
 
 case class MongoError(error: String) extends DatabaseError {
   override val message: String = s"Mongo exception occurred. Exception: $error"
-}
-
-object MongoError {
-  implicit val formats: OFormat[MongoError] = Json.format[MongoError]
 }

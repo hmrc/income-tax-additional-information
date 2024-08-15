@@ -51,7 +51,7 @@ class GainsSessionServiceISpec extends IntegrationTest {
           gateway = Some(true)), taxYear)
         (user, ec))
 
-      initialResult shouldBe Right(true)
+      initialResult shouldBe Right(())
       duplicateResult shouldBe Left(MongoError("User data was not updated due to mongo exception"))
     }
   }

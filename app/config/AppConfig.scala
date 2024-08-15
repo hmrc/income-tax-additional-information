@@ -27,19 +27,19 @@ import scala.concurrent.duration.Duration
 
 @ImplementedBy(classOf[BackendAppConfig])
 trait AppConfig {
-  val authBaseUrl: String
-  val auditingEnabled: Boolean
-  val graphiteHost: String
+  def authBaseUrl: String
+  def auditingEnabled: Boolean
+  def graphiteHost: String
 
-  val ifAuthorisationToken: String
-  val ifBaseUrl: String
-  val ifEnvironment: String
+  def ifAuthorisationToken: String
+  def ifBaseUrl: String
+  def ifEnvironment: String
 
   val addInfoFEBaseUrl: String
 
-  val useEncryption: Boolean
-  val encryptionKey: String
-  val mongoTTL: Int
+  def useEncryption: Boolean
+  def encryptionKey: String
+  def mongoTTL: Int
 
   def authorisationTokenFor(apiVersion: String): String
 }

@@ -46,7 +46,7 @@ trait UserDataRepository[C <: UserDataTemplate] {
 
   def decryptionMethod: C => UserData
 
-  def create[T](userData: UserData): Future[Either[DatabaseError, Boolean]] = {
+  def create[T](userData: UserData): Future[Either[DatabaseError, Unit]] = {
     lazy val start = s"[$repoName][create]"
     Try {
       encryptionMethod(userData)
@@ -54,7 +54,7 @@ trait UserDataRepository[C <: UserDataTemplate] {
       case Some(exception: Exception) => Future.successful(handleEncryptionDecryptionException(exception, start))
       case Some(encryptedData) =>
         collection.insertOne(encryptedData).toFutureOption().map {
-          case Some(_) => Right(true)
+          case Some(_) => Right(())
           case None => Left(DataNotUpdated)
         }.recover {
           case exception: Exception =>

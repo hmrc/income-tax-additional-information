@@ -18,12 +18,13 @@ package models
 
 import models.gains.{GainsSubmissionModel, PolicyCyaModel}
 import play.api.libs.json.{JsObject, Json}
-import support.UnitTest
+import testUtils.TestSuite
 
-class AllGainsSessionModelSpec extends UnitTest {
+class AllGainsSessionModelSpec extends TestSuite {
 
   val lifeInsurancePolicyModel: PolicyCyaModel = PolicyCyaModel(
-    "sessionId", Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true), Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+    "sessionId", Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true),
+    Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
   )
 
   val cyaModels: Seq[PolicyCyaModel] = Seq(
@@ -51,11 +52,11 @@ class AllGainsSessionModelSpec extends UnitTest {
     "correctly parse to Json" when {
 
       "the model is fully filled out" in {
-        Json.toJson(modelMax) shouldBe jsonMax
+        Json.toJson(modelMax) mustBe jsonMax
       }
 
       "the model is empty" in {
-        Json.toJson(modelMin) shouldBe jsonMin
+        Json.toJson(modelMin) mustBe jsonMin
       }
 
     }
@@ -63,11 +64,11 @@ class AllGainsSessionModelSpec extends UnitTest {
     "correctly parse to a model" when {
 
       "the json contains all the data for the model" in {
-        jsonMax.as[AllGainsSessionModel] shouldBe modelMax
+        jsonMax.as[AllGainsSessionModel] mustBe modelMax
       }
 
       "the json contains no data" in {
-        jsonMin.as[AllGainsSessionModel] shouldBe modelMin
+        jsonMin.as[AllGainsSessionModel] mustBe modelMin
       }
 
     }

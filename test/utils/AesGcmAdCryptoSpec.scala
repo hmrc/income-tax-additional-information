@@ -16,12 +16,11 @@
 
 package utils
 
-import org.scalamock.scalatest.MockFactory
-import support.UnitTest
 import support.stubs.AppConfigStub
+import testUtils.TestSuite
 import uk.gov.hmrc.crypto.{AdDecrypter, AdEncrypter, EncryptedValue}
 
-class AesGcmAdCryptoSpec extends UnitTest with MockFactory {
+class AesGcmAdCryptoSpec extends TestSuite {
 
   implicit private val associatedText: String = "some-associated-text"
   private val mockAesGcmAdCryptoFactory = mock[AesGcmAdCryptoFactory]
@@ -43,7 +42,7 @@ class AesGcmAdCryptoSpec extends UnitTest with MockFactory {
           .expects()
           .returning(mockAesGcmAdCrypto)
 
-        underTest.encrypt(valueToEncrypt) shouldBe EncryptedValue("some-value", nonce)
+        underTest.encrypt(valueToEncrypt) mustBe EncryptedValue("some-value", nonce)
       }
     }
 
@@ -52,7 +51,7 @@ class AesGcmAdCryptoSpec extends UnitTest with MockFactory {
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(appConfig, mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {
-        underTest.encrypt(valueToEncrypt) shouldBe EncryptedValue(valueToEncrypt, valueToEncrypt + "-Nonce")
+        underTest.encrypt(valueToEncrypt) mustBe EncryptedValue(valueToEncrypt, valueToEncrypt + "-Nonce")
       }
     }
   }
@@ -66,7 +65,7 @@ class AesGcmAdCryptoSpec extends UnitTest with MockFactory {
           .expects()
           .returning(mockAesGcmAdCrypto)
 
-        underTest.decrypt(EncryptedValue("value-to-decrypt", nonce)) shouldBe decryptedValue
+        underTest.decrypt(EncryptedValue("value-to-decrypt", nonce)) mustBe decryptedValue
       }
     }
 
@@ -75,7 +74,7 @@ class AesGcmAdCryptoSpec extends UnitTest with MockFactory {
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(appConfig, mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {
-        underTest.decrypt(EncryptedValue(valueToEncrypt, nonce)) shouldBe valueToEncrypt
+        underTest.decrypt(EncryptedValue(valueToEncrypt, nonce)) mustBe valueToEncrypt
       }
     }
   }

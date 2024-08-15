@@ -19,11 +19,6 @@ package models.gains.prior
 import models.gains._
 import play.api.libs.json.{Json, OFormat}
 
-case class IncomeSourceObject(gains: Option[GainsPriorDataModel])
-
-object IncomeSourceObject {
-  implicit val format: OFormat[IncomeSourceObject] = Json.format[IncomeSourceObject]
-}
 case class GainsPriorDataModel(
                                 submittedOn: String,
                                 lifeInsurance: Option[Seq[LifeInsuranceModel]] = None,
@@ -33,7 +28,7 @@ case class GainsPriorDataModel(
                                 foreign: Option[Seq[ForeignModel]] = None
                               ) {
   def toPolicyCya: Seq[PolicyCyaModel] = {
-    val lifeInsuranceConverted = lifeInsurance.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
+    val lifeInsuranceConverted = lifeInsurance.toSeq.flatMap(_.map(_.toPolicyCya))
     val capitalRedemptionConverted = capitalRedemption.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
     val lifeAnnuityConverted = lifeAnnuity.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)
     val voidedIsaConverted = voidedIsa.map(_.map(_.toPolicyCya)).getOrElse(Seq.empty)

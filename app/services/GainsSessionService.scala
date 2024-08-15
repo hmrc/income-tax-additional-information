@@ -28,13 +28,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataRepository)(implicit correlationId: String) extends Logging {
 
   def createSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)
-                          (implicit user: User[_], ec: ExecutionContext): Future[Either[MongoError, Boolean]] = {
+                          (implicit user: User[_], ec: ExecutionContext): Future[Either[MongoError, Unit]] = {
 
     val userData = GainsUserDataModel(user.sessionId, user.mtditid, user.nino, taxYear, Some(cyaModel), Instant.now)
 
     gainsUserDataRepository.create(userData).map {
       case Right(_) =>
-        Right(true)
+        Right(())
       case Left(databaseError) =>
         logger.error(s"[GainsSessionService][createSessionData] session create failed. correlation id: " + correlationId)
         Left(MongoError(databaseError.message))
@@ -52,12 +52,12 @@ class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataReposi
   }
 
   def updateSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)
-                          (implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Boolean]] = {
+                          (implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Unit]] = {
 
     val userData = GainsUserDataModel(user.sessionId, user.mtditid, user.nino, taxYear, Some(cyaModel), Instant.now)
 
     gainsUserDataRepository.update(userData).map {
-      case Right(_) => Right(true)
+      case Right(_) => Right(())
       case Left(databaseError) =>
         logger.error(s"[GainsSessionService][updateSessionData] session update failure. correlation id: " + correlationId)
         Left(MongoError(databaseError.message))

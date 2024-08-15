@@ -29,7 +29,7 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
       LifeInsuranceModel(
         customerReference = cya.policyNumber,
         event = cya.policyEvent,
-        gainAmount = cya.amountOfGain.get,
+        gainAmount = cya.amountOfGain.getOrElse(BigDecimal(0)),
         taxPaid = cya.treatedAsTaxPaid,
         yearsHeld = cya.yearsPolicyHeld,
         yearsHeldSinceLastGain = cya.yearsPolicyHeldPrevious,
@@ -39,7 +39,7 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
       CapitalRedemptionModel(
         customerReference = cya.policyNumber,
         event = cya.policyEvent,
-        gainAmount = cya.amountOfGain.get,
+        gainAmount = cya.amountOfGain.getOrElse(BigDecimal(0)),
         taxPaid = cya.treatedAsTaxPaid,
         yearsHeld = cya.yearsPolicyHeld,
         yearsHeldSinceLastGain = cya.yearsPolicyHeldPrevious,
@@ -49,7 +49,7 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
       LifeAnnuityModel(
         customerReference = cya.policyNumber,
         event = cya.policyEvent,
-        gainAmount = cya.amountOfGain.get,
+        gainAmount = cya.amountOfGain.getOrElse(BigDecimal(0)),
         taxPaid = cya.treatedAsTaxPaid,
         yearsHeld = cya.yearsPolicyHeld,
         yearsHeldSinceLastGain = cya.yearsPolicyHeldPrevious,
@@ -60,7 +60,7 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
       VoidedIsaModel(
         customerReference = cya.policyNumber,
         event = cya.policyEvent,
-        gainAmount = cya.amountOfGain.get,
+        gainAmount = cya.amountOfGain.getOrElse(BigDecimal(0)),
         taxPaidAmount = cya.taxPaidAmount,
         yearsHeld = cya.yearsPolicyHeld,
         yearsHeldSinceLastGain = cya.yearsPolicyHeldPrevious
@@ -70,7 +70,7 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
     val foreign: Option[Seq[ForeignModel]] = convertEmptyToOption(allGains.filter(elem => elem.policyType.contains("Foreign Policy")).map(cya =>
       ForeignModel(
         customerReference = cya.policyNumber,
-        gainAmount = cya.amountOfGain.get,
+        gainAmount = cya.amountOfGain.getOrElse(BigDecimal(0)),
         /*As per additional information manual form requirement, taxPaidAmount field is only relevant to voided ISA and
           doesn't require for foreign policy and hence this question is not part of foreign policy journey*/
         taxPaidAmount = None,
@@ -88,18 +88,14 @@ case class AllGainsSessionModel(allGains: Seq[PolicyCyaModel], gateway: Option[B
 }
 
 object AllGainsSessionModel {
-
   implicit val formatOpt: OFormat[PolicyCyaModel] = Json.format[PolicyCyaModel]
   implicit val format: OFormat[AllGainsSessionModel] = Json.format[AllGainsSessionModel]
-
 }
 
 case class EncryptedAllGainsSessionModel(allGains: Seq[EncryptedPolicyCyaModel], gateway: Option[Boolean])
 
 object EncryptedAllGainsSessionModel {
-
   implicit val formatEnc: OFormat[EncryptedValue] = Json.format[EncryptedValue]
   implicit val formatSeq: OFormat[EncryptedPolicyCyaModel] = Json.format[EncryptedPolicyCyaModel]
   implicit val format: OFormat[EncryptedAllGainsSessionModel] = Json.format[EncryptedAllGainsSessionModel]
-
 }

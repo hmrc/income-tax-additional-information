@@ -48,15 +48,15 @@ class UserDataRepositoryISpec extends IntegrationTest with FutureAwaits with Def
   "create" should {
     "add a document to the collection" in new EmptyDatabase {
       count mustBe 0
-      val result: Either[DatabaseError, Boolean] = await(gainsRepo.create(gainsUserData))
-      result mustBe Right(true)
+      val result: Either[DatabaseError, Unit] = await(gainsRepo.create(gainsUserData))
+      result mustBe Right(())
       count mustBe 1
     }
 
     "fail to add a document to the collection when it already exists" in new EmptyDatabase {
       count mustBe 0
       await(gainsRepo.create(gainsUserData))
-      val result: Either[DatabaseError, Boolean] = await(gainsRepo.create(gainsUserData))
+      val result: Either[DatabaseError, Unit] = await(gainsRepo.create(gainsUserData))
       result mustBe Left(DataNotUpdated)
       count mustBe 1
     }

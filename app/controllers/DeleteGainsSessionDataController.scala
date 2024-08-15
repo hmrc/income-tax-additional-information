@@ -34,7 +34,7 @@ class DeleteGainsSessionDataController @Inject()(gainsSessionService: GainsSessi
     implicit user =>
       gainsSessionService.deleteSessionData(taxYear).map {
         case Right(_) => NoContent
-        case Left(error) => Status(INTERNAL_SERVER_ERROR)(Json.toJson(error.message))
+        case Left(error) => InternalServerError(Json.toJson(error.message))
       }
   }
 }

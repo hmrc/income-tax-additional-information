@@ -16,15 +16,13 @@
 
 package utils
 
-import org.scalamock.scalatest.MockFactory
-import support.UnitTest
+import testUtils.TestSuite
 import uk.gov.hmrc.crypto.EncryptedValue
 import utils.Cypher.{bigDecimalCypher, booleanCypher, monthCypher, stringCypher}
 
 import java.time.Month
 
-class CypherSpec extends UnitTest
-  with MockFactory {
+class CypherSpec extends TestSuite {
 
   private val encryptedBoolean = mock[EncryptedValue]
   private val encryptedString = mock[EncryptedValue]
@@ -40,14 +38,14 @@ class CypherSpec extends UnitTest
     "encrypt string values" in {
       (aesGcmAdCrypto.encrypt(_: String)(_: String)).expects(stringValue, associatedText).returning(encryptedString)
 
-      stringCypher.encrypt(stringValue) shouldBe encryptedString
+      stringCypher.encrypt(stringValue) mustBe encryptedString
     }
 
     "decrypt to string values" in {
       (aesGcmAdCrypto.decrypt(_: EncryptedValue)(_: String))
         .expects(encryptedValue, associatedText).returning(stringValue)
 
-      stringCypher.decrypt(encryptedValue) shouldBe stringValue
+      stringCypher.decrypt(encryptedValue) mustBe stringValue
     }
   }
 
@@ -56,14 +54,14 @@ class CypherSpec extends UnitTest
     "encrypt boolean values" in {
       (aesGcmAdCrypto.encrypt(_: String)(_: String)).expects(someBoolean.toString, associatedText).returning(encryptedBoolean)
 
-      booleanCypher.encrypt(someBoolean) shouldBe encryptedBoolean
+      booleanCypher.encrypt(someBoolean) mustBe encryptedBoolean
     }
 
     "decrypt to boolean values" in {
       (aesGcmAdCrypto.decrypt(_: EncryptedValue)(_: String))
         .expects(encryptedValue, associatedText).returning(someBoolean.toString)
 
-      booleanCypher.decrypt(encryptedValue) shouldBe someBoolean
+      booleanCypher.decrypt(encryptedValue) mustBe someBoolean
     }
   }
 
@@ -72,14 +70,14 @@ class CypherSpec extends UnitTest
     "encrypt BigDecimal values" in {
       (aesGcmAdCrypto.encrypt(_: String)(_: String)).expects(bigDecimalValue.toString, associatedText).returning(encryptedBigDecimal)
 
-      bigDecimalCypher.encrypt(bigDecimalValue) shouldBe encryptedBigDecimal
+      bigDecimalCypher.encrypt(bigDecimalValue) mustBe encryptedBigDecimal
     }
 
     "decrypt to BigDecimal values" in {
       (aesGcmAdCrypto.decrypt(_: EncryptedValue)(_: String))
         .expects(encryptedValue, associatedText).returning(bigDecimalValue.toString)
 
-      bigDecimalCypher.decrypt(encryptedValue) shouldBe bigDecimalValue
+      bigDecimalCypher.decrypt(encryptedValue) mustBe bigDecimalValue
     }
   }
 
@@ -89,14 +87,14 @@ class CypherSpec extends UnitTest
     "encrypt Month values" in {
       (aesGcmAdCrypto.encrypt(_: String)(_: String)).expects(monthValue.toString, associatedText).returning(encryptedMonth)
 
-      monthCypher.encrypt(monthValue) shouldBe encryptedMonth
+      monthCypher.encrypt(monthValue) mustBe encryptedMonth
     }
 
     "decrypt to Month values" in {
       (aesGcmAdCrypto.decrypt(_: EncryptedValue)(_: String))
         .expects(encryptedValue, associatedText).returning(monthValue.toString)
 
-      monthCypher.decrypt(encryptedValue) shouldBe monthValue
+      monthCypher.decrypt(encryptedValue) mustBe monthValue
     }
   }
 }

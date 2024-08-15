@@ -17,9 +17,9 @@
 package models.gains
 
 import play.api.libs.json.{JsObject, Json}
-import support.UnitTest
+import testUtils.TestSuite
 
-class GainsSubmissionModelSpec extends UnitTest {
+class GainsSubmissionModelSpec extends TestSuite {
 
   val validLifeInsuranceModel: LifeInsuranceModel = LifeInsuranceModel(
     customerReference = Some("RefNo13254687"),
@@ -130,15 +130,13 @@ class GainsSubmissionModelSpec extends UnitTest {
   )
 
   "GainsSubmission" should {
-
     "parse from json" in {
-      validJson.as[GainsSubmissionModel] shouldBe validGainsSubmissionModel
+      validJson.as[GainsSubmissionModel] mustBe validGainsSubmissionModel
     }
 
     "parse to json" in {
-      Json.toJson(validGainsSubmissionModel) shouldBe validJson
+      Json.toJson(validGainsSubmissionModel) mustBe validJson
     }
-
   }
 
 }

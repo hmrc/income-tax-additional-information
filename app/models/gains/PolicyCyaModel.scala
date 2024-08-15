@@ -38,16 +38,16 @@ case class PolicyCyaModel(
     policyNumber.isDefined &&
       amountOfGain.isDefined &&
       policyEvent.isDefined &&
-      (previousGain.contains(true) && yearsPolicyHeldPrevious.isDefined | previousGain.contains(false)) &&
+      (previousGain.contains(true) && yearsPolicyHeldPrevious.isDefined || previousGain.contains(false)) &&
       yearsPolicyHeld.isDefined &&
       treatedAsTaxPaid.isDefined &&
-      (entitledToDeficiencyRelief.contains(true) && deficiencyReliefAmount.isDefined | entitledToDeficiencyRelief.contains(false))
+      (entitledToDeficiencyRelief.contains(true) && deficiencyReliefAmount.isDefined || entitledToDeficiencyRelief.contains(false))
 
   private def isFinishedVoidedIsa: Boolean =
     policyNumber.isDefined &&
       amountOfGain.isDefined &&
       policyEvent.isDefined &&
-      (previousGain.contains(true) && yearsPolicyHeldPrevious.isDefined | previousGain.contains(false)) &&
+      (previousGain.contains(true) && yearsPolicyHeldPrevious.isDefined || previousGain.contains(false)) &&
       yearsPolicyHeld.isDefined &&
       taxPaidAmount.isDefined
 
@@ -60,9 +60,7 @@ case class PolicyCyaModel(
 }
 
 object PolicyCyaModel {
-
   implicit val format: OFormat[PolicyCyaModel] = Json.format[PolicyCyaModel]
-
 }
 
 case class EncryptedPolicyCyaModel(
@@ -81,7 +79,5 @@ case class EncryptedPolicyCyaModel(
                                   )
 
 object EncryptedPolicyCyaModel {
-
   implicit val format: OFormat[PolicyCyaModel] = Json.format[PolicyCyaModel]
-
 }

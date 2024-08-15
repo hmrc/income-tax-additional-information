@@ -52,10 +52,10 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
   ".createSession" should {
 
     "Return a 204 NO_CONTENT response with valid Session Data" in {
-      def serviceCallMock(): CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Boolean]]] =
+      def serviceCallMock(): CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Unit]]] =
         (mockGainsSessionService.updateSessionData(_: AllGainsSessionModel, _: Int)(_: User[_], _: ExecutionContext))
           .expects(model, taxYear, *, *)
-          .returning(Future.successful(Right(true)))
+          .returning(Future.successful(Right(())))
 
       val result = {
         mockAuth()
@@ -78,7 +78,7 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
 
       "the service returns a INTERNAL_SERVER_ERROR" in {
         def mockCreateOrAmendCreateSessionWithError(mongoError: MongoError):
-          CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Boolean]]] = {
+          CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Unit]]] = {
 
           (mockGainsSessionService.updateSessionData(_: AllGainsSessionModel, _: Int)(_: User[_], _: ExecutionContext))
             .expects(model, taxYear, *, *)

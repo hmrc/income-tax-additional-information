@@ -17,15 +17,16 @@
 package models.gains
 
 import play.api.libs.json.{JsObject, Json}
-import support.UnitTest
+import testUtils.TestSuite
 
 import java.util.UUID
 
-class PolicyCyaModelSpec extends UnitTest {
+class PolicyCyaModelSpec extends TestSuite {
 
   val sessionId: String = UUID.randomUUID().toString
   val modelMax: PolicyCyaModel = PolicyCyaModel(
-    sessionId, Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true), Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+    sessionId, Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true),
+    Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
   )
 
   val modelMin: PolicyCyaModel = PolicyCyaModel(sessionId, Some(""))
@@ -52,11 +53,11 @@ class PolicyCyaModelSpec extends UnitTest {
     "correctly parse to Json" when {
 
       "the model is fully filled out" in {
-        Json.toJson(modelMax) shouldBe jsonMax
+        Json.toJson(modelMax) mustBe jsonMax
       }
 
       "the model is empty" in {
-        Json.toJson(modelMin) shouldBe jsonMin
+        Json.toJson(modelMin) mustBe jsonMin
       }
 
     }
@@ -64,21 +65,21 @@ class PolicyCyaModelSpec extends UnitTest {
     "correctly parse to a model" when {
 
       "the json contains all the data for the model" in {
-        jsonMax.as[PolicyCyaModel] shouldBe modelMax
+        jsonMax.as[PolicyCyaModel] mustBe modelMax
       }
 
       "the json contains no data" in {
-        jsonMin.as[PolicyCyaModel] shouldBe modelMin
+        jsonMin.as[PolicyCyaModel] mustBe modelMin
       }
 
     }
 
     "return true when model is full for voided isa" in {
-      modelMax.copy(policyType = Some("Voided ISA")).isFinished shouldBe true
+      modelMax.copy(policyType = Some("Voided ISA")).isFinished mustBe true
     }
 
     "return true when model is full for not voided isa" in {
-      modelMax.copy(policyType = Some("Life Insurance")).isFinished shouldBe true
+      modelMax.copy(policyType = Some("Life Insurance")).isFinished mustBe true
     }
 
   }

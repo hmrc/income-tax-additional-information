@@ -190,25 +190,25 @@ trait IntegrationTest extends AnyWordSpec
 
   val gainsSessionService: GainsSessionService = new GainsSessionService(gainsUserDataRepository)(correlationId)
 
-  def populateSessionData(): Either[MongoError, Boolean] =
+  def populateSessionData(): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(Seq(PolicyCyaModel(sessionId, Some("Life Insurance"), Some("RefNo13254687"), Some(123.11),
       Some("Full or part surrender"), Some(true), Some(99), Some(10), Some(true), None, Some(true), Some(100))),
       gateway = Some(true)), taxYear)(user, ec))
 
-  def populateSessionDataWithRandomSession(): Either[MongoError, Boolean] =
+  def populateSessionDataWithRandomSession(): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(Seq(PolicyCyaModel(UUID.randomUUID().toString, Some(""))), gateway = Some(true)), taxYear)
     (anAuthorisationRequest.user, ec))
 
-  def populateOnlyGatewayData(): Either[MongoError, Boolean] =
+  def populateOnlyGatewayData(): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(Seq[PolicyCyaModel]().empty, gateway = Some(true)), taxYear)(user, ec))
 
-  def populateSessionDataWithEmptyGateway(): Either[MongoError, Boolean] =
+  def populateSessionDataWithEmptyGateway(): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(Seq(), gateway = None), taxYear)(user, ec))
 
-  def populateSessionDataWithFalseGateway(): Either[MongoError, Boolean] =
+  def populateSessionDataWithFalseGateway(): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(Seq(), gateway = Some(false)), taxYear)(user, ec))
 
-  def populateWithSessionDataModel(cya: Seq[PolicyCyaModel]): Either[MongoError, Boolean] =
+  def populateWithSessionDataModel(cya: Seq[PolicyCyaModel]): Either[MongoError, Unit] =
     await(gainsSessionService.createSessionData(AllGainsSessionModel(cya, gateway = Some(true)), taxYear)(user, ec))
 
   def clearSession(): Boolean = await(gainsUserDataRepository.clear(taxYear))
