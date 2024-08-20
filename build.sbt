@@ -36,7 +36,7 @@ lazy val coverageSettings: Seq[Setting[?]] = {
     "config.*",
     "testOnly.*",
     "testOnlyDoNotUseInAppConf.*",
-    "controllers.testOnly.*",
+    "controllers.testOnly.*"
   )
 
   Seq(

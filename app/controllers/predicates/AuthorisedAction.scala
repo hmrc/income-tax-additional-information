@@ -82,13 +82,14 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
       case enrolments ~ userConfidence if userConfidence.level >= minimumConfidenceLevel =>
         val optionalMtdItId: Option[String] = enrolmentGetIdentifierValue(EnrolmentKeys.Individual, EnrolmentIdentifiers.individualId, enrolments)
         val optionalNino: Option[String] = enrolmentGetIdentifierValue(EnrolmentKeys.nino, EnrolmentIdentifiers.nino, enrolments)
+        val sessionId: String = request.headers.get("X-Session-ID").getOrElse("")
 
         (optionalMtdItId, optionalNino) match {
           case (Some(authMTDITID), Some(_)) =>
             enrolments.enrolments.collectFirst {
               case Enrolment(EnrolmentKeys.Individual, enrolmentIdentifiers, _, _)
                 if enrolmentIdentifiers.exists(identifier => identifier.key == EnrolmentIdentifiers.individualId && identifier.value == requestMtdItId) =>
-                block(User(requestMtdItId, None))
+                block(User(requestMtdItId, None, optionalNino.getOrElse(""), "", sessionId))
             } getOrElse {
               logger.info(s"[AuthorisedAction][individualAuthentication] Non-agent with an invalid MTDITID. " +
                 s"MTDITID in auth matches MTDITID in request: ${authMTDITID == requestMtdItId}")
@@ -110,6 +111,8 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   private[predicates] def agentAuthentication[A](block: User[A] => Future[Result], mtdItId: String)
                                                 (implicit request: Request[A], hc: HeaderCarrier): Future[Result] = {
 
+    val sessionId: String = request.headers.get("sessionId").getOrElse("")
+
     lazy val agentDelegatedAuthRuleKey = "mtd-it-auth"
 
     lazy val agentAuthPredicate: String => Enrolment = identifierId =>
@@ -122,7 +125,7 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
 
         enrolmentGetIdentifierValue(EnrolmentKeys.Agent, EnrolmentIdentifiers.agentReference, enrolments) match {
           case Some(arn) =>
-            block(User(mtdItId, Some(arn)))
+            block(User(mtdItId, Some(arn), "", "", sessionId))
           case None =>
             logger.info("[AuthorisedAction][agentAuthentication] Agent with no HMRC-AS-AGENT enrolment.")
             unauthorized

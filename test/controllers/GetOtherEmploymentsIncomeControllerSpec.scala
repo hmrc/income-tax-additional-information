@@ -88,11 +88,12 @@ class GetOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockGetOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[GetOtherEmploymentsIncomeResponse]] = {
-        (serviceMock.getOtherEmploymentsIncome(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(Left(errorModel)))
-      }
+      def mockGetOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel):
+        CallHandler3[String, Int, HeaderCarrier, Future[GetOtherEmploymentsIncomeResponse]] = {
+          (serviceMock.getOtherEmploymentsIncome(_: String, _: Int)(_: HeaderCarrier))
+            .expects(nino, taxYear, *)
+            .returning(Future.successful(Left(errorModel)))
+        }
 
       "the service returns a NO_CONTENT" in {
         val result = {
