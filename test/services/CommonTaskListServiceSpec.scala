@@ -54,16 +54,16 @@ class CommonTaskListServiceSpec extends TestSuite with AppConfigStubProvider {
     TaskListSection(SectionTitle.InsuranceGainsTitle,
       Some(List(
         TaskListSectionItem(TaskTitle.LifeInsurance, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/gains-gateway")
+          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
         ),
         TaskListSectionItem(TaskTitle.LifeAnnuity, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/gains-gateway")
+          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Annuity")
         ),
         TaskListSectionItem(TaskTitle.CapitalRedemption, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/gains-gateway")
+          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Capital+Redemption")
         ),
         TaskListSectionItem(TaskTitle.VoidedISA, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/gains-gateway")
+          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Voided+ISA")
         )
       ))
     )
@@ -94,7 +94,7 @@ class CommonTaskListServiceSpec extends TestSuite with AppConfigStubProvider {
       await(underTest) mustBe fullTaskSection.copy(
         taskItems = Some(List(
           TaskListSectionItem(TaskTitle.LifeInsurance, TaskStatus.Completed,
-            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/gains-gateway")
+            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
           )
         ))
       )
