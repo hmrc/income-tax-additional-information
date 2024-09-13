@@ -40,11 +40,14 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
   }
 
   private def getTasks(insurancePolicies: InsurancePoliciesModel, taxYear: Int): Seq[TaskListSectionItem] = {
-    // TODO: these will be links to the new individual CYA pages when they are made
-    val lifeInsuranceUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val lifeAnnuityUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val capitalRedemptionUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
-    val voidedIsaBaseUrl = s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/gains-gateway"
+
+    def gainsSummaryUrl(param: String): String =
+      s"${appConfig.addInfoFEBaseUrl}/update-and-submit-income-tax-return/additional-information/$taxYear/gains/summary?$param"
+
+    val lifeInsuranceUrl: String = gainsSummaryUrl("policyType=Life+Insurance")
+    val lifeAnnuityUrl: String = gainsSummaryUrl("policyType=Life+Annuity")
+    val capitalRedemptionUrl: String = gainsSummaryUrl("policyType=Capital+Redemption")
+    val voidedIsaBaseUrl: String = gainsSummaryUrl("policyType=Voided+ISA")
 
     Seq(
       createTaskListItem(insurancePolicies.lifeInsurance, TaskTitle.LifeInsurance, lifeInsuranceUrl),
@@ -57,5 +60,4 @@ class CommonTaskListService @Inject()(appConfig: AppConfig,
   private def createTaskListItem(optItems: Option[Seq[_]], taskTitle: TaskTitle, url: String): Option[TaskListSectionItem] = {
     optItems.map(_ => TaskListSectionItem(taskTitle, TaskStatus.Completed, Some(url)))
   }
-
 }
