@@ -16,7 +16,6 @@
 
 package controllers.predicates
 
-import common.EnrolmentKeys.Agent
 import common.{EnrolmentIdentifiers, EnrolmentKeys}
 import models.User
 import org.scalamock.handlers.CallHandler4
