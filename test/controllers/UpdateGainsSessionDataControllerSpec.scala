@@ -26,6 +26,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.GainsSessionService
 import testUtils.TestSuite
+import uk.gov.hmrc.http.SessionKeys
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -47,7 +48,8 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
 
   val mongoError: MongoError = MongoError(DataNotFound.message)
 
-  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("PUT", "/").withHeaders("MTDITID" -> mtditid)
+  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("PUT", "/")
+    .withHeaders("MTDITID" -> mtditid, SessionKeys.sessionId -> "some-session-id")
 
   ".createSession" should {
 

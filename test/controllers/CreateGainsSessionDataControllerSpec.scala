@@ -26,6 +26,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.GainsSessionService
 import testUtils.TestSuite
+import uk.gov.hmrc.http.SessionKeys
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,7 +47,8 @@ class CreateGainsSessionDataControllerSpec extends TestSuite {
 
   val allGainsSessionModel: AllGainsSessionModel = AllGainsSessionModel(Seq(completePolicyCyaModel), gateway = Some(true))
 
-  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("POST", "/").withHeaders("MTDITID" -> mtditid)
+  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("POST", "/").withHeaders("MTDITID" -> mtditid,
+    SessionKeys.sessionId -> "some-session-id")
 
   ".createSession" should {
 

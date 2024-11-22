@@ -25,7 +25,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import services.CreateOrAmendInsurancePoliciesService
 import testUtils.TestSuite
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.Future
 
@@ -54,7 +54,8 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
     foreign = Some(Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3))))
   )
 
-  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("PUT", "/").withHeaders("MTDITID" -> mtditid)
+  override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("PUT", "/")
+    .withHeaders("MTDITID" -> mtditid, SessionKeys.sessionId -> "some-session-id")
 
   ".putInsurancePolicies" should {
 
