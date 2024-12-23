@@ -276,9 +276,24 @@ class AuthorisedActionSpec extends TestSuite {
             status(result) mustBe UNAUTHORIZED
           }
         }
+
+      }
+
+      "results in a non-Auth related Exception to be returned for Secondary Agent check" in {
+
+        object Exception extends Exception("Some reason")
+
+        lazy val result = {
+
+          mockAuthorisePredicates(authWithEMAEnabled.agentAuthPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Primary failed")))
+          mockAuthorisePredicates(authWithEMAEnabled.secondaryAgentPredicate(aUser.mtditid), Future.failed(Exception))
+
+          authWithEMAEnabled.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
+        }
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
-
 
     ".agentAuthenticated" should {
 
@@ -355,6 +370,18 @@ class AuthorisedActionSpec extends TestSuite {
           status(result) mustBe UNAUTHORIZED
         }
       }
+
+      "results in a non-Auth related Exception to be returned for Primary Agent check" in {
+
+          object Exception extends Exception("Some reason")
+
+          lazy val result = {
+            mockAuthReturnException(Exception)
+            auth.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
+          }
+
+          status(result) mustBe INTERNAL_SERVER_ERROR
+      }
     }
 
     ".async" should {
@@ -423,6 +450,18 @@ class AuthorisedActionSpec extends TestSuite {
           status(result) mustBe UNAUTHORIZED
         }
 
+      }
+
+      "return ISE" when {
+
+        "the authorisation service returns an Exception that is not an Auth related Exception" in {
+
+          mockAuthReturnException(new Exception("Some reason"))
+
+          val result = auth.async(block)
+
+          status(result(fakeRequest)) mustBe INTERNAL_SERVER_ERROR
+        }
       }
     }
   }
