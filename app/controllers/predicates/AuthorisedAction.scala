@@ -125,11 +125,6 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
       .withIdentifier("MTDITID", mtdId)
       .withDelegatedAuthRule("mtd-it-auth")
 
-  private[predicates] def secondaryAgentPredicate(mtdId: String): Predicate =
-    Enrolment("HMRC-MTD-IT-SUPP")
-      .withIdentifier("MTDITID", mtdId)
-      .withDelegatedAuthRule("mtd-it-auth-supp")
-
 
   private[predicates] def agentAuthentication[A](block: User[A] => Future[Result], mtdItId: String)
                                                 (implicit request: Request[A], hc: HeaderCarrier): Future[Result] = {
@@ -145,19 +140,6 @@ private def agentRecovery[A](block: User[A] => Future[Result], mtdItId: String)
       val logMessage = s"[AuthorisedAction][agentAuthentication] - No active session."
       logger.info(logMessage)
       unauthorized
-    case _: AuthorisationException if appConfig.emaSupportingAgentsEnabled =>
-      authorised(secondaryAgentPredicate(mtdItId))
-        .retrieve(allEnrolments)(
-          enrolments => populateAgent(block, mtdItId, None, enrolments)
-        )
-        .recover {
-          case _: AuthorisationException =>
-            logger.warn(s"[AuthorisedAction][agentAuthentication] - Agent does not have delegated primary or secondary authority for Client.")
-            Unauthorized
-          case e =>
-            logger.error(s"[AuthorisedAction][agentAuthentication] - Unexpected exception of type '${e.getClass.getSimpleName}' was caught.")
-            InternalServerError
-        }
     case _: AuthorisationException =>
       logger.warn(s"[AuthorisedAction][agentAuthentication] - Agent does not have delegated authority for Client.")
       unauthorized

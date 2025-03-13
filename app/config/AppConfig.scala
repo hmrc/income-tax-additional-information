@@ -43,7 +43,6 @@ trait AppConfig {
 
   def authorisationTokenFor(apiVersion: String): String
 
-  def emaSupportingAgentsEnabled: Boolean
 }
 
 
@@ -67,5 +66,4 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   val addInfoFEBaseUrl: String = config.get[String]("microservice.services.income-tax-additional-information-frontend.url")
 
   def authorisationTokenFor(api: String): String = config.get[String](s"microservice.services.integration-framework.authorisation-token.$api")
-  def emaSupportingAgentsEnabled: Boolean = config.get[Boolean]("feature-switch.ema-supporting-agents-enabled")
 }
