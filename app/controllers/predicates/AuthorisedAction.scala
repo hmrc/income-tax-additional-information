@@ -23,7 +23,6 @@ import play.api.Logging
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolments, confidenceLevel}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
@@ -131,11 +130,10 @@ class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
   authorised(agentAuthPredicate(mtdItId))
     .retrieve(allEnrolments) { enrolments =>
       populateAgent(block, mtdItId, None, enrolments)
-    }.recoverWith(agentRecovery(block, mtdItId))
+    }.recoverWith(agentRecovery)
 }
 
-private def agentRecovery[A](block: User[A] => Future[Result], mtdItId: String)
-                             (implicit request: Request[A], hc: HeaderCarrier): PartialFunction[Throwable, Future[Result]] = {
+private def agentRecovery: PartialFunction[Throwable, Future[Result]] = {
     case _: NoActiveSession =>
       val logMessage = s"[AuthorisedAction][agentAuthentication] - No active session."
       logger.info(logMessage)
