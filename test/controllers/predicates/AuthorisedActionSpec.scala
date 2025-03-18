@@ -23,8 +23,6 @@ import play.api.http.Status._
 import play.api.mvc.Results._
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
-import support.builders.UserBuilder.{aUser, anAgentUser}
-import support.stubs.AppConfigStub
 import testUtils.TestSuite
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -38,9 +36,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthorisedActionSpec extends TestSuite {
 
   val auth: AuthorisedAction = authorisedAction
-  val featureSwitchTestConfig =new AppConfigStub().featureSwitchConfigs()(("ema-supporting-agents-enabled"->true))
 
-  val authWithEMAEnabled = new AuthorisedAction()(mockAuthConnector, defaultActionBuilder, featureSwitchTestConfig, mockControllerComponents)
+  val authWithEMAEnabled = new AuthorisedAction()(mockAuthConnector, defaultActionBuilder, mockControllerComponents)
 
   def mockAuthorisePredicates[A](predicate: Predicate,
                                  returningResult: Future[A]): CallHandler4[Predicate, Retrieval[_], HeaderCarrier, ExecutionContext, Future[Any]] = {
@@ -215,83 +212,6 @@ class AuthorisedActionSpec extends TestSuite {
             status(result) mustBe UNAUTHORIZED
           }
         }
-      }
-    }
-
-    ".agentAuthenticated as secondary agent" should {
-      val block: User[AnyContent] => Future[Result] = user => Future.successful(Ok(s"${user.mtditid} ${user.arn.get}"))
-
-      val secondaryAgentEnrolments = Enrolments(Set(
-        Enrolment("HMRC-MTD-IT-SUPP", Seq(EnrolmentIdentifier("MTDITID", aUser.mtditid)), "Activated"),
-        Enrolment("HMRC-AS-AGENT", Seq(EnrolmentIdentifier("AgentReferenceNumber", anAgentUser.arn.get)), "Activated")
-      ))
-
-      "fallback to secondary agent if primary fails" which {
-
-        val enrolments = Enrolments(Set(
-          Enrolment(EnrolmentKeys.Individual, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.individualId, "1234567890")), "Activated"),
-          Enrolment(EnrolmentKeys.Agent, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.agentReference, "0987654321")), "Activated")
-        ))
-
-        lazy val result = {
-          mockAuthorisePredicates(authWithEMAEnabled.agentAuthPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Primary failed")))
-
-          mockAuthorisePredicates(authWithEMAEnabled.secondaryAgentPredicate(aUser.mtditid), Future.successful(secondaryAgentEnrolments))
-
-          authWithEMAEnabled.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
-        }
-
-        "has a status of OK" in {
-          status(result) mustBe OK
-        }
-
-        "has the correct body" in {
-          bodyOf(result) mustBe "1234567890 0987654321"
-        }
-
-
-        "not fallback to secondary agent if primary fails when supporting agents are disabled" which {
-          lazy val result = {
-            mockAuthorisePredicates(auth.agentAuthPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Primary failed")))
-
-            auth.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
-          }
-
-          "has a status of SEE_OTHER" in {
-            status(result) mustBe UNAUTHORIZED
-          }
-        }
-
-        "return error if both primary and secondary fails when supporting agents are enabled" which {
-          lazy val result = {
-
-            mockAuthorisePredicates(authWithEMAEnabled.agentAuthPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Primary failed")))
-            mockAuthorisePredicates(authWithEMAEnabled.secondaryAgentPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Secondary failed")))
-
-
-            authWithEMAEnabled.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
-          }
-
-          "has a status of SEE_OTHER" in {
-            status(result) mustBe UNAUTHORIZED
-          }
-        }
-
-      }
-
-      "results in a non-Auth related Exception to be returned for Secondary Agent check" in {
-
-        object Exception extends Exception("Some reason")
-
-        lazy val result = {
-
-          mockAuthorisePredicates(authWithEMAEnabled.agentAuthPredicate(aUser.mtditid), Future.failed(InsufficientEnrolments("Primary failed")))
-          mockAuthorisePredicates(authWithEMAEnabled.secondaryAgentPredicate(aUser.mtditid), Future.failed(Exception))
-
-          authWithEMAEnabled.agentAuthentication(block, "1234567890")(fakeRequestWithMtditid, emptyHeaderCarrier)
-        }
-
-        status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
 

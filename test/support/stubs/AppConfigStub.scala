@@ -42,9 +42,6 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = true
     override val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
-
-    def emaSupportingAgentsEnabled: Boolean = false
-
   }
 
   def noEncryptionConfig(): AppConfig = new AppConfig() {
@@ -66,11 +63,9 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = false
     override lazy val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
-    def emaSupportingAgentsEnabled: Boolean = false
   }
 
   def featureSwitchConfigs(environment: String = "test")(flags: (String, Boolean)*): AppConfig = new AppConfig() {
-    def deriveValue(featureName: String, defaultValue: Boolean) = flags.toMap.getOrElse(featureName, defaultValue)
 
     private val wireMockPort = 11111
     override val authBaseUrl: String = "/auth"
@@ -90,7 +85,5 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = true
     override val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
-    def emaSupportingAgentsEnabled: Boolean = deriveValue("ema-supporting-agents-enabled",false)
-
   }
 }
