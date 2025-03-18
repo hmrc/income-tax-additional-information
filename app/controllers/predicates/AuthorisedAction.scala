@@ -17,7 +17,6 @@
 package controllers.predicates
 
 import common.{EnrolmentIdentifiers, EnrolmentKeys}
-import config.AppConfig
 import models.User
 import play.api.Logging
 import play.api.mvc.Results.{InternalServerError, Unauthorized}
@@ -35,7 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedAction @Inject()()(implicit val authConnector: AuthConnector,
                                    defaultActionBuilder: DefaultActionBuilder,
-                                   val appConfig: AppConfig,
                                    val cc: ControllerComponents) extends AuthorisedFunctions with Logging {
 
   implicit val executionContext: ExecutionContext = cc.executionContext

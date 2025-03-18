@@ -66,7 +66,6 @@ class AppConfigStub extends MockFactory {
   }
 
   def featureSwitchConfigs(environment: String = "test")(flags: (String, Boolean)*): AppConfig = new AppConfig() {
-    def deriveValue(featureName: String, defaultValue: Boolean) = flags.toMap.getOrElse(featureName, defaultValue)
 
     private val wireMockPort = 11111
     override val authBaseUrl: String = "/auth"

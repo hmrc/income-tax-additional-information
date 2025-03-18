@@ -23,7 +23,6 @@ import play.api.http.Status._
 import play.api.mvc.Results._
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
-import support.stubs.AppConfigStub
 import testUtils.TestSuite
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -37,9 +36,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthorisedActionSpec extends TestSuite {
 
   val auth: AuthorisedAction = authorisedAction
-  val featureSwitchTestConfig =new AppConfigStub().featureSwitchConfigs()(("ema-supporting-agents-enabled"->true))
 
-  val authWithEMAEnabled = new AuthorisedAction()(mockAuthConnector, defaultActionBuilder, featureSwitchTestConfig, mockControllerComponents)
+  val authWithEMAEnabled = new AuthorisedAction()(mockAuthConnector, defaultActionBuilder, mockControllerComponents)
 
   def mockAuthorisePredicates[A](predicate: Predicate,
                                  returningResult: Future[A]): CallHandler4[Predicate, Retrieval[_], HeaderCarrier, ExecutionContext, Future[Any]] = {
