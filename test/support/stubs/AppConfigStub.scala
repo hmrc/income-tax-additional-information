@@ -42,6 +42,7 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = true
     override val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
+    override lazy val userAnswersReplaceIndexes = true
   }
 
   def noEncryptionConfig(): AppConfig = new AppConfig() {
@@ -63,6 +64,7 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = false
     override lazy val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
+    override lazy val userAnswersReplaceIndexes = true
   }
 
   def featureSwitchConfigs(environment: String = "test")(flags: (String, Boolean)*): AppConfig = new AppConfig() {
@@ -85,5 +87,6 @@ class AppConfigStub extends MockFactory {
     override lazy val useEncryption: Boolean = true
     override val encryptionKey: String = "1234556"
     override lazy val mongoTTL: Int = Duration("28days").toDays.toInt
+    override lazy val userAnswersReplaceIndexes = true
   }
 }
