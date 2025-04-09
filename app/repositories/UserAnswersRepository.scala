@@ -29,9 +29,10 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.play.http.logging.Mdc
 import utils.TimeMachine
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
                                       appConfig: AppConfig,
                                       timeMachine: TimeMachine)(implicit ec: ExecutionContext)
