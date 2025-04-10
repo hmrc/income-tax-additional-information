@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package models.mongo
 
-import com.google.inject.AbstractModule
+import play.api.libs.json.{JsString, Json}
+import testUtils.TestSuite
 
-import java.time.Clock
+class JourneyModelSpec extends TestSuite {
 
-class Module extends AbstractModule {
+  "should serialise to JSON correctly" in {
+    Json.toJson[Journey](BusinessTaxReliefs) mustBe JsString("businessTaxReliefs")
+  }
 
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[Clock]).toInstance(Clock.systemUTC())
+  "should deserialise from JSON correctly" in {
+    JsString("businessTaxReliefs").as[Journey] mustBe BusinessTaxReliefs
   }
 }

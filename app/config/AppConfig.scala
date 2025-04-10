@@ -40,6 +40,7 @@ trait AppConfig {
   def useEncryption: Boolean
   def encryptionKey: String
   def mongoTTL: Int
+  def userAnswersReplaceIndexes: Boolean
 
   def authorisationTokenFor(apiVersion: String): String
 
@@ -55,6 +56,7 @@ class BackendAppConfig @Inject()(config: Configuration, servicesConfig: Services
   // Mongo config
   lazy val encryptionKey: String = servicesConfig.getString("mongodb.encryption.key")
   lazy val mongoTTL: Int = Duration(servicesConfig.getString("mongodb.timeToLive")).toDays.toInt
+  lazy val userAnswersReplaceIndexes: Boolean = config.get[Boolean]("mongodb.userAnswersReplaceIndexes")
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
   val graphiteHost: String = config.get[String]("microservice.metrics.graphite.host")
