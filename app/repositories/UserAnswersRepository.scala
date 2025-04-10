@@ -27,15 +27,15 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.play.http.logging.Mdc
-import utils.TimeMachine
 
+import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
                                       appConfig: AppConfig,
-                                      timeMachine: TimeMachine)(implicit ec: ExecutionContext)
+                                      clock: Clock)(implicit ec: ExecutionContext)
   extends PlayMongoRepository[UserAnswersModel](
     collectionName = "userAnswers",
     mongoComponent = mongoComponent,
@@ -56,7 +56,7 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
       collection
         .findOneAndUpdate(
           filter = pk(mtdItId, nino, taxYear, journey),
-          update = Updates.set("lastUpdated", timeMachine.instantNow),
+          update = Updates.set("lastUpdated", Instant.now(clock)),
           options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
         )
         .headOption()
@@ -67,7 +67,7 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
       collection
         .findOneAndReplace(
           filter = pk(userData.mtdItId, userData.nino, userData.taxYear, userData.journey),
-          replacement = userData.copy(lastUpdated = timeMachine.instantNow),
+          replacement = userData.copy(lastUpdated = Instant.now(clock)),
           options = FindOneAndReplaceOptions()
             .upsert(true)
             .returnDocument(model.ReturnDocument.AFTER)

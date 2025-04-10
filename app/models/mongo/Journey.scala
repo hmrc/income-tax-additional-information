@@ -18,9 +18,9 @@ package models.mongo
 
 import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 
-sealed trait Journey { val name: String }
+sealed abstract class Journey(val name: String)
 
-object BusinessTaxReliefs extends Journey { override val name: String = "businessTaxReliefs" }
+object BusinessTaxReliefs extends Journey("businessTaxReliefs")
 
 object Journey {
   implicit val format: Format[Journey] = new Format[Journey] {
