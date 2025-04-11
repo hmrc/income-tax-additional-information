@@ -114,7 +114,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
                 authoriseIndividual()
 
-                val result = urlPost(routes.UserAnswersController.set().url, Json.toJson(userAnswers))
+                val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers))
 
                 result.status shouldBe NO_CONTENT
                 await(repo.get(user.mtditid, user.nino, taxYear, BusinessTaxReliefs)) shouldBe Some(userAnswers)
@@ -130,7 +130,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
                 val updatedAnswers = userAnswers.copy(data = Json.obj("foo" -> "bar"))
 
-                val result = urlPost(routes.UserAnswersController.set().url, Json.toJson(updatedAnswers))
+                val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(updatedAnswers))
 
                 result.status shouldBe NO_CONTENT
                 await(repo.get(user.mtditid, user.nino, taxYear, BusinessTaxReliefs)) shouldBe Some(updatedAnswers)
@@ -144,7 +144,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
               authoriseIndividual()
 
-              val result = urlPost(routes.UserAnswersController.set().url, Json.toJson(userAnswers).as[JsObject].-("mtdItId"))
+              val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers).as[JsObject].-("mtdItId"))
 
               result.status shouldBe BAD_REQUEST
               result.body should include(
@@ -160,7 +160,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
             authoriseIndividual()
 
-            val result = urlPost(routes.UserAnswersController.set().url, "")
+            val result = urlPut(routes.UserAnswersController.set().url, "")
 
             result.status shouldBe BAD_REQUEST
             result.body should include("No JSON payload received")
@@ -174,7 +174,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
           authoriseIndividual()
 
-          val result = urlPost(routes.UserAnswersController.set().url, Json.toJson(userAnswers.copy(mtdItId = "wrong-mtdItId")))
+          val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers.copy(mtdItId = "wrong-mtdItId")))
 
           result.status shouldBe FORBIDDEN
           result.body should include("Attempting to save UserAnswers for another user")
@@ -188,7 +188,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
         authoriseIndividualUnauthorized()
 
-        val result = urlPost(routes.UserAnswersController.set().url, Json.toJson(userAnswers))
+        val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers))
 
         result.status shouldBe UNAUTHORIZED
       }

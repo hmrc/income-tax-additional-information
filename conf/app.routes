@@ -16,7 +16,7 @@ PUT       /income-tax/income/insurance-policies/:taxYear/session             con
 GET       /income-tax/income/insurance-policies/:taxYear/session             controllers.GetGainsSessionDataController.getSession(taxYear: Int)
 DELETE    /income-tax/income/insurance-policies/:taxYear/session             controllers.DeleteGainsSessionDataController.deleteSession(taxYear: Int)
 
-POST      /income-tax/user-answers                                           controllers.UserAnswersController.set()
+PUT       /income-tax/user-answers                                           controllers.UserAnswersController.set()
 GET       /income-tax/user-answers/:taxYear/:journey                         controllers.UserAnswersController.get(taxYear: Int, journey: Journey)
 DELETE    /income-tax/user-answers/:taxYear/:journey                         controllers.UserAnswersController.delete(taxYear: Int, journey: Journey)
 
