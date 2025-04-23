@@ -122,11 +122,22 @@ trait IntegrationTest extends AnyWordSpec
     super.afterAll()
   }
 
+  lazy val defaultHeaders: Seq[(String, String)] = Seq(
+    "Authorization" -> s"Bearer token",
+    "mtditid" -> user.mtditid,
+    "sessionId" -> user.sessionId
+  )
+
   protected def urlGet(url: String, welsh: Boolean = false, follow: Boolean = false,
                        headers: Seq[(String, String)] = Seq())(implicit wsClient: WSClient): WSResponse = {
-
     val newHeaders = if (welsh) Seq(HeaderNames.ACCEPT_LANGUAGE -> "cy") ++ headers else headers
-    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders: _*).get())
+    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders ++ defaultHeaders: _*).get())
+  }
+
+  def urlDelete(url: String, welsh: Boolean = false, follow: Boolean = false,
+                       headers: Seq[(String, String)] = Seq())(implicit wsClient: WSClient): WSResponse = {
+    val newHeaders = if (welsh) Seq(HeaderNames.ACCEPT_LANGUAGE -> "cy") ++ headers else headers
+    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders ++ defaultHeaders: _*).delete())
   }
 
   def urlPost[T](url: String,
@@ -138,7 +149,7 @@ trait IntegrationTest extends AnyWordSpec
 
     val headersWithNoCheck = headers ++ Seq("Csrf-Token" -> "nocheck")
     val newHeaders = if (welsh) Seq(HeaderNames.ACCEPT_LANGUAGE -> "cy") ++ headersWithNoCheck else headersWithNoCheck
-    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders: _*).post(body))
+    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders ++ defaultHeaders: _*).post(body))
   }
 
   def urlPut[T](url: String,
@@ -150,7 +161,7 @@ trait IntegrationTest extends AnyWordSpec
 
     val headersWithNoCheck = headers ++ Seq("Csrf-Token" -> "nocheck")
     val newHeaders = if (welsh) Seq(HeaderNames.ACCEPT_LANGUAGE -> "cy") ++ headersWithNoCheck else headersWithNoCheck
-    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders: _*).put(body))
+    await(wsClient.url(fullUrl(url)).withFollowRedirects(follow).withHttpHeaders(newHeaders ++ defaultHeaders: _*).put(body))
   }
 
   private def fullUrl(endOfUrl: String): String = s"http://localhost:$port" + endOfUrl

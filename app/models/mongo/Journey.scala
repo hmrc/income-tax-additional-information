@@ -16,19 +16,31 @@
 
 package models.mongo
 
-import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
+import play.api.libs.json.{Format, JsResult, JsString, JsValue}
+import play.api.mvc.PathBindable
 
 sealed abstract class Journey(val name: String)
 
 object BusinessTaxReliefs extends Journey("businessTaxReliefs")
 
 object Journey {
+
+  def apply(name: String): Journey = name match {
+    case BusinessTaxReliefs.name => BusinessTaxReliefs
+    case invalid                 => throw new IllegalArgumentException("Invalid journey name supplied: " + invalid)
+  }
+
   implicit val format: Format[Journey] = new Format[Journey] {
     override def writes(model: Journey): JsValue = JsString(model.name)
+    override def reads(json: JsValue): JsResult[Journey] = json.validate[String].map(apply)
+  }
 
-    override def reads(json: JsValue): JsResult[Journey] = json match {
-      case JsString(BusinessTaxReliefs.name) => JsSuccess(BusinessTaxReliefs)
-      case _ => JsError("Unknown journey")
-    }
+  implicit def pathBindable(implicit strBinder: PathBindable[String]): PathBindable[Journey] = new PathBindable[Journey] {
+
+    override def bind(key: String, value: String): Either[String, Journey] =
+      strBinder.bind(key, value).map(Journey(_))
+
+    override def unbind(key: String, journey: Journey): String =
+      strBinder.unbind(key, journey.name)
   }
 }

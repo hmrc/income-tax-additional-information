@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "income-tax-additional-information"
@@ -55,7 +56,8 @@ lazy val microservice = Project(appName, file("."))
     scalacOptions ++= Seq(
       "-Wconf:cat=unused-imports&src=.*routes.*:s",
       "-Wconf:cat=unused&src=.*routes.*:s"
-    )
+    ),
+    RoutesKeys.routesImport ++= Seq("models.mongo.Journey")
   )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(PlayKeys.playDefaultPort.withRank(KeyRanks.Invisible) := 10004)
