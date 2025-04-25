@@ -57,7 +57,7 @@ class UserAnswersController @Inject()(userAnswersService: UserAnswersService,
   }
 
   private def checkUser(userAnswers: UserAnswersModel)(f: => Future[Result])(implicit user: User[_]): Future[Result] =
-    if (userAnswers.mtdItId == user.mtditid && userAnswers.nino == user.nino) f else {
+    if (userAnswers.mtdItId == user.mtditid) f else {
       Future(Forbidden("Attempting to save UserAnswers for another user"))
     }
 }
