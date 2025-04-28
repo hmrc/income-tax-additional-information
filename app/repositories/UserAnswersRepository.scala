@@ -44,18 +44,17 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
     replaceIndexes = appConfig.userAnswersReplaceIndexes
   ) {
 
-  private def pk(mtdItId: String, nino: String, taxYear: Int, journey: Journey): Bson = and(
+  private def journeyFilter(mtdItId: String, taxYear: Int, journey: Journey): Bson = and(
     equal("mtdItId", toBson(mtdItId)),
-    equal("nino", toBson(nino)),
     equal("taxYear", toBson(taxYear)),
     equal("journey", toBson(journey))
   )
 
-  def get(mtdItId: String, nino: String, taxYear: Int, journey: Journey): Future[Option[UserAnswersModel]] =
+  def get(mtdItId: String, taxYear: Int, journey: Journey): Future[Option[UserAnswersModel]] =
     Mdc.preservingMdc(
       collection
         .findOneAndUpdate(
-          filter = pk(mtdItId, nino, taxYear, journey),
+          filter = journeyFilter(mtdItId, taxYear, journey),
           update = Updates.set("lastUpdated", Instant.now(clock)),
           options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
         )
@@ -66,7 +65,7 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
     Mdc.preservingMdc(
       collection
         .findOneAndReplace(
-          filter = pk(userData.mtdItId, userData.nino, userData.taxYear, userData.journey),
+          filter = journeyFilter(userData.mtdItId, userData.taxYear, userData.journey),
           replacement = userData.copy(lastUpdated = Instant.now(clock)),
           options = FindOneAndReplaceOptions()
             .upsert(true)
@@ -75,10 +74,10 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
         .toFuture()
     )
 
-  def delete(mtdItId: String, nino: String, taxYear: Int, journey: Journey): Future[DeleteResult] =
+  def delete(mtdItId: String, taxYear: Int, journey: Journey): Future[DeleteResult] =
     Mdc.preservingMdc(
       collection
-        .deleteOne(pk(mtdItId, nino, taxYear, journey))
+        .deleteOne(journeyFilter(mtdItId, taxYear, journey))
         .toFuture()
     )
 }

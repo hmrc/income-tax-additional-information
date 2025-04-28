@@ -56,7 +56,7 @@ class UserAnswersServiceISpec extends IntegrationTest {
       val result = await(service.set(userAnswers))
       result.data shouldBe userAnswers.data
 
-      await(repo.get(userAnswers.mtdItId, userAnswers.nino, taxYear, BusinessTaxReliefs)).map(_.data) shouldBe Some(userAnswers.data)
+      await(repo.get(userAnswers.mtdItId, taxYear, BusinessTaxReliefs)).map(_.data) shouldBe Some(userAnswers.data)
     }
   }
 
@@ -64,10 +64,10 @@ class UserAnswersServiceISpec extends IntegrationTest {
 
     "remove the answers for the specific user and journey" in {
       await(repo.set(userAnswers))
-      await(repo.get(userAnswers.mtdItId, userAnswers.nino, taxYear, BusinessTaxReliefs)).map(_.data) shouldBe Some(userAnswers.data)
+      await(repo.get(userAnswers.mtdItId, taxYear, BusinessTaxReliefs)).map(_.data) shouldBe Some(userAnswers.data)
 
       await(service.delete(taxYear, BusinessTaxReliefs)) shouldBe Done
-      await(repo.get(userAnswers.mtdItId, userAnswers.nino, taxYear, BusinessTaxReliefs)) shouldBe None
+      await(repo.get(userAnswers.mtdItId, taxYear, BusinessTaxReliefs)) shouldBe None
     }
   }
 }
