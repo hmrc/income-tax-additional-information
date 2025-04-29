@@ -74,13 +74,13 @@ class UserAnswersRepositoryISpec extends IntegrationTest with FutureAwaits with 
   ".get" should {
 
     "return None when no document exists" in new Fixture {
-      await(userAnswersRepo.get(userAnswers.mtdItId, userAnswers.nino, userAnswers.taxYear, userAnswers.journey)) mustBe None
+      await(userAnswersRepo.get(userAnswers.mtdItId, userAnswers.taxYear, userAnswers.journey)) mustBe None
     }
 
     "return Some(UserAnswers) when document exists" in new Fixture {
       await(userAnswersRepo.set(userAnswers))
       count mustBe 1
-      val result: Option[UserAnswersModel] = await(userAnswersRepo.get(userAnswers.mtdItId, userAnswers.nino, userAnswers.taxYear, userAnswers.journey))
+      val result: Option[UserAnswersModel] = await(userAnswersRepo.get(userAnswers.mtdItId, userAnswers.taxYear, userAnswers.journey))
       result.map(_.data) mustBe Some(Json.obj())
     }
   }
@@ -92,7 +92,7 @@ class UserAnswersRepositoryISpec extends IntegrationTest with FutureAwaits with 
       await(userAnswersRepo.set(userAnswers.copy(mtdItId = "other")))
       await(userAnswersRepo.set(userAnswers.copy(mtdItId = "other2")))
       count shouldBe 3
-      val deleted: DeleteResult = await(userAnswersRepo.delete(userAnswers.mtdItId, userAnswers.nino, userAnswers.taxYear, userAnswers.journey))
+      val deleted: DeleteResult = await(userAnswersRepo.delete(userAnswers.mtdItId, userAnswers.taxYear, userAnswers.journey))
       deleted.getDeletedCount mustBe 1
       count shouldBe 2
     }

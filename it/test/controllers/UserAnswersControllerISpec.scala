@@ -117,7 +117,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
                 val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers))
 
                 result.status shouldBe NO_CONTENT
-                await(repo.get(user.mtditid, user.nino, taxYear, BusinessTaxReliefs)) shouldBe Some(userAnswers)
+                await(repo.get(user.mtditid, taxYear, BusinessTaxReliefs)) shouldBe Some(userAnswers)
               }
             }
 
@@ -133,7 +133,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
                 val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(updatedAnswers))
 
                 result.status shouldBe NO_CONTENT
-                await(repo.get(user.mtditid, user.nino, taxYear, BusinessTaxReliefs)) shouldBe Some(updatedAnswers)
+                await(repo.get(user.mtditid, taxYear, BusinessTaxReliefs)) shouldBe Some(updatedAnswers)
               }
             }
           }
@@ -209,7 +209,7 @@ class UserAnswersControllerISpec extends IntegrationTest {
           val result = urlDelete(routes.UserAnswersController.delete(taxYear, BusinessTaxReliefs).url)
 
           result.status shouldBe NO_CONTENT
-          await(repo.get(user.mtditid, user.nino, taxYear, BusinessTaxReliefs)) shouldBe None
+          await(repo.get(user.mtditid, taxYear, BusinessTaxReliefs)) shouldBe None
         }
       }
 
