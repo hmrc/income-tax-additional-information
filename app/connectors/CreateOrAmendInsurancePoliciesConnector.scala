@@ -27,6 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CreateOrAmendInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
+  // For connectivity to IF API#1614 - Create/Update Insurance Policies
   def createOrAmendInsurancePolicies(nino: String,
                                      taxYear: Int,
                                      createOrAmendinsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)(implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
