@@ -22,12 +22,10 @@ import helpers.WiremockSpec
 import models._
 import models.otherReliefs._
 import org.scalatestplus.play.PlaySpec
-import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, SessionId}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.TaxYearUtils.convertStringTaxYear
 
 class CreateOrUpdateOtherReliefsConnectorISpec extends PlaySpec with WiremockSpec {
@@ -58,10 +56,10 @@ class CreateOrUpdateOtherReliefsConnectorISpec extends PlaySpec with WiremockSpe
     nonDeductableLoanInterest = None,
     payrollGiving = None,
     qualifyingDistributionRedemptionOfSharesAndSecurities = None,
-    maintenancePayments = Some(Seq()),
-    postCessationTradeReliefAndCertainOtherLosses = Some(Seq()),
+    maintenancePayments = Some(Seq.empty),
+    postCessationTradeReliefAndCertainOtherLosses = Some(Seq.empty),
     annualPaymentsMade = None,
-    qualifyingLoanInterestPayments = Some(Seq()),
+    qualifyingLoanInterestPayments = Some(Seq.empty),
   )
 
   val modelEmpty: JsObject = Json.obj()
