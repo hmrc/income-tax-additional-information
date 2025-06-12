@@ -73,6 +73,26 @@ class CreateOrUpdateOtherReliefsModelSpec extends TestSuite {
     Some(Seq(validQualifyingLoanInterestPaymentsModel))
   )
 
+  val emptyCreateOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel = CreateOrUpdateOtherReliefsModel(
+    None,
+    None,
+    None,
+    None,
+    None,
+    None,
+    None
+  )
+
+  val emptySeqCreateOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel = CreateOrUpdateOtherReliefsModel(
+    None,
+    None,
+    None,
+    Some(Seq()),
+    Some(Seq()),
+    None,
+    Some(Seq())
+  )
+
   val validJson: JsObject = Json.obj(
     "nonDeductableLoanInterest" -> Json.obj(
       "customerReference" -> "RefNo13254687",
@@ -117,13 +137,24 @@ class CreateOrUpdateOtherReliefsModelSpec extends TestSuite {
     ),
   )
 
+  val emptyJson: JsObject = Json.obj()
+
   "CreateOrUpdateOtherReliefs" should {
-    "parse from json" in {
-      validJson.as[CreateOrUpdateOtherReliefsModel] mustBe validCreateOrUpdateOtherReliefsModel
+    "parse from json for valid" in {
+      validJson.as[CreateOrUpdateOtherReliefsModel](CreateOrUpdateOtherReliefsModel.reads) mustBe validCreateOrUpdateOtherReliefsModel
+    }
+    "parse from json for empty json" in {
+      emptyJson.as[CreateOrUpdateOtherReliefsModel](CreateOrUpdateOtherReliefsModel.reads) mustBe emptyCreateOrUpdateOtherReliefsModel
     }
 
-    "parse to json" in {
-      Json.toJson(validCreateOrUpdateOtherReliefsModel) mustBe validJson
+    "parse to json for valid" in {
+      Json.toJson(validCreateOrUpdateOtherReliefsModel)(CreateOrUpdateOtherReliefsModel.writes) mustBe validJson
+    }
+    "parse to json for full empty model" in {
+      Json.toJson(emptyCreateOrUpdateOtherReliefsModel)(CreateOrUpdateOtherReliefsModel.writes) mustBe emptyJson
+    }
+    "parse to json for model with empty seq()" in {
+      Json.toJson(emptySeqCreateOrUpdateOtherReliefsModel)(CreateOrUpdateOtherReliefsModel.writes) mustBe emptyJson
     }
   }
 

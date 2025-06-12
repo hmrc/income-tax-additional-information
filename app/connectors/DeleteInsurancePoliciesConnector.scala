@@ -18,20 +18,21 @@ package connectors
 
 import config.AppConfig
 import connectors.parsers.DeleteInsurancePoliciesParser.{DeleteInsurancePoliciesHttpReads, DeleteInsurancePoliciesResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertStringTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeleteInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class DeleteInsurancePoliciesConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
   def deleteInsurancePoliciesData(nino: String,
                                   taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] = {
 
     val taxYearParameter = convertStringTaxYear(taxYear)
     val deleteInsurancePoliciesUrl: String = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
 
-    http.DELETE[DeleteInsurancePoliciesResponse](deleteInsurancePoliciesUrl)(DeleteInsurancePoliciesHttpReads,
-      ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePolicies), ec)
+    http.delete(url"$deleteInsurancePoliciesUrl")(ifHeaderCarrier(deleteInsurancePoliciesUrl, DeleteInsurancePolicies))
+      .execute[DeleteInsurancePoliciesResponse](DeleteInsurancePoliciesHttpReads, ec)
   }
 }

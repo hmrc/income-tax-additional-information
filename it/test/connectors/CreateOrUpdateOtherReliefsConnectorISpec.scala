@@ -25,7 +25,8 @@ import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, SessionId}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, SessionId}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.TaxYearUtils.convertStringTaxYear
 
@@ -39,9 +40,11 @@ class CreateOrUpdateOtherReliefsConnectorISpec extends PlaySpec with WiremockSpe
 
   val url = s"/income-tax/reliefs/other/$nino/$taxYearParameter"
 
-  lazy val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+  lazy val httpClient: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
 
-  def appConfig: AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig])
+  def appConfig: AppConfig = app.injector.instanceOf[BackendAppConfig]
+
+  //def appConfig: AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig])
 
   val model: CreateOrUpdateOtherReliefsModel = CreateOrUpdateOtherReliefsModel(
     nonDeductableLoanInterest = Some(NonDeductableLoanInterestModel(Some("RefNo13254687"), 123.45)),
@@ -51,6 +54,16 @@ class CreateOrUpdateOtherReliefsConnectorISpec extends PlaySpec with WiremockSpe
     postCessationTradeReliefAndCertainOtherLosses = Some(Seq(PostCessationTradeReliefModel(Some("RefNo13254687"), Some("Monsters Inc"), Some("01-01-2025"), Some("Power Distribution"), Some("Cash"), 123.49))),
     annualPaymentsMade = Some(AnnualPaymentsMadeModel(Some("RefNo13254687"), 123.50)),
     qualifyingLoanInterestPayments = Some(Seq(QualifyingLoanInterestPaymentsModel(Some("RefNo13254687"), Some("Bank"), 123.51))),
+  )
+
+  val emptyModel: CreateOrUpdateOtherReliefsModel = CreateOrUpdateOtherReliefsModel(
+    nonDeductableLoanInterest = None,
+    payrollGiving = None,
+    qualifyingDistributionRedemptionOfSharesAndSecurities = None,
+    maintenancePayments = Some(Seq()),
+    postCessationTradeReliefAndCertainOtherLosses = Some(Seq()),
+    annualPaymentsMade = None,
+    qualifyingLoanInterestPayments = Some(Seq()),
   )
 
   val modelEmpty: JsObject = Json.obj()

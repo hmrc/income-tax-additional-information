@@ -18,17 +18,19 @@ package connectors
 
 import config.AppConfig
 import connectors.parsers.GetInsurancePoliciesParser.{GetInsurancePoliciesResponse, InsurancePoliciesHttpReads}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertStringTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GetInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class GetInsurancePoliciesConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
   def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
     val taxYearParameter = convertStringTaxYear(taxYear)
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
-    http.GET[GetInsurancePoliciesResponse](insurancePoliciesUrl)(InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, GetInsurancePolicies), ec)
+    http.get(url"$insurancePoliciesUrl")(ifHeaderCarrier(insurancePoliciesUrl, GetInsurancePolicies))
+      .execute[GetInsurancePoliciesResponse](InsurancePoliciesHttpReads, ec)
   }
 }

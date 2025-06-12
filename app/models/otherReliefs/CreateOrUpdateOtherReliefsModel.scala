@@ -16,7 +16,7 @@
 
 package models.otherReliefs
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OWrites, Reads}
 
 case class CreateOrUpdateOtherReliefsModel(nonDeductableLoanInterest: Option[NonDeductableLoanInterestModel],
                                            payrollGiving: Option[PayrollGivingModel],
@@ -24,21 +24,18 @@ case class CreateOrUpdateOtherReliefsModel(nonDeductableLoanInterest: Option[Non
                                            maintenancePayments: Option[Seq[MaintenancePaymentsModel]],
                                            postCessationTradeReliefAndCertainOtherLosses: Option[Seq[PostCessationTradeReliefModel]],
                                            annualPaymentsMade: Option[AnnualPaymentsMadeModel],
-                                           qualifyingLoanInterestPayments: Option[Seq[QualifyingLoanInterestPaymentsModel]]){
-
-  def clearModel: CreateOrUpdateOtherReliefsModel = {
-    CreateOrUpdateOtherReliefsModel(
-      nonDeductableLoanInterest = nonDeductableLoanInterest,
-      payrollGiving = payrollGiving,
-      qualifyingDistributionRedemptionOfSharesAndSecurities = qualifyingDistributionRedemptionOfSharesAndSecurities,
-      maintenancePayments = if (maintenancePayments.exists(_.isEmpty)) None else maintenancePayments,
-      postCessationTradeReliefAndCertainOtherLosses = if (postCessationTradeReliefAndCertainOtherLosses.exists(_.isEmpty)) None else postCessationTradeReliefAndCertainOtherLosses,
-      annualPaymentsMade = annualPaymentsMade,
-      qualifyingLoanInterestPayments = if (qualifyingLoanInterestPayments.exists(_.isEmpty)) None else qualifyingLoanInterestPayments
-    )
-  }
-}
+                                           qualifyingLoanInterestPayments: Option[Seq[QualifyingLoanInterestPaymentsModel]])
 
 object CreateOrUpdateOtherReliefsModel {
-  implicit val formats: OFormat[CreateOrUpdateOtherReliefsModel] = Json.format[CreateOrUpdateOtherReliefsModel]
+  implicit val reads: Reads[CreateOrUpdateOtherReliefsModel] = Json.reads[CreateOrUpdateOtherReliefsModel]
+
+  implicit val writes: OWrites[CreateOrUpdateOtherReliefsModel] = OWrites[CreateOrUpdateOtherReliefsModel] { model =>
+    val removedEmpty = model.copy(
+      maintenancePayments = if (model.maintenancePayments.exists(_.isEmpty)) None else model.maintenancePayments,
+      postCessationTradeReliefAndCertainOtherLosses = if (model.postCessationTradeReliefAndCertainOtherLosses.exists(_.isEmpty)) None else model.postCessationTradeReliefAndCertainOtherLosses,
+      qualifyingLoanInterestPayments = if (model.qualifyingLoanInterestPayments.exists(_.isEmpty)) None else model.qualifyingLoanInterestPayments
+    )
+
+    Json.writes[CreateOrUpdateOtherReliefsModel].writes(removedEmpty)
+  }
 }
