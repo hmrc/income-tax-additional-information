@@ -18,20 +18,21 @@ package connectors
 
 import config.AppConfig
 import connectors.parsers.DeleteOtherEmploymentsIncomeParser.{DeleteOtherEmploymentsIncomeHttpReads, DeleteOtherEmploymentsIncomeResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertStringTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeleteOtherEmploymentsIncomeConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class DeleteOtherEmploymentsIncomeConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
   def deleteOtherEmploymentsIncomeData(nino: String,
                                        taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] = {
 
     val taxYearParameter = convertStringTaxYear(taxYear)
-    val deleteOtherEmploymentsIncome: String = appConfig.ifBaseUrl + s"/income-tax/income/other/employments/$taxYearParameter/$nino"
+    val deleteOtherEmploymentsIncomeUrl: String = appConfig.ifBaseUrl + s"/income-tax/income/other/employments/$taxYearParameter/$nino"
 
-    http.DELETE[DeleteOtherEmploymentsIncomeResponse](deleteOtherEmploymentsIncome)(DeleteOtherEmploymentsIncomeHttpReads,
-      ifHeaderCarrier(deleteOtherEmploymentsIncome, DeleteOtherEmploymentsIncome), ec)
+    http.delete(url"$deleteOtherEmploymentsIncomeUrl")(ifHeaderCarrier(deleteOtherEmploymentsIncomeUrl, DeleteOtherEmploymentsIncome))
+      .execute[DeleteOtherEmploymentsIncomeResponse](DeleteOtherEmploymentsIncomeHttpReads, ec)
   }
 }

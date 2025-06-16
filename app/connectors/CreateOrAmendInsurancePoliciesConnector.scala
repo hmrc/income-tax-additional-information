@@ -19,21 +19,24 @@ package connectors
 import config.AppConfig
 import connectors.parsers.CreateOrAmendInsurancePoliciesParser.{CreateOrAmendInsurancePoliciesResponse, InsurancePoliciesHttpReads}
 import models.CreateOrAmendInsurancePoliciesModel
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertStringTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateOrAmendInsurancePoliciesConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class CreateOrAmendInsurancePoliciesConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
+  // For connectivity to IF API#1614 - Create/Update Insurance Policies
   def createOrAmendInsurancePolicies(nino: String,
                                      taxYear: Int,
                                      createOrAmendinsurancePoliciesModel: CreateOrAmendInsurancePoliciesModel)(implicit hc: HeaderCarrier): Future[CreateOrAmendInsurancePoliciesResponse] = {
     val taxYearParameter = convertStringTaxYear(taxYear)
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
-      http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl,
-        createOrAmendinsurancePoliciesModel.clearModel)(
-        CreateOrAmendInsurancePoliciesModel.formats.writes(_), InsurancePoliciesHttpReads, ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePolicies), ec)    }
-
+    http.put(url"$insurancePoliciesUrl")(ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePolicies))
+      .withBody(Json.toJson(createOrAmendinsurancePoliciesModel.clearModel)(CreateOrAmendInsurancePoliciesModel.formats.writes(_)))
+      .execute[CreateOrAmendInsurancePoliciesResponse](InsurancePoliciesHttpReads, ec)
+  }
 }

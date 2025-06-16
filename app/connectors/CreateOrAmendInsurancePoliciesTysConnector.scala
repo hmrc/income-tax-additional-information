@@ -19,13 +19,15 @@ package connectors
 import config.AppConfig
 import connectors.parsers.CreateOrAmendInsurancePoliciesParser.{CreateOrAmendInsurancePoliciesResponse, InsurancePoliciesHttpReads}
 import models.CreateOrAmendInsurancePoliciesModel
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertSpecificTaxYear
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClient, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
   def createOrAmendInsurancePolicies(nino: String,
                                      taxYear: Int,
@@ -33,13 +35,9 @@ class CreateOrAmendInsurancePoliciesTysConnector @Inject()(http: HttpClient, val
     val taxYearParameter = convertSpecificTaxYear(taxYear)
 
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$taxYearParameter/$nino"
-      http.PUT[CreateOrAmendInsurancePoliciesModel, CreateOrAmendInsurancePoliciesResponse](insurancePoliciesUrl,
-        createOrAmendinsurancePoliciesModel.clearModel)(
-        CreateOrAmendInsurancePoliciesModel.formats.writes(_),
-        InsurancePoliciesHttpReads,
-        ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePoliciesTys),
-        ec
-      )
+    http.put(url"$insurancePoliciesUrl")(ifHeaderCarrier(insurancePoliciesUrl, PutInsurancePoliciesTys))
+      .withBody(Json.toJson(createOrAmendinsurancePoliciesModel.clearModel)(CreateOrAmendInsurancePoliciesModel.formats.writes(_)))
+      .execute[CreateOrAmendInsurancePoliciesResponse](InsurancePoliciesHttpReads, ec)
   }
 
 }
