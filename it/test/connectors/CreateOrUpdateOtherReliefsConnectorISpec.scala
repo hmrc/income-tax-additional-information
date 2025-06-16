@@ -44,8 +44,6 @@ class CreateOrUpdateOtherReliefsConnectorISpec extends PlaySpec with WiremockSpe
 
   def appConfig: AppConfig = app.injector.instanceOf[BackendAppConfig]
 
-  //def appConfig: AppConfig = new BackendAppConfig(app.injector.instanceOf[Configuration], app.injector.instanceOf[ServicesConfig])
-
   val model: CreateOrUpdateOtherReliefsModel = CreateOrUpdateOtherReliefsModel(
     nonDeductableLoanInterest = Some(NonDeductableLoanInterestModel(Some("RefNo13254687"), 123.45)),
     payrollGiving = Some(PayrollGivingModel(Some("RefNo13254687"), 123.46)),
