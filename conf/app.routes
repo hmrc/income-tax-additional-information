@@ -3,6 +3,9 @@ GET        /income-tax/insurance-policies/income/:nino/:taxYear              con
 PUT        /income-tax/insurance-policies/income/:nino/:taxYear              controllers.CreateOrAmendInsurancePoliciesController.createOrAmendInsurancePolicies(nino:String, taxYear: Int)
 DELETE     /income-tax/insurance-policies/income/:nino/:taxYear              controllers.DeleteInsurancePoliciesController.deleteInsurancePoliciesData(nino: String, taxYear: Int)
 
+## IF #1632 - v0.1.0 ###
+PUT        /income-tax/reliefs/other/:nino/:taxYear                          controllers.CreateOrUpdateOtherReliefsController.createOrUpdateOtherReliefs(nino:String, taxYear: Int)
+
 GET        /:taxYear/tasks/:nino                                             controllers.CommonTaskListController.getCommonTaskList(taxYear: Int, nino: String)
 
 ### IF #1794 - v9.1.0 ###

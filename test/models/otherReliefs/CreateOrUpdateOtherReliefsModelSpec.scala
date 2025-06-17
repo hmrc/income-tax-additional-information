@@ -87,10 +87,10 @@ class CreateOrUpdateOtherReliefsModelSpec extends TestSuite {
     None,
     None,
     None,
-    Some(Seq()),
-    Some(Seq()),
+    Some(Seq.empty),
+    Some(Seq.empty),
     None,
-    Some(Seq())
+    Some(Seq.empty)
   )
 
   val validJson: JsObject = Json.obj(
