@@ -82,7 +82,6 @@ trait IntegrationTest extends AnyWordSpec
     "microservice.services.income-tax-submission.url" -> "http://localhost:11111",
     "microservice.services.view-and-change.url" -> "http://localhost:11111",
     "microservice.services.sign-in.url" -> s"/auth-login-stub/gg-sign-in",
-    "taxYearErrorFeatureSwitch" -> "false",
     "useEncryption" -> "true"
   )
 
@@ -98,7 +97,6 @@ trait IntegrationTest extends AnyWordSpec
     "microservice.services.income-tax-submission.url" -> s"http://$wiremockHost:$wiremockPort",
     "microservice.services.view-and-change.url" -> s"http://$wiremockHost:$wiremockPort",
     "microservice.services.sign-in.url" -> s"/auth-login-stub/gg-sign-in",
-    "taxYearErrorFeatureSwitch" -> "false",
     "useEncryption" -> "true",
     "mongodb.encryption.key" -> "key"
   )

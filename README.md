@@ -1,4 +1,3 @@
-
 # income-tax-additional-info
 
 This is where users can view additional information of the overall state of their income tax submission, tailoring their return, start submitting or append an income source,
@@ -8,15 +7,17 @@ or submit a completed Submission.
 
 You will need to have the following:
 - Installed [MongoDB](https://docs.mongodb.com/manual/installation/)
-- Installed/configured [service manager](https://github.com/hmrc/service-manager).
+- Installed/configured [service manager](https://github.com/hmrc/sm2).
+  
+This can be found in the [developer handbook](https://docs.tax.service.gov.uk/mdtp-handbook/documentation/developer-set-up/)
 
 The service manager profile for this service is:
 
-    sm --start INCOME_TAX_ADDITIONAL_INFO
+    sm2 --start INCOME_TAX_ADDITIONAL_INFO
 Run the following command to start the remaining services locally:
 
     sudo mongod (If not already running)
-    sm --start INCOME_TAX_SUBMISSION_ALL -r
+    sm2 --start INCOME_TAX_SUBMISSION_ALL
 
 This service runs on port: `localhost:10004`
 
@@ -26,25 +27,6 @@ This service runs on port: `localhost:10004`
 - Run Unit and Integration Tests: `sbt test it/test`
 - Run Unit and Integration Tests with coverage report: `sbt runAllChecks`<br/>
   which runs `clean compile coverage test it/test coverageReport`
-
-### Feature Switches
-
-| Feature                | Environments Enabled In            |
-|------------------------|------------------------------------|
-| Welsh                  | Local, QA, Staging                 |
-| Tax Year Error         | Production                         |
-| Dividends              | Local, QA, Staging, Production, ET |
-| Interest               | Local, QA, Staging, Production, ET |
-| GiftAid                | Local, QA, Staging, Production, ET |
-| Student loans          | Local, QA, Staging, Production, ET |
-| EmploymentsEnabled     | Local, QA, Staging, Production, ET |
-| EmploymentsReleased    | Local, QA, Staging, Production, ET |
-| End of year employment | Local, QA, Staging, ET             |
-| CISEnabled             | Local, QA, Staging                 |
-| CISReleased            | Local, QA, Staging                 |
-| CrystallisationEnabled | Local, QA, Staging, Production, ET |
-| TailoringEnabled       | Local                              |
-| GAINSEnabled           | Local, QA, Staging                 |
 
 ## Auth Setup - How to enter the service
 
@@ -56,12 +38,12 @@ auth-wizard - http://localhost:9949/auth-login-stub/gg-sign-in
 |----------------------|----------------------------------------------------------------------|
 | Redirect url         | http://localhost:9302/update-and-submit-income-tax-return/2022/start |
 | Credential Strength  | strong                                                               |
-| Confidence Level      | 250                                                                  |
-| Affinity Group        | Individual                                                           |
+| Confidence Level     | 250                                                                  |
+| Affinity Group       | Individual                                                           |
 | Nino                 | AA123456A                                                            |
 | Enrolment Key 1      | HMRC-MTD-IT                                                          |
-| Identifier Name 1     | MTDITID                                                              |
-| Identifier Value 1    | 1234567890                                                           |
+| Identifier Name 1    | MTDITID                                                              |
+| Identifier Value 1   | 1234567890                                                           |
 
 ### Example Auth Setup - Agent
 
@@ -73,14 +55,14 @@ if running locally outside service manager ensure service is ran including testO
 |----------------------|-----------------------------------------------------------------------------------|
 | Redirect url         | /test-only/2022/additional-parameters?ClientNino=AA123457A&ClientMTDID=1234567890 |
 | Credential Strength  | weak                                                                              |
-| Confidence Level      | 250                                                                               |
-| Affinity Group        | Agent                                                                             |
+| Confidence Level     | 250                                                                               |
+| Affinity Group       | Agent                                                                             |
 | Enrolment Key 1      | HMRC-MTD-IT                                                                       |
-| Identifier Name 1     | MTDITID                                                                           |
-| Identifier Value 1    | 1234567890                                                                        |
+| Identifier Name 1    | MTDITID                                                                           |
+| Identifier Value 1   | 1234567890                                                                        |
 | Enrolment Key 2      | HMRC-AS-AGENT                                                                     |
-| Identifier Name 2     | AgentReferenceNumber                                                              |
-| Identifier Value 2    | XARN1234567                                                                       |
+| Identifier Name 2    | AgentReferenceNumber                                                              |
+| Identifier Value 2   | XARN1234567                                                                       |
 
 ## Income Sources
 Income-Tax-Submission-Frontend is the root of the users journey and links outward to all income sources
@@ -540,35 +522,8 @@ passing along any previously submitted data.
 ```
 </details>
 
-## Dividends, Interest, GiftAid
-These journeys are a part of the Personal-Income-Tax-Submission-Frontend repository see its [readMe](https://github.com/hmrc/personal-income-tax-submission-frontend/blob/main/README.md) for more.
-
-## Employments
-This journey is a part of the Income-Tax-Employment-Frontend repository see its [readMe](https://github.com/hmrc/income-tax-employment-frontend/blob/main/README.md) for more.
-
-## CIS
-This journey is a part of the Income-Tax-Cis-Frontend repository see its [readMe](https://github.com/hmrc/income-tax-cis-frontend/blob/main/README.md) for more.
-
-## Pensions
-This journey is a part of the Income-Tax-Pensions-Frontend repository see its [readMe](https://github.com/hmrc/income-tax-pensions-frontend/blob/main/README.md) for more.
-
-## Gains
+## Upstream service
 These journeys are a part of the Income-Tax-Additional-info-Frontend repository see its [readMe](https://github.com/hmrc/income-tax-additional-info-frontend/blob/main/README.md) for more.
-
-## Crystallisation
-It must be the end of the tax year for a user to submit for crystallisation.
-
-The user also requires the following extra enrollment:
-
-| IR-SA | UTR | Identifier Value, e.g. 1234567890 |
-|-------|-----|----------------------------------|
-
-### Crystallisation in Staging
-Currently, the crystallisation journey and tax account in staging can only be accessed using the following:
-
-| Nino      | MTDITID         |
-|-----------|-----------------|
-| AA888888A | XAIT00000888888 |
 
 ## Ninos with stub data for Income Tax Submission Frontend
 
@@ -583,7 +538,6 @@ Currently, the crystallisation journey and tax account in staging can only be ac
 |-----------|-------------------------------------|---------------------|
 | BB444444A | PAYE data                           | HMRC-Held, Customer |
 | AA123459A | All employments                     | HMRC-Held, Customer |
-
 
 
 ### License
