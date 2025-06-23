@@ -32,7 +32,7 @@ class DeleteOtherEmploymentsIncomeController @Inject()(deleteOtherEmploymentsInc
   def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async {
     implicit user =>
       deleteOtherEmploymentsIncomeService.deleteOtherEmploymentsIncomeData(nino, taxYear).map {
-        case Right(true) => NoContent
+        case Right(_) => NoContent
         case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)
       }
   }

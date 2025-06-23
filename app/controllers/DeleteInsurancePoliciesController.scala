@@ -32,7 +32,7 @@ class DeleteInsurancePoliciesController @Inject()(deleteInsurancePoliciesService
   def deleteInsurancePoliciesData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async {
     implicit user =>
       deleteInsurancePoliciesService.deleteInsurancePoliciesData(nino, taxYear).map {
-        case Right(true) => NoContent
+        case Right(_) => NoContent
         case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)      }
   }
 }

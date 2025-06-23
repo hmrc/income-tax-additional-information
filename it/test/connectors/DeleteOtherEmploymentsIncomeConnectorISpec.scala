@@ -62,7 +62,7 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
         val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
-        result mustBe Right(true)
+        result mustBe Right(())
       }
 
       "the host for IF is 'External'" in {
@@ -73,7 +73,7 @@ class DeleteOtherEmploymentsIncomeConnectorISpec extends PlaySpec with WiremockS
 
         val result = await(connector.deleteOtherEmploymentsIncomeData(nino, taxYear)(hc))
 
-        result mustBe Right(true)
+        result mustBe Right(())
       }
     }
 
