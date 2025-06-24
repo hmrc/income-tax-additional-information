@@ -24,12 +24,12 @@ import utils.PagerDutyHelper.PagerDutyKeys._
 import utils.PagerDutyHelper._
 
 object DeleteOtherEmploymentsIncomeParser extends APIParser with Logging {
-  type DeleteOtherEmploymentsIncomeResponse = Either[ErrorModel, Boolean]
+  type DeleteOtherEmploymentsIncomeResponse = Either[ErrorModel, Unit]
 
   implicit object DeleteOtherEmploymentsIncomeHttpReads extends HttpReads[DeleteOtherEmploymentsIncomeResponse] {
     override def read(method: String, url: String, response: HttpResponse): DeleteOtherEmploymentsIncomeResponse = response.status match {
 
-      case NO_CONTENT => Right(true)
+      case NO_CONTENT => Right(())
       case INTERNAL_SERVER_ERROR =>
         pagerDutyLog(INTERNAL_SERVER_ERROR_FROM_API, logMessage(response))
         handleAPIError(response)

@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
+import connectors.parsers.DeleteOtherEmploymentsIncomeParser.DeleteOtherEmploymentsIncomeResponse
 import models.{ErrorBodyModel, ErrorModel}
 import org.scalamock.handlers.CallHandler3
 import play.api.http.Status._
@@ -45,9 +45,9 @@ class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
     "Return a NO CONTENT if deletes other employments income data successful" in {
 
-      val serviceResult = Right(true)
+      val serviceResult = Right(())
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] =
+      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteOtherEmploymentsIncomeResponse]] =
         (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
           .expects(nino, taxYear, *)
           .returning(Future.successful(serviceResult))
@@ -65,7 +65,7 @@ class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
     "return a Left response" when {
 
       def mockDeleteOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String,
-        Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] = {
+        Int, HeaderCarrier, Future[DeleteOtherEmploymentsIncomeResponse]] = {
         (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
           .expects(nino, taxYear, *)
           .returning(Future.successful(Left(errorModel)))

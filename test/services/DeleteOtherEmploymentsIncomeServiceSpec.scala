@@ -17,7 +17,7 @@
 package services
 
 import connectors.DeleteOtherEmploymentsIncomeConnector
-import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
+import connectors.parsers.DeleteOtherEmploymentsIncomeParser.DeleteOtherEmploymentsIncomeResponse
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,7 +31,7 @@ class DeleteOtherEmploymentsIncomeServiceSpec extends TestSuite {
 
     "return the connector response" in {
 
-      val expectedResult: DeleteInsurancePoliciesResponse = Right(true)
+      val expectedResult: DeleteOtherEmploymentsIncomeResponse = Right(())
 
       (connector.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
         .expects("12345678", 1234, *)
