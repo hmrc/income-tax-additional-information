@@ -4,7 +4,7 @@ import sbt.*
 object AppDependencies {
 
   private val bootstrapBackendPlay30Version = "10.2.0"
-  private val hmrcMongoPlayVersion = "2.9.0"
+  private val hmrcMongoPlayVersion = "2.10.0"
 
   private val jacksonAndPlayExclusions: Seq[InclusionRule] = Seq(
     ExclusionRule(organization = "com.fasterxml.jackson.core"),
