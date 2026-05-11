@@ -18,7 +18,8 @@ package controllers
 
 import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesResponse
 import models._
-import org.scalamock.handlers.CallHandler3
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import play.api.libs.json.Json
 import services.GetInsurancePoliciesService
@@ -30,7 +31,7 @@ import scala.concurrent.Future
 class GetInsurancePoliciesControllerSpec extends TestSuite {
 
   val serviceMock: GetInsurancePoliciesService = mock[GetInsurancePoliciesService]
-  val controller = new GetInsurancePoliciesController(serviceMock, mockControllerComponents, authorisedAction)
+  val controller                               = new GetInsurancePoliciesController(serviceMock, mockControllerComponents, authorisedAction)
 
   val notFoundModel: ErrorModel = ErrorModel(NOT_FOUND, ErrorBodyModel("NotFound", "Unable to find source"))
   val serviceUnavailableModel: ErrorModel =
@@ -39,8 +40,7 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
 
-
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2023
   val mtditid = "someMtditid"
 
@@ -58,13 +58,11 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
     "Return a 200 OK response with valid InsurancePolicies" in {
 
       val serviceResult = Right(insurancePoliciesModel)
-      val finalResult = Json.toJson(insurancePoliciesModel).toString()
+      val finalResult   = Json.toJson(insurancePoliciesModel).toString()
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[GetInsurancePoliciesResponse]] =
-        (serviceMock.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(serviceResult))
-
+      def serviceCallMock(): Unit =
+        when(serviceMock.getInsurancePolicies(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(serviceResult))
 
       val result = {
         mockAuth()
@@ -78,11 +76,9 @@ class GetInsurancePoliciesControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockGetInsurancePoliciesDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[GetInsurancePoliciesResponse]] = {
-        (serviceMock.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(Left(errorModel)))
-      }
+      def mockGetInsurancePoliciesDataWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.getInsurancePolicies(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

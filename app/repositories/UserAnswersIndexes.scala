@@ -37,7 +37,7 @@ object UserAnswersIndexes {
     IndexModel(
       ascending("lastUpdated"),
       IndexOptions()
-        .expireAfter(appConfig.mongoTTL, TimeUnit.DAYS)
+        .expireAfter(appConfig.mongoTTL.toLong, TimeUnit.DAYS)
         .name("last-updated-index")
     )
   )

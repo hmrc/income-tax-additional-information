@@ -19,10 +19,10 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class TaxableLumpSumsAndCertainIncomeModel(
-                                                 amount: BigDecimal,
-                                                 taxPaid: Option[BigDecimal],
-                                                 taxTakenOffInEmployment: Option[Boolean]
-                                               )
+    amount: BigDecimal,
+    taxPaid: Option[BigDecimal],
+    taxTakenOffInEmployment: Option[Boolean]
+)
 
 object TaxableLumpSumsAndCertainIncomeModel {
   implicit val formats: OFormat[TaxableLumpSumsAndCertainIncomeModel] = Json.format[TaxableLumpSumsAndCertainIncomeModel]

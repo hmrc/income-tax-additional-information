@@ -25,16 +25,15 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DeleteGainsSessionDataController @Inject()(gainsSessionService: GainsSessionService,
-                                                 cc: ControllerComponents,
-                                                 authorisedAction: AuthorisedAction)
-                                                (implicit ec: ExecutionContext) extends BackendController(cc) {
+class DeleteGainsSessionDataController @Inject() (gainsSessionService: GainsSessionService,
+                                                  cc: ControllerComponents,
+                                                  authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
-  def deleteSession(taxYear: Int): Action[AnyContent] = authorisedAction.async {
-    implicit user =>
-      gainsSessionService.deleteSessionData(taxYear).map {
-        case Right(_) => NoContent
-        case Left(error) => InternalServerError(Json.toJson(error.message))
-      }
+  def deleteSession(taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
+    gainsSessionService.deleteSessionData(taxYear).map {
+      case Right(_)    => NoContent
+      case Left(error) => InternalServerError(Json.toJson(error.message))
+    }
   }
 }

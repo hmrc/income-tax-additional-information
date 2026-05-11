@@ -19,13 +19,15 @@ package services
 import connectors.DeleteOtherEmploymentsIncomeConnector
 import connectors.parsers.DeleteOtherEmploymentsIncomeParser.DeleteOtherEmploymentsIncomeResponse
 import testUtils.TestSuite
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 class DeleteOtherEmploymentsIncomeServiceSpec extends TestSuite {
   val connector: DeleteOtherEmploymentsIncomeConnector = mock[DeleteOtherEmploymentsIncomeConnector]
-  val service: DeleteOtherEmploymentsIncomeService = new DeleteOtherEmploymentsIncomeService(connector)
+  val service: DeleteOtherEmploymentsIncomeService     = new DeleteOtherEmploymentsIncomeService(connector)
 
   "DeleteInsurancePoliciesData" should {
 
@@ -33,9 +35,8 @@ class DeleteOtherEmploymentsIncomeServiceSpec extends TestSuite {
 
       val expectedResult: DeleteOtherEmploymentsIncomeResponse = Right(())
 
-      (connector.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", 1234, *)
-        .returning(Future.successful(expectedResult))
+      when(connector.deleteOtherEmploymentsIncomeData(eqTo("12345678"), eqTo(1234))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.deleteOtherEmploymentsIncomeData("12345678", 1234))
 

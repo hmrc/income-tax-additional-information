@@ -20,15 +20,17 @@ import connectors.{CreateOrAmendInsurancePoliciesConnector, CreateOrAmendInsuran
 import connectors.parsers.CreateOrAmendInsurancePoliciesParser.CreateOrAmendInsurancePoliciesResponse
 import models._
 import testUtils.TestSuite
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 class CreateOrAmendInsurancePoliciesServiceSpec extends TestSuite {
 
-  val connector: CreateOrAmendInsurancePoliciesConnector = mock[CreateOrAmendInsurancePoliciesConnector]
+  val connector: CreateOrAmendInsurancePoliciesConnector       = mock[CreateOrAmendInsurancePoliciesConnector]
   val tysConnector: CreateOrAmendInsurancePoliciesTysConnector = mock[CreateOrAmendInsurancePoliciesTysConnector]
-  val service: CreateOrAmendInsurancePoliciesService = new CreateOrAmendInsurancePoliciesService(connector, tysConnector)
+  val service: CreateOrAmendInsurancePoliciesService           = new CreateOrAmendInsurancePoliciesService(connector, tysConnector)
 
   val model: CreateOrAmendInsurancePoliciesModel = CreateOrAmendInsurancePoliciesModel(
     lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
@@ -44,9 +46,8 @@ class CreateOrAmendInsurancePoliciesServiceSpec extends TestSuite {
 
       val expectedResult: CreateOrAmendInsurancePoliciesResponse = Right(true)
 
-      (connector.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-        .expects("12345678", 2023, model, *)
-        .returning(Future.successful(expectedResult))
+      when(connector.createOrAmendInsurancePolicies(eqTo("12345678"), eqTo(2023), eqTo(model))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.createOrAmendInsurancePolicies("12345678", 2023, model))
 
@@ -56,9 +57,8 @@ class CreateOrAmendInsurancePoliciesServiceSpec extends TestSuite {
     "return the tysConnector response" in {
       val expectedResult: CreateOrAmendInsurancePoliciesResponse = Right(true)
 
-      (tysConnector.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-        .expects("12345678", 2024, model, *)
-        .returning(Future.successful(expectedResult))
+      when(tysConnector.createOrAmendInsurancePolicies(eqTo("12345678"), eqTo(2024), eqTo(model))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.createOrAmendInsurancePolicies("12345678", 2024, model))
 

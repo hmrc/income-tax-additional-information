@@ -19,9 +19,9 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class ForeignServiceModel(
-                                customerReference: Option[String],
-                                amountDeducted: BigDecimal
-                              )
+    customerReference: Option[String],
+    amountDeducted: BigDecimal
+)
 
 object ForeignServiceModel {
   implicit val formats: OFormat[ForeignServiceModel] = Json.format[ForeignServiceModel]

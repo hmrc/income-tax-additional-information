@@ -23,17 +23,27 @@ import testUtils.TestSuite
 class AllGainsSessionModelSpec extends TestSuite {
 
   val lifeInsurancePolicyModel: PolicyCyaModel = PolicyCyaModel(
-    "sessionId", Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true),
-    Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+    "sessionId",
+    Some("Life Insurance"),
+    Some("123"),
+    Some(0),
+    Some(""),
+    Some(true),
+    Some(0),
+    Some(0),
+    Some(true),
+    Some(123.11),
+    Some(true),
+    Some(123.11)
   )
 
   val cyaModels: Seq[PolicyCyaModel] = Seq(
-      lifeInsurancePolicyModel,
-      lifeInsurancePolicyModel.copy(policyType = Some("Life Annuity")),
-      lifeInsurancePolicyModel.copy(policyType = Some("Capital Redemption")),
-      lifeInsurancePolicyModel.copy(policyType = Some("Voided ISA")),
-      lifeInsurancePolicyModel.copy(policyType = Some("Foreign Policy"))
-    )
+    lifeInsurancePolicyModel,
+    lifeInsurancePolicyModel.copy(policyType = Some("Life Annuity")),
+    lifeInsurancePolicyModel.copy(policyType = Some("Capital Redemption")),
+    lifeInsurancePolicyModel.copy(policyType = Some("Voided ISA")),
+    lifeInsurancePolicyModel.copy(policyType = Some("Foreign Policy"))
+  )
 
   val modelMax: AllGainsSessionModel = AllGainsSessionModel(cyaModels, gateway = Some(true))
 
@@ -42,7 +52,8 @@ class AllGainsSessionModelSpec extends TestSuite {
   val submissionModel: GainsSubmissionModel = AllGainsSessionModel(cyaModels, gateway = Some(true)).toSubmissionModel
 
   val jsonMax: JsObject = Json.obj(
-    "allGains" -> modelMax.allGains, "gateway" -> true
+    "allGains" -> modelMax.allGains,
+    "gateway"  -> true
   )
 
   val jsonMin: JsObject = Json.obj("allGains" -> Seq[PolicyCyaModel](), "gateway" -> Some(true))

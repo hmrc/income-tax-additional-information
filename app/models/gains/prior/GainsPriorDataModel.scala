@@ -20,19 +20,19 @@ import models.gains._
 import play.api.libs.json.{Json, OFormat}
 
 case class GainsPriorDataModel(
-                                submittedOn: String,
-                                lifeInsurance: Option[Seq[LifeInsuranceModel]] = None,
-                                capitalRedemption: Option[Seq[CapitalRedemptionModel]] = None,
-                                lifeAnnuity: Option[Seq[LifeAnnuityModel]] = None,
-                                voidedIsa: Option[Seq[VoidedIsaModel]] = None,
-                                foreign: Option[Seq[ForeignModel]] = None
-                              ) {
+    submittedOn: String,
+    lifeInsurance: Option[Seq[LifeInsuranceModel]] = None,
+    capitalRedemption: Option[Seq[CapitalRedemptionModel]] = None,
+    lifeAnnuity: Option[Seq[LifeAnnuityModel]] = None,
+    voidedIsa: Option[Seq[VoidedIsaModel]] = None,
+    foreign: Option[Seq[ForeignModel]] = None
+) {
   def toPolicyCya: Seq[PolicyCyaModel] = {
-    val lifeInsuranceConverted = lifeInsurance.toSeq.flatMap(_.map(_.toPolicyCya))
+    val lifeInsuranceConverted     = lifeInsurance.toSeq.flatMap(_.map(_.toPolicyCya))
     val capitalRedemptionConverted = capitalRedemption.toSeq.flatMap(_.map(_.toPolicyCya))
-    val lifeAnnuityConverted = lifeAnnuity.toSeq.flatMap(_.map(_.toPolicyCya))
-    val voidedIsaConverted = voidedIsa.toSeq.flatMap(_.map(_.toPolicyCya))
-    val foreignConverted = foreign.toSeq.flatMap(_.map(_.toPolicyCya))
+    val lifeAnnuityConverted       = lifeAnnuity.toSeq.flatMap(_.map(_.toPolicyCya))
+    val voidedIsaConverted         = voidedIsa.toSeq.flatMap(_.map(_.toPolicyCya))
+    val foreignConverted           = foreign.toSeq.flatMap(_.map(_.toPolicyCya))
     lifeInsuranceConverted ++ capitalRedemptionConverted ++ lifeAnnuityConverted ++ voidedIsaConverted ++ foreignConverted
   }
 }

@@ -19,22 +19,22 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class ShareOptionModel(
-                             employerName: String,
-                             employerRef: Option[String],
-                             schemePlanType: String,
-                             dateOfOptionGrant: String,
-                             dateOfEvent: String,
-                             optionNotExercisedButConsiderationReceived: Option[Boolean],
-                             amountOfConsiderationReceived: BigDecimal,
-                             noOfSharesAcquired: Int,
-                             classOfSharesAcquired: Option[String],
-                             exercisePrice: BigDecimal,
-                             amountPaidForOption: BigDecimal,
-                             marketValueOfSharesOnExcise: BigDecimal,
-                             profitOnOptionExercised: BigDecimal,
-                             employersNicPaid: BigDecimal,
-                             taxableAmount: BigDecimal
-                           )
+    employerName: String,
+    employerRef: Option[String],
+    schemePlanType: String,
+    dateOfOptionGrant: String,
+    dateOfEvent: String,
+    optionNotExercisedButConsiderationReceived: Option[Boolean],
+    amountOfConsiderationReceived: BigDecimal,
+    noOfSharesAcquired: Int,
+    classOfSharesAcquired: Option[String],
+    exercisePrice: BigDecimal,
+    amountPaidForOption: BigDecimal,
+    marketValueOfSharesOnExcise: BigDecimal,
+    profitOnOptionExercised: BigDecimal,
+    employersNicPaid: BigDecimal,
+    taxableAmount: BigDecimal
+)
 
 object ShareOptionModel {
   implicit val formats: OFormat[ShareOptionModel] = Json.format[ShareOptionModel]

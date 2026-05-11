@@ -24,7 +24,7 @@ import utils.CypherSyntax.{DecryptableOps, EncryptableOps}
 
 import javax.inject.Inject
 
-class EncryptionService @Inject()(implicit val encryptionService: AesGcmAdCrypto) {
+class EncryptionService @Inject() (implicit val encryptionService: AesGcmAdCrypto) {
 
   // Gains
   def encryptGainsUserData(gainsUserDataModel: GainsUserDataModel): EncryptedGainsUserDataModel = {
@@ -53,22 +53,21 @@ class EncryptionService @Inject()(implicit val encryptionService: AesGcmAdCrypto
     )
   }
 
-  private def encryptAllGainsSessionModel(allGainsSessionModel: AllGainsSessionModel)
-                                           (implicit associatedText: String): EncryptedAllGainsSessionModel = {
+  private def encryptAllGainsSessionModel(allGainsSessionModel: AllGainsSessionModel)(implicit
+      associatedText: String): EncryptedAllGainsSessionModel =
     EncryptedAllGainsSessionModel(
-      allGains = allGainsSessionModel.allGains.map(encryptPolicyCyaModel), allGainsSessionModel.gateway
+      allGains = allGainsSessionModel.allGains.map(encryptPolicyCyaModel),
+      allGainsSessionModel.gateway
     )
-  }
 
-  private def decryptAllGainsSessionModel(allGainsSessionModel: EncryptedAllGainsSessionModel)
-                                           (implicit associatedText: String): AllGainsSessionModel = {
+  private def decryptAllGainsSessionModel(allGainsSessionModel: EncryptedAllGainsSessionModel)(implicit
+      associatedText: String): AllGainsSessionModel =
     AllGainsSessionModel(
-      allGains = allGainsSessionModel.allGains.map(decryptPolicyCyaModel), allGainsSessionModel.gateway
+      allGains = allGainsSessionModel.allGains.map(decryptPolicyCyaModel),
+      allGainsSessionModel.gateway
     )
-  }
 
-  private def encryptPolicyCyaModel(gains: PolicyCyaModel)
-                                  (implicit associatedText: String): EncryptedPolicyCyaModel = {
+  private def encryptPolicyCyaModel(gains: PolicyCyaModel)(implicit associatedText: String): EncryptedPolicyCyaModel =
     EncryptedPolicyCyaModel(
       gains.sessionId.encrypted,
       gains.policyType.map(_.encrypted),
@@ -83,10 +82,8 @@ class EncryptionService @Inject()(implicit val encryptionService: AesGcmAdCrypto
       gains.entitledToDeficiencyRelief.map(_.encrypted),
       gains.deficiencyReliefAmount.map(_.encrypted)
     )
-  }
 
-  private def decryptPolicyCyaModel(gains: EncryptedPolicyCyaModel)
-                                  (implicit associatedText: String): PolicyCyaModel = {
+  private def decryptPolicyCyaModel(gains: EncryptedPolicyCyaModel)(implicit associatedText: String): PolicyCyaModel =
     PolicyCyaModel(
       gains.sessionId.decrypted[String],
       gains.policyType.map(_.decrypted[String]),
@@ -102,5 +99,4 @@ class EncryptionService @Inject()(implicit val encryptionService: AesGcmAdCrypto
       gains.deficiencyReliefAmount.map(_.decrypted[BigDecimal])
     )
 
-  }
 }

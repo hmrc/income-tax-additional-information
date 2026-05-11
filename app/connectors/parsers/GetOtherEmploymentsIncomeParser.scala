@@ -16,7 +16,6 @@
 
 package connectors.parsers
 
-
 import models.{ErrorModel, OtherEmploymentsIncomeModel}
 import play.api.Logging
 import play.api.http.Status._
@@ -29,10 +28,13 @@ object GetOtherEmploymentsIncomeParser extends APIParser with Logging {
 
   implicit object OtherEmploymentsIncomeHttpReads extends HttpReads[GetOtherEmploymentsIncomeResponse] {
     override def read(method: String, url: String, response: HttpResponse): GetOtherEmploymentsIncomeResponse = response.status match {
-      case OK => response.json.validate[OtherEmploymentsIncomeModel].fold[GetOtherEmploymentsIncomeResponse](
-        jsonErrors => badSuccessJsonFromAPI,
-        parserModel => Right(parserModel)
-      )
+      case OK =>
+        response.json
+          .validate[OtherEmploymentsIncomeModel]
+          .fold[GetOtherEmploymentsIncomeResponse](
+            jsonErrors => badSuccessJsonFromAPI,
+            parserModel => Right(parserModel)
+          )
       case BAD_REQUEST | UNPROCESSABLE_ENTITY =>
         pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response)

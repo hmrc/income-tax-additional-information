@@ -18,7 +18,8 @@ package controllers
 
 import connectors.parsers.DeleteOtherEmploymentsIncomeParser.DeleteOtherEmploymentsIncomeResponse
 import models.{ErrorBodyModel, ErrorModel}
-import org.scalamock.handlers.CallHandler3
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import services.DeleteOtherEmploymentsIncomeService
 import testUtils.TestSuite
@@ -38,7 +39,7 @@ class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
 
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2021
 
   "DeleteOtherEmploymentsIncome" should {
@@ -47,10 +48,9 @@ class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
       val serviceResult = Right(())
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteOtherEmploymentsIncomeResponse]] =
-        (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(serviceResult))
+      def serviceCallMock(): Unit =
+        when(serviceMock.deleteOtherEmploymentsIncomeData(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(serviceResult))
 
       val result = {
         mockAuth()
@@ -64,12 +64,9 @@ class DeleteOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockDeleteOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String,
-        Int, HeaderCarrier, Future[DeleteOtherEmploymentsIncomeResponse]] = {
-        (serviceMock.deleteOtherEmploymentsIncomeData(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(Left(errorModel)))
-      }
+      def mockDeleteOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.deleteOtherEmploymentsIncomeData(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

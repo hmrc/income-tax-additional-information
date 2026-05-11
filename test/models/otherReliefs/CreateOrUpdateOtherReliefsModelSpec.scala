@@ -96,45 +96,45 @@ class CreateOrUpdateOtherReliefsModelSpec extends TestSuite {
   val validJson: JsObject = Json.obj(
     "nonDeductableLoanInterest" -> Json.obj(
       "customerReference" -> "RefNo13254687",
-      "reliefClaimed" -> 123.45
+      "reliefClaimed"     -> 123.45
     ),
     "payrollGiving" -> Json.obj(
       "customerReference" -> "RefNo13254687",
-      "reliefClaimed" -> 123.46
+      "reliefClaimed"     -> 123.46
     ),
     "qualifyingDistributionRedemptionOfSharesAndSecurities" -> Json.obj(
       "customerReference" -> "RefNo13254687",
-      "amount" -> 123.47
+      "amount"            -> 123.47
     ),
     "maintenancePayments" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "exSpouseName" -> "Jane Doe",
+        "customerReference"   -> "RefNo13254687",
+        "exSpouseName"        -> "Jane Doe",
         "exSpouseDateOfBirth" -> "01-01-2000",
-        "amount" -> 123.48
+        "amount"              -> 123.48
       )
     ),
     "postCessationTradeReliefAndCertainOtherLosses" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "businessName" -> "Monsters Inc",
+        "customerReference"  -> "RefNo13254687",
+        "businessName"       -> "Monsters Inc",
         "dateBusinessCeased" -> "01-01-2025",
-        "natureOfTrade" -> "Power Distribution",
-        "incomeSource" -> "Cash",
-        "amount" -> 123.49
+        "natureOfTrade"      -> "Power Distribution",
+        "incomeSource"       -> "Cash",
+        "amount"             -> 123.49
       )
     ),
     "annualPaymentsMade" -> Json.obj(
       "customerReference" -> "RefNo13254687",
-      "reliefClaimed" -> 123.50
+      "reliefClaimed"     -> 123.50
     ),
     "qualifyingLoanInterestPayments" -> Json.arr(
       Json.obj(
         "customerReference" -> "RefNo13254687",
-        "lenderName" -> "Bank",
-        "reliefClaimed" -> 123.51
+        "lenderName"        -> "Bank",
+        "reliefClaimed"     -> 123.51
       )
-    ),
+    )
   )
 
   val emptyJson: JsObject = Json.obj()

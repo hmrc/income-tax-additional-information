@@ -18,7 +18,8 @@ package controllers
 
 import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
 import models.{ErrorBodyModel, ErrorModel}
-import org.scalamock.handlers.CallHandler3
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import services.DeleteInsurancePoliciesService
 import testUtils.TestSuite
@@ -26,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class DeleteinsurancePoliciesControllerSpec extends TestSuite{
+class DeleteinsurancePoliciesControllerSpec extends TestSuite {
   val serviceMock: DeleteInsurancePoliciesService = mock[DeleteInsurancePoliciesService]
 
   val controller = new DeleteInsurancePoliciesController(serviceMock, mockControllerComponents, authorisedAction)
@@ -38,7 +39,7 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
 
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2021
 
   "DeleteInsurancePoliciesData" should {
@@ -47,10 +48,9 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
 
       val serviceResult = Right(true)
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse] ]=
-        (serviceMock.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(serviceResult))
+      def serviceCallMock(): Unit =
+        when(serviceMock.deleteInsurancePoliciesData(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(serviceResult))
 
       val result = {
         mockAuth()
@@ -64,11 +64,9 @@ class DeleteinsurancePoliciesControllerSpec extends TestSuite{
 
     "return a Left response" when {
 
-      def mockDeleteSavingIncomeDataWithError(errorModel: ErrorModel): CallHandler3[String, Int, HeaderCarrier, Future[DeleteInsurancePoliciesResponse]] = {
-        (serviceMock.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(Left(errorModel)))
-      }
+      def mockDeleteSavingIncomeDataWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.deleteInsurancePoliciesData(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

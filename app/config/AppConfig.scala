@@ -24,7 +24,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.duration.Duration
 
-
 @ImplementedBy(classOf[BackendAppConfig])
 trait AppConfig {
   def authBaseUrl: String
@@ -46,24 +45,23 @@ trait AppConfig {
 
 }
 
-
-class BackendAppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
+class BackendAppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
 
   val authBaseUrl: String = servicesConfig.baseUrl("auth")
 
   lazy val useEncryption: Boolean = servicesConfig.getBoolean("useEncryption")
 
   // Mongo config
-  lazy val encryptionKey: String = servicesConfig.getString("mongodb.encryption.key")
-  lazy val mongoTTL: Int = Duration(servicesConfig.getString("mongodb.timeToLive")).toDays.toInt
+  lazy val encryptionKey: String              = servicesConfig.getString("mongodb.encryption.key")
+  lazy val mongoTTL: Int                      = Duration(servicesConfig.getString("mongodb.timeToLive")).toDays.toInt
   lazy val userAnswersReplaceIndexes: Boolean = config.get[Boolean]("mongodb.userAnswersReplaceIndexes")
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String = config.get[String]("microservice.metrics.graphite.host")
+  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
 
   lazy val ifAuthorisationToken: String = "microservice.services.integration-framework.authorisation-token"
-  lazy val ifBaseUrl: String = servicesConfig.baseUrl(serviceName = "integration-framework")
-  lazy val ifEnvironment: String = servicesConfig.getString(key = "microservice.services.integration-framework.environment")
+  lazy val ifBaseUrl: String            = servicesConfig.baseUrl(serviceName = "integration-framework")
+  lazy val ifEnvironment: String        = servicesConfig.getString(key = "microservice.services.integration-framework.environment")
 
   val addInfoFEBaseUrl: String = config.get[String]("microservice.services.income-tax-additional-information-frontend.url")
 

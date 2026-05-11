@@ -32,7 +32,8 @@ object CreateOrUpdateOtherReliefsModel {
   implicit val writes: OWrites[CreateOrUpdateOtherReliefsModel] = OWrites[CreateOrUpdateOtherReliefsModel] { model =>
     val removedEmpty = model.copy(
       maintenancePayments = if (model.maintenancePayments.exists(_.isEmpty)) None else model.maintenancePayments,
-      postCessationTradeReliefAndCertainOtherLosses = if (model.postCessationTradeReliefAndCertainOtherLosses.exists(_.isEmpty)) None else model.postCessationTradeReliefAndCertainOtherLosses,
+      postCessationTradeReliefAndCertainOtherLosses =
+        if (model.postCessationTradeReliefAndCertainOtherLosses.exists(_.isEmpty)) None else model.postCessationTradeReliefAndCertainOtherLosses,
       qualifyingLoanInterestPayments = if (model.qualifyingLoanInterestPayments.exists(_.isEmpty)) None else model.qualifyingLoanInterestPayments
     )
 

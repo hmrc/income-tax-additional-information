@@ -25,14 +25,15 @@ import utils.TaxYearUtils.convertStringTaxYear
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeleteOtherEmploymentsIncomeConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
-  def deleteOtherEmploymentsIncomeData(nino: String,
-                                       taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] = {
+class DeleteOtherEmploymentsIncomeConnector @Inject() (http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends IFConnector {
+  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] = {
 
-    val taxYearParameter = convertStringTaxYear(taxYear)
+    val taxYearParameter                        = convertStringTaxYear(taxYear)
     val deleteOtherEmploymentsIncomeUrl: String = appConfig.ifBaseUrl + s"/income-tax/income/other/employments/$taxYearParameter/$nino"
 
-    http.delete(url"$deleteOtherEmploymentsIncomeUrl")(ifHeaderCarrier(deleteOtherEmploymentsIncomeUrl, DeleteOtherEmploymentsIncome))
+    http
+      .delete(url"$deleteOtherEmploymentsIncomeUrl")(ifHeaderCarrier(deleteOtherEmploymentsIncomeUrl, DeleteOtherEmploymentsIncome))
       .execute[DeleteOtherEmploymentsIncomeResponse](DeleteOtherEmploymentsIncomeHttpReads, ec)
   }
 }

@@ -21,10 +21,11 @@ import org.apache.pekko.stream.SystemMaterializer
 import com.codahale.metrics.SharedMetricRegistries
 import common.{EnrolmentIdentifiers, EnrolmentKeys}
 import controllers.predicates.AuthorisedAction
-import org.scalamock.scalatest.MockFactory
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, DefaultActionBuilder, Result}
 import play.api.test.{FakeRequest, Helpers}
 import support.providers.AppConfigStubProvider
@@ -35,33 +36,36 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Awaitable, ExecutionContext, Future}
 
-trait TestSuite extends AnyWordSpec with Matchers with MockFactory with BeforeAndAfterEach with AppConfigStubProvider{
+trait TestSuite extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach with AppConfigStubProvider {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     SharedMetricRegistries.clear()
   }
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
+  implicit val actorSystem: ActorSystem         = ActorSystem()
   implicit val materializer: SystemMaterializer = SystemMaterializer(actorSystem)
 
   def await[T](awaitable: Awaitable[T]): T = Await.result(awaitable, Duration.Inf)
 
-  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("mtditid" -> "1234567890",
-    SessionKeys.sessionId -> "some-session-id")
-  val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession("MTDITID" -> "1234567890")
+  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withHeaders("mtditid" -> "1234567890", SessionKeys.sessionId -> "some-session-id")
+  val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    .withSession("MTDITID" -> "1234567890")
     .withHeaders(SessionKeys.sessionId -> "some-session-id")
   implicit val emptyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 
   implicit val mockControllerComponents: ControllerComponents = Helpers.stubControllerComponents()
-  implicit val mockExecutionContext: ExecutionContext = ExecutionContext.Implicits.global
-  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val defaultActionBuilder: DefaultActionBuilder = DefaultActionBuilder(mockControllerComponents.parsers.default)
+  implicit val mockExecutionContext: ExecutionContext         = ExecutionContext.Implicits.global
+  implicit val mockAuthConnector: AuthConnector               = mock[AuthConnector]
+  val defaultActionBuilder: DefaultActionBuilder              = DefaultActionBuilder(mockControllerComponents.parsers.default)
   val authorisedAction = new AuthorisedAction()(mockAuthConnector, defaultActionBuilder, mockControllerComponents)
-
 
   def status(awaitable: Future[Result]): Int = await(awaitable).header.status
 
@@ -70,43 +74,42 @@ trait TestSuite extends AnyWordSpec with Matchers with MockFactory with BeforeAn
     await(awaited.body.consumeData.map(_.utf8String))
   }
 
-  val individualEnrolments: Enrolments = Enrolments(Set(
-    Enrolment(EnrolmentKeys.Individual, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.individualId, "1234567890")), "Activated"),
-    Enrolment(EnrolmentKeys.nino, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.nino, "1234567890")), "Activated")))
+  val individualEnrolments: Enrolments = Enrolments(
+    Set(
+      Enrolment(EnrolmentKeys.Individual, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.individualId, "1234567890")), "Activated"),
+      Enrolment(EnrolmentKeys.nino, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.nino, "1234567890")), "Activated")
+    ))
 
-  //noinspection ScalaStyle
+  // noinspection ScalaStyle
   def mockAuth(enrolments: Enrolments = individualEnrolments) = {
 
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, Retrievals.affinityGroup, *, *)
-      .returning(Future.successful(Some(AffinityGroup.Individual)))
+    when(mockAuthConnector.authorise(any[Predicate], eqTo(Retrievals.affinityGroup))(any(), any()))
+      .thenReturn(Future.successful(Some(AffinityGroup.Individual)))
 
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, Retrievals.allEnrolments and Retrievals.confidenceLevel, *, *)
-      .returning(Future.successful(enrolments and ConfidenceLevel.L250))
+    when(mockAuthConnector.authorise(any[Predicate], eqTo(Retrievals.allEnrolments and Retrievals.confidenceLevel))(any(), any()))
+      .thenReturn(Future.successful(enrolments and ConfidenceLevel.L250))
+
   }
 
-  val agentEnrolments: Enrolments = Enrolments(Set(
-    Enrolment(EnrolmentKeys.Individual, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.individualId, "1234567890")), "Activated"),
-    Enrolment(EnrolmentKeys.Agent, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.agentReference, "0987654321")), "Activated")
-  ))
+  val agentEnrolments: Enrolments = Enrolments(
+    Set(
+      Enrolment(EnrolmentKeys.Individual, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.individualId, "1234567890")), "Activated"),
+      Enrolment(EnrolmentKeys.Agent, Seq(EnrolmentIdentifier(EnrolmentIdentifiers.agentReference, "0987654321")), "Activated")
+    ))
 
-  //noinspection ScalaStyle
+  // noinspection ScalaStyle
   def mockAuthAsAgent(enrolments: Enrolments = agentEnrolments) = {
 
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, Retrievals.affinityGroup, *, *)
-      .returning(Future.successful(Some(AffinityGroup.Agent)))
+    when(mockAuthConnector.authorise(any[Predicate], eqTo(Retrievals.affinityGroup))(any(), any()))
+      .thenReturn(Future.successful(Some(AffinityGroup.Agent)))
 
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, Retrievals.allEnrolments, *, *)
-      .returning(Future.successful(enrolments))
+    when(mockAuthConnector.authorise(any[Predicate], eqTo(Retrievals.allEnrolments))(any(), any()))
+      .thenReturn(Future.successful(enrolments))
+
   }
 
-  //noinspection ScalaStyle
-  def mockAuthReturnException(exception: Exception) = {
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
-      .returning(Future.failed(exception))
-  }
+  // noinspection ScalaStyle
+  def mockAuthReturnException(exception: Exception) =
+    when(mockAuthConnector.authorise(any[Predicate], any[Retrieval[Any]])(any(), any()))
+      .thenReturn(Future.failed(exception))
 }

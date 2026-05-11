@@ -21,15 +21,15 @@ import play.api.libs.json.{Json, OFormat}
 import java.util.UUID
 
 case class CapitalRedemptionModel(
-                                   customerReference: Option[String] = None,
-                                   event: Option[String] = None,
-                                   gainAmount: BigDecimal,
-                                   taxPaid: Option[Boolean] = None,
-                                   yearsHeld: Option[Int] = None,
-                                   yearsHeldSinceLastGain: Option[Int] = None,
-                                   deficiencyRelief: Option[BigDecimal] = None
-                                 ) {
-  def toPolicyCya: PolicyCyaModel = {
+    customerReference: Option[String] = None,
+    event: Option[String] = None,
+    gainAmount: BigDecimal,
+    taxPaid: Option[Boolean] = None,
+    yearsHeld: Option[Int] = None,
+    yearsHeldSinceLastGain: Option[Int] = None,
+    deficiencyRelief: Option[BigDecimal] = None
+) {
+  def toPolicyCya: PolicyCyaModel =
     PolicyCyaModel(
       sessionId = UUID.randomUUID().toString,
       policyType = Some("Capital Redemption"),
@@ -43,7 +43,6 @@ case class CapitalRedemptionModel(
       entitledToDeficiencyRelief = Some(this.deficiencyRelief.isDefined),
       deficiencyReliefAmount = this.deficiencyRelief
     )
-  }
 }
 
 object CapitalRedemptionModel {

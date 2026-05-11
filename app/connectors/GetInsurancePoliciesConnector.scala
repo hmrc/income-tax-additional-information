@@ -25,12 +25,13 @@ import utils.TaxYearUtils.convertStringTaxYear
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GetInsurancePoliciesConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class GetInsurancePoliciesConnector @Inject() (http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
 
   def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
-    val taxYearParameter = convertStringTaxYear(taxYear)
+    val taxYearParameter     = convertStringTaxYear(taxYear)
     val insurancePoliciesUrl = appConfig.ifBaseUrl + s"/income-tax/insurance-policies/income/$nino/$taxYearParameter"
-    http.get(url"$insurancePoliciesUrl")(ifHeaderCarrier(insurancePoliciesUrl, GetInsurancePolicies))
+    http
+      .get(url"$insurancePoliciesUrl")(ifHeaderCarrier(insurancePoliciesUrl, GetInsurancePolicies))
       .execute[GetInsurancePoliciesResponse](InsurancePoliciesHttpReads, ec)
   }
 }

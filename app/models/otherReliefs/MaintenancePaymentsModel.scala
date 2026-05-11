@@ -19,11 +19,11 @@ package models.otherReliefs
 import play.api.libs.json.{Json, OFormat}
 
 case class MaintenancePaymentsModel(
-                               customerReference: Option[String],
-                               exSpouseName: Option[String],
-                               exSpouseDateOfBirth: Option[String],
-                               amount: BigDecimal
-                             )
+    customerReference: Option[String],
+    exSpouseName: Option[String],
+    exSpouseDateOfBirth: Option[String],
+    amount: BigDecimal
+)
 
 object MaintenancePaymentsModel {
   implicit val formats: OFormat[MaintenancePaymentsModel] = Json.format[MaintenancePaymentsModel]

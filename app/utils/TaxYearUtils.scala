@@ -22,11 +22,9 @@ object TaxYearUtils extends Logging {
 
   val specificTaxYear: Int = 2024
 
-  def convertStringTaxYear(taxYear: Int): String = {
+  def convertStringTaxYear(taxYear: Int): String =
     s"${taxYear - 1}-${taxYear.toString takeRight 2}"
-  }
 
-  def convertSpecificTaxYear(taxYear: Int): String = {
+  def convertSpecificTaxYear(taxYear: Int): String =
     s"${(taxYear - 1).toString takeRight 2}-${taxYear.toString takeRight 2}"
-  }
 }

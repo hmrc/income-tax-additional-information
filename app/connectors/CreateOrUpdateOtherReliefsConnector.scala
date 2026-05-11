@@ -23,19 +23,21 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.TaxYearUtils.convertStringTaxYear
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateOrUpdateOtherReliefsConnector @Inject()(http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext) extends IFConnector {
+class CreateOrUpdateOtherReliefsConnector @Inject() (http: HttpClientV2, val appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends IFConnector {
 
   // For connectivity to IF API#1632 - Create/Update Other Reliefs Submission
-  def createOrUpdateOtherReliefs(nino: String,
-                                 taxYear: Int,
-                                 createOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel)(implicit hc: HeaderCarrier): Future[CreateOrUpdateOtherReliefsResponse] = {
+  def createOrUpdateOtherReliefs(nino: String, taxYear: Int, createOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel)(implicit
+      hc: HeaderCarrier): Future[CreateOrUpdateOtherReliefsResponse] = {
     val taxYearParameter = convertStringTaxYear(taxYear)
-    val otherReliefsUrl = appConfig.ifBaseUrl + s"/income-tax/reliefs/other/$nino/$taxYearParameter"
-    http.put(url"$otherReliefsUrl")(ifHeaderCarrier(otherReliefsUrl, PutOtherReliefs))
+    val otherReliefsUrl  = appConfig.ifBaseUrl + s"/income-tax/reliefs/other/$nino/$taxYearParameter"
+    http
+      .put(url"$otherReliefsUrl")(ifHeaderCarrier(otherReliefsUrl, PutOtherReliefs))
       .withBody(Json.toJson(createOrUpdateOtherReliefsModel)(CreateOrUpdateOtherReliefsModel.writes))
       .execute[CreateOrUpdateOtherReliefsResponse](OtherReliefsHttpReads, ec)
   }

@@ -20,13 +20,15 @@ import connectors.{DeleteInsurancePoliciesConnector, DeleteInsurancePoliciesTysC
 import connectors.parsers.DeleteInsurancePoliciesParser.DeleteInsurancePoliciesResponse
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 
 class DeleteInsurancePoliciesSpec extends TestSuite {
-  val connector: DeleteInsurancePoliciesConnector = mock[DeleteInsurancePoliciesConnector]
+  val connector: DeleteInsurancePoliciesConnector       = mock[DeleteInsurancePoliciesConnector]
   val tysConnector: DeleteInsurancePoliciesTysConnector = mock[DeleteInsurancePoliciesTysConnector]
-  val service: DeleteInsurancePoliciesService = new DeleteInsurancePoliciesService(connector, tysConnector)
+  val service: DeleteInsurancePoliciesService           = new DeleteInsurancePoliciesService(connector, tysConnector)
 
   "DeleteInsurancePoliciesConnector.deleteInsurancePolicies" should {
 
@@ -34,9 +36,12 @@ class DeleteInsurancePoliciesSpec extends TestSuite {
 
       val expectedResult: DeleteInsurancePoliciesResponse = Right(true)
 
-      (connector.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", 1234, *)
-        .returning(Future.successful(expectedResult))
+      when(
+        connector.deleteInsurancePoliciesData(
+          eqTo("12345678"),
+          eqTo(1234)
+        )(any[HeaderCarrier]())
+      ).thenReturn(Future.successful(expectedResult))
 
       val result = await(service.deleteInsurancePoliciesData("12345678", 1234))
 
@@ -51,9 +56,12 @@ class DeleteInsurancePoliciesSpec extends TestSuite {
 
       val expectedResult: DeleteInsurancePoliciesResponse = Right(true)
 
-      (tysConnector.deleteInsurancePoliciesData(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", 2024, *)
-        .returning(Future.successful(expectedResult))
+      when(
+        tysConnector.deleteInsurancePoliciesData(
+          eqTo("12345678"),
+          eqTo(2024)
+        )(any[HeaderCarrier]())
+      ).thenReturn(Future.successful(expectedResult))
 
       val result = await(service.deleteInsurancePoliciesData("12345678", 2024))
 

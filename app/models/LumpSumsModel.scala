@@ -19,13 +19,13 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class LumpSumsModel(
-                          employerName: String,
-                          employerRef: String,
-                          taxableLumpSumsAndCertainIncome: Option[TaxableLumpSumsAndCertainIncomeModel],
-                          benefitFromEmployerFinancedRetirementScheme: Option[BenefitFromEmployerFinancedRetirementSchemeModel],
-                          redundancyCompensationPaymentsOverExemption: Option[RedundancyCompensationPaymentsOverExemptionModel],
-                          redundancyCompensationPaymentsUnderExemption: Option[RedundancyCompensationPaymentsUnderExemptionModel]
-                        )
+    employerName: String,
+    employerRef: String,
+    taxableLumpSumsAndCertainIncome: Option[TaxableLumpSumsAndCertainIncomeModel],
+    benefitFromEmployerFinancedRetirementScheme: Option[BenefitFromEmployerFinancedRetirementSchemeModel],
+    redundancyCompensationPaymentsOverExemption: Option[RedundancyCompensationPaymentsOverExemptionModel],
+    redundancyCompensationPaymentsUnderExemption: Option[RedundancyCompensationPaymentsUnderExemptionModel]
+)
 
 object LumpSumsModel {
   implicit val formats: OFormat[LumpSumsModel] = Json.format[LumpSumsModel]

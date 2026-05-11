@@ -24,15 +24,15 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DeleteInsurancePoliciesController @Inject()(deleteInsurancePoliciesService: DeleteInsurancePoliciesService,
-                                                  cc: ControllerComponents,
-                                                  authorisedAction: AuthorisedAction)
-                                                 (implicit ec: ExecutionContext) extends BackendController(cc) {
+class DeleteInsurancePoliciesController @Inject() (deleteInsurancePoliciesService: DeleteInsurancePoliciesService,
+                                                   cc: ControllerComponents,
+                                                   authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
-  def deleteInsurancePoliciesData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async {
-    implicit user =>
-      deleteInsurancePoliciesService.deleteInsurancePoliciesData(nino, taxYear).map {
-        case Right(_) => NoContent
-        case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)      }
+  def deleteInsurancePoliciesData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
+    deleteInsurancePoliciesService.deleteInsurancePoliciesData(nino, taxYear).map {
+      case Right(_)         => NoContent
+      case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)
+    }
   }
 }

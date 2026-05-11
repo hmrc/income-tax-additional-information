@@ -24,13 +24,12 @@ import utils.TaxYearUtils.specificTaxYear
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DeleteInsurancePoliciesService @Inject()(deleteInsurancePoliciesConnector:DeleteInsurancePoliciesConnector,
-                                               deleteInsurancePoliciesTysConnector: DeleteInsurancePoliciesTysConnector){
-  def deleteInsurancePoliciesData (nino: String, taxYear: Int) (implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] = {
+class DeleteInsurancePoliciesService @Inject() (deleteInsurancePoliciesConnector: DeleteInsurancePoliciesConnector,
+                                                deleteInsurancePoliciesTysConnector: DeleteInsurancePoliciesTysConnector) {
+  def deleteInsurancePoliciesData(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteInsurancePoliciesResponse] =
     if (taxYear >= specificTaxYear) {
       deleteInsurancePoliciesTysConnector.deleteInsurancePoliciesData(nino, taxYear)
     } else {
       deleteInsurancePoliciesConnector.deleteInsurancePoliciesData(nino, taxYear)
     }
-  }
 }

@@ -19,21 +19,21 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class SharesAwardedOrReceivedModel(
-                                         employerName: String,
-                                         employerRef: Option[String],
-                                         schemePlanType: String,
-                                         dateSharesCeasedToBeSubjectToPlan: String,
-                                         noOfShareSecuritiesAwarded: Int,
-                                         classOfShareAwarded: String,
-                                         dateSharesAwarded: String,
-                                         sharesSubjectToRestrictions: Boolean,
-                                         electionEnteredIgnoreRestrictions: Boolean,
-                                         actualMarketValueOfSharesOnAward: BigDecimal,
-                                         unrestrictedMarketValueOfSharesOnAward: BigDecimal,
-                                         amountPaidForSharesOnAward: BigDecimal,
-                                         marketValueAfterRestrictionsLifted: BigDecimal,
-                                         taxableAmount: BigDecimal
-                                       )
+    employerName: String,
+    employerRef: Option[String],
+    schemePlanType: String,
+    dateSharesCeasedToBeSubjectToPlan: String,
+    noOfShareSecuritiesAwarded: Int,
+    classOfShareAwarded: String,
+    dateSharesAwarded: String,
+    sharesSubjectToRestrictions: Boolean,
+    electionEnteredIgnoreRestrictions: Boolean,
+    actualMarketValueOfSharesOnAward: BigDecimal,
+    unrestrictedMarketValueOfSharesOnAward: BigDecimal,
+    amountPaidForSharesOnAward: BigDecimal,
+    marketValueAfterRestrictionsLifted: BigDecimal,
+    taxableAmount: BigDecimal
+)
 
 object SharesAwardedOrReceivedModel {
   implicit val formats: OFormat[SharesAwardedOrReceivedModel] = Json.format[SharesAwardedOrReceivedModel]

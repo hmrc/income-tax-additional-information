@@ -26,10 +26,10 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class CommonTaskListController @Inject()(service: CommonTaskListService,
-                                         auth: AuthorisedAction,
-                                         cc: ControllerComponents)
-                                        (implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
+class CommonTaskListController @Inject() (service: CommonTaskListService, auth: AuthorisedAction, cc: ControllerComponents)(implicit
+    ec: ExecutionContext)
+    extends BackendController(cc)
+    with Logging {
 
   def getCommonTaskList(taxYear: Int, nino: String): Action[AnyContent] = auth.async { implicit user =>
     service.get(taxYear, nino).map { taskList =>

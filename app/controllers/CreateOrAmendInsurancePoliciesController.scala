@@ -27,23 +27,21 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class CreateOrAmendInsurancePoliciesController @Inject()(createOrAmendInsurancePoliciesService: CreateOrAmendInsurancePoliciesService,
-                                                         cc: ControllerComponents,
-                                                         authorisedAction: AuthorisedAction)
-                                                        (implicit ec: ExecutionContext) extends BackendController(cc) {
+class CreateOrAmendInsurancePoliciesController @Inject() (createOrAmendInsurancePoliciesService: CreateOrAmendInsurancePoliciesService,
+                                                          cc: ControllerComponents,
+                                                          authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def createOrAmendInsurancePolicies(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
     user.request.body.asJson.map(_.validate[CreateOrAmendInsurancePoliciesModel]) match {
       case Some(JsSuccess(model, _)) => responseHandler(createOrAmendInsurancePoliciesService.createOrAmendInsurancePolicies(nino, taxYear, model))
-      case _ => Future.successful(BadRequest)
+      case _                         => Future.successful(BadRequest)
     }
   }
 
-  def responseHandler(serviceResponse: Future[CreateOrAmendInsurancePoliciesResponse]): Future[Result] = {
+  def responseHandler(serviceResponse: Future[CreateOrAmendInsurancePoliciesResponse]): Future[Result] =
     serviceResponse.map {
-      case Right(_) => NoContent
+      case Right(_)         => NoContent
       case Left(errorModel) => Status(errorModel.status)(Json.toJson(errorModel.toJson))
     }
-  }
 }

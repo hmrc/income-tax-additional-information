@@ -21,9 +21,13 @@ import org.mongodb.scala.bson.BsonDocument
 import play.api.http.Status.{BAD_REQUEST, FORBIDDEN, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.ws.writeableOf_String
+import play.api.libs.ws.DefaultBodyReadables.readableAsString
 import play.api.{Application, Environment, Mode, inject}
 import repositories.UserAnswersRepository
 import support.IntegrationTest
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.SingleObservableFuture
 
 import java.time.{Clock, Instant}
 
@@ -144,12 +148,15 @@ class UserAnswersControllerISpec extends IntegrationTest {
 
               authoriseIndividual()
 
-              val result = urlPut(routes.UserAnswersController.set().url, Json.toJson(userAnswers).as[JsObject].-("mtdItId"))
+              val body: play.api.libs.json.JsValue =
+                Json.toJson(userAnswers).as[JsObject] - "mtdItId"
+
+              val result = urlPut(routes.UserAnswersController.set().url, body)
 
               result.status shouldBe BAD_REQUEST
-              result.body should include(
-                """Invalid JSON received:
-                  | - (/mtdItId,List(JsonValidationError(List(error.path.missing),List())))""".stripMargin)
+              result.body should include("Invalid JSON received:")
+              result.body should include("(/mtdItId")
+              result.body should include("error.path.missing")
             }
           }
         }

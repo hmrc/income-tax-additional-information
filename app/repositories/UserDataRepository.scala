@@ -53,14 +53,17 @@ trait UserDataRepository[C <: UserDataTemplate] {
     }.toOption match {
       case Some(exception: Exception) => Future.successful(handleEncryptionDecryptionException(exception, start))
       case Some(encryptedData) =>
-        collection.insertOne(encryptedData).toFutureOption().map {
-          case Some(_) => Right(())
-          case None => Left(DataNotUpdated)
-        }.recover {
-          case exception: Exception =>
+        collection
+          .insertOne(encryptedData)
+          .toFutureOption()
+          .map {
+            case Some(_) => Right(())
+            case None    => Left(DataNotUpdated)
+          }
+          .recover { case exception: Exception =>
             pagerDutyLog(FAILED_TO_CREATE_DATA, s"$start Failed to create user data. Exception: ${exception.getMessage}")
             Left(DataNotUpdated)
-        }
+          }
       case _ => Future(Left(DataNotUpdated))
     }
   }
@@ -68,20 +71,23 @@ trait UserDataRepository[C <: UserDataTemplate] {
   def find[T](taxYear: Int)(implicit user: User[_]): Future[Either[DatabaseError, Option[UserData]]] = {
     lazy val start = s"[$repoName][find]"
 
-    val userData = collection.findOneAndUpdate(
-      filter = filter(user.sessionId, user.mtditid, user.nino, taxYear),
-      update = set("lastUpdated", toBson(Instant.now(Clock.systemUTC()))),
-      options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
-    ).toFutureOption().map {
-      case Some(data) => Right(Some(data))
-      case None =>
-        logger.info(s"$start No CYA data found for user. SessionId: ${user.sessionId}")
-        Right(None)
-    }.recover {
-      case exception: Exception =>
+    val userData = collection
+      .findOneAndUpdate(
+        filter = filter(user.sessionId, user.mtditid, user.nino, taxYear),
+        update = set("lastUpdated", toBson(Instant.now(Clock.systemUTC()))),
+        options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+      )
+      .toFutureOption()
+      .map {
+        case Some(data) => Right(Some(data))
+        case None =>
+          logger.info(s"$start No CYA data found for user. SessionId: ${user.sessionId}")
+          Right(None)
+      }
+      .recover { case exception: Exception =>
         pagerDutyLog(FAILED_TO_FIND_DATA, s"$start Failed to find user data. Exception: ${exception.getMessage}")
         Left(DataNotFound)
-    }
+      }
 
     userData.map {
       case Left(_) => Left(DataNotFound)
@@ -89,7 +95,7 @@ trait UserDataRepository[C <: UserDataTemplate] {
         Try {
           data.map(decryptionMethod)
         }.toEither match {
-          case Left(value) => handleEncryptionDecryptionException(value.asInstanceOf[Exception], start)
+          case Left(value)                    => handleEncryptionDecryptionException(value.asInstanceOf[Exception], start)
           case Right(value: Option[UserData]) => Right(value)
         }
     }
@@ -104,25 +110,31 @@ trait UserDataRepository[C <: UserDataTemplate] {
     }.toOption match {
       case Some(exception: Exception) => Future.successful(handleEncryptionDecryptionException(exception, start))
       case Some(encryptedData) =>
-        collection.findOneAndReplace(
-          filter = filter(encryptedData.sessionId, encryptedData.mtdItId, encryptedData.nino, encryptedData.taxYear),
-          replacement = encryptedData,
-          options = FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER)
-        ).toFutureOption().map {
-          case Some(_) => Right(())
-          case None => Left(DataNotUpdated)
-        }.recover {
-          case exception: Exception =>
+        collection
+          .findOneAndReplace(
+            filter = filter(encryptedData.sessionId, encryptedData.mtdItId, encryptedData.nino, encryptedData.taxYear),
+            replacement = encryptedData,
+            options = FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER)
+          )
+          .toFutureOption()
+          .map {
+            case Some(_) => Right(())
+            case None    => Left(DataNotUpdated)
+          }
+          .recover { case exception: Exception =>
             pagerDutyLog(FAILED_TO_UPDATE_DATA, s"$start Failed to update user data. Exception: ${exception.getMessage}")
             Left(DataNotUpdated)
-        }
+          }
       case _ => Future(Left(DataNotUpdated))
     }
   }
 
-  def clear(taxYear: Int)(implicit user: User[_]): Future[Boolean] = collection.deleteOne(
-    filter = filter(user.sessionId, user.mtditid, user.nino, taxYear)
-  ).toFutureOption().map(_.isDefined)
+  def clear(taxYear: Int)(implicit user: User[_]): Future[Boolean] = collection
+    .deleteOne(
+      filter = filter(user.sessionId, user.mtditid, user.nino, taxYear)
+    )
+    .toFutureOption()
+    .map(_.isDefined)
 
   def filter(sessionId: String, mtdItId: String, nino: String, taxYear: Int): Bson = and(
     equal("sessionId", toBson(sessionId)),
