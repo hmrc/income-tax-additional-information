@@ -19,7 +19,8 @@ package controllers
 import connectors.parsers.CreateOrUpdateOtherReliefsParser.CreateOrUpdateOtherReliefsResponse
 import models._
 import models.otherReliefs._
-import org.scalamock.handlers.CallHandler4
+import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -41,10 +42,12 @@ class CreateOrUpdateOtherReliefsControllerSpec extends TestSuite {
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
   val unprocessableEntityModel: ErrorModel =
-    ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect."))
+    ErrorModel(
+      UNPROCESSABLE_ENTITY,
+      ErrorBodyModel("UNPROCESSABLE_ENTITY", "The remote endpoint has indicated that for given income source type, message payload is incorrect.")
+    )
 
-
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2023
   val mtditid = "1234567890"
 
@@ -53,9 +56,17 @@ class CreateOrUpdateOtherReliefsControllerSpec extends TestSuite {
     payrollGiving = Some(PayrollGivingModel(Some("RefNo13254687"), 123.46)),
     qualifyingDistributionRedemptionOfSharesAndSecurities = Some(QualifyingDistributionModel(Some("RefNo13254687"), 123.47)),
     maintenancePayments = Some(Seq(MaintenancePaymentsModel(Some("RefNo13254687"), Some("Jane Doe"), Some("01-01-2000"), 123.48))),
-    postCessationTradeReliefAndCertainOtherLosses = Some(Seq(PostCessationTradeReliefModel(Some("RefNo13254687"), Some("Monsters Inc"), Some("01-01-2025"), Some("Power Distribution"), Some("Cash"), 123.49))),
+    postCessationTradeReliefAndCertainOtherLosses = Some(
+      Seq(
+        PostCessationTradeReliefModel(
+          Some("RefNo13254687"),
+          Some("Monsters Inc"),
+          Some("01-01-2025"),
+          Some("Power Distribution"),
+          Some("Cash"),
+          123.49))),
     annualPaymentsMade = Some(AnnualPaymentsMadeModel(Some("RefNo13254687"), 123.50)),
-    qualifyingLoanInterestPayments = Some(Seq(QualifyingLoanInterestPaymentsModel(Some("RefNo13254687"), Some("Bank"), 123.51))),
+    qualifyingLoanInterestPayments = Some(Seq(QualifyingLoanInterestPaymentsModel(Some("RefNo13254687"), Some("Bank"), 123.51)))
   )
 
   override val fakeRequestWithMtditid: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("PUT", "/")
@@ -66,10 +77,8 @@ class CreateOrUpdateOtherReliefsControllerSpec extends TestSuite {
     "Return a 204 NO Content response with valid putOtherReliefs" in {
       val serviceResult = Right(true)
 
-      def serviceCallMock(): CallHandler4[String, Int, CreateOrUpdateOtherReliefsModel, HeaderCarrier, Future[CreateOrUpdateOtherReliefsResponse]] =
-        (serviceMock.createOrUpdateOtherReliefs(_: String, _: Int, _: CreateOrUpdateOtherReliefsModel)(_: HeaderCarrier))
-          .expects(nino, taxYear, model, *)
-          .returning(Future.successful(serviceResult))
+      def serviceCallMock(): Unit = when(serviceMock.createOrUpdateOtherReliefs(eqTo(nino), eqTo(taxYear), eqTo(model))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(serviceResult))
 
       val result: Future[Result] = {
         mockAuth()
@@ -90,12 +99,9 @@ class CreateOrUpdateOtherReliefsControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockCreateOrUpdateOtherReliefsWithError(errorModel: ErrorModel):
-        CallHandler4[String, Int, CreateOrUpdateOtherReliefsModel, HeaderCarrier, Future[CreateOrUpdateOtherReliefsResponse]] = {
-          (serviceMock.createOrUpdateOtherReliefs(_: String, _: Int, _: CreateOrUpdateOtherReliefsModel)(_: HeaderCarrier))
-            .expects(nino, taxYear, *, *)
-            .returning(Future.successful(Left(errorModel)))
-      }
+      def mockCreateOrUpdateOtherReliefsWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.createOrUpdateOtherReliefs(eqTo(nino), eqTo(taxYear), any[CreateOrUpdateOtherReliefsModel]())(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a BAD_REQUEST" in {
         val result = {

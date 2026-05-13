@@ -20,11 +20,12 @@ import models.User
 import models.mongo._
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.result.DeleteResult
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.AnyContent
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import support.IntegrationTest
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.SingleObservableFuture
 
 class UserAnswersRepositoryISpec extends IntegrationTest with FutureAwaits with DefaultAwaitTimeout {
 

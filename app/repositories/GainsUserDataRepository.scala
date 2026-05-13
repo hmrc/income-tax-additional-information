@@ -26,17 +26,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class GainsUserDataRepository @Inject()(
-                                         implicit mongo: MongoComponent,
-                                         val ec: ExecutionContext,
-                                         appConfig: AppConfig,
-                                         encryptionService: EncryptionService
-                                       ) extends PlayMongoRepository[EncryptedGainsUserDataModel](
-  mongoComponent = mongo,
-  collectionName = "gainsUserData",
-  domainFormat = EncryptedGainsUserDataModel.format,
-  indexes = GainsDataIndexes.indexes(appConfig)
-) with UserDataRepository[EncryptedGainsUserDataModel] {
+class GainsUserDataRepository @Inject() (implicit
+    mongo: MongoComponent,
+    val ec: ExecutionContext,
+    appConfig: AppConfig,
+    encryptionService: EncryptionService
+) extends PlayMongoRepository[EncryptedGainsUserDataModel](
+      mongoComponent = mongo,
+      collectionName = "gainsUserData",
+      domainFormat = EncryptedGainsUserDataModel.format,
+      indexes = GainsDataIndexes.indexes(appConfig)
+    )
+    with UserDataRepository[EncryptedGainsUserDataModel] {
   override val repoName = "gainsUserData"
   override type UserData = GainsUserDataModel
 

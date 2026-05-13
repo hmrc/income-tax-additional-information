@@ -25,7 +25,7 @@ object CreateOrUpdateOtherReliefsParser extends APIParser with Logging {
   type CreateOrUpdateOtherReliefsResponse = Either[ErrorModel, Boolean]
 
   implicit object OtherReliefsHttpReads extends HttpReads[CreateOrUpdateOtherReliefsResponse] {
-    override def read(method: String, url: String, response: HttpResponse): CreateOrUpdateOtherReliefsResponse = {
+    override def read(method: String, url: String, response: HttpResponse): CreateOrUpdateOtherReliefsResponse =
       response.status match {
         case NO_CONTENT => Right(true)
 
@@ -33,6 +33,5 @@ object CreateOrUpdateOtherReliefsParser extends APIParser with Logging {
           logger.error(logMessage(response))
           handleAPIError(response)
       }
-    }
   }
 }

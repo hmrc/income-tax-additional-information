@@ -20,10 +20,11 @@ import com.mongodb.client.result.InsertOneResult
 import models.gains.PolicyCyaModel
 import models.mongo._
 import models.{AllGainsSessionModel, User}
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.mvc.AnyContent
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import support.IntegrationTest
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.SingleObservableFuture
 
 class UserDataRepositoryISpec extends IntegrationTest with FutureAwaits with DefaultAwaitTimeout {
 
@@ -138,8 +139,9 @@ class UserDataRepositoryISpec extends IntegrationTest with FutureAwaits with Def
       }
       result.isLeft mustBe true
 
-      result.left.e.swap.getOrElse(new Exception("wrong message")).getMessage must include(
-        "E11000 duplicate key error collection: income-tax-additional-information.gainsUserData")
+      result.left.e.swap.getOrElse(new Exception("wrong message")).getMessage.contains(
+        "E11000 duplicate key error collection: income-tax-additional-information.gainsUserData"
+      ) mustBe true
     }
   }
 

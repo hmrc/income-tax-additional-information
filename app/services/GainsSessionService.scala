@@ -25,10 +25,11 @@ import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataRepository)(implicit correlationId: String) extends Logging {
+class GainsSessionService @Inject() (gainsUserDataRepository: GainsUserDataRepository)(implicit correlationId: String) extends Logging {
 
-  def createSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)
-                          (implicit user: User[_], ec: ExecutionContext): Future[Either[MongoError, Unit]] = {
+  def createSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)(implicit
+      user: User[_],
+      ec: ExecutionContext): Future[Either[MongoError, Unit]] = {
 
     val userData = GainsUserDataModel(user.sessionId, user.mtditid, user.nino, taxYear, Some(cyaModel), Instant.now)
 
@@ -41,7 +42,7 @@ class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataReposi
     }
   }
 
-  def getSessionData(taxYear: Int)(implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Option[GainsUserDataModel]]] = {
+  def getSessionData(taxYear: Int)(implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Option[GainsUserDataModel]]] =
     gainsUserDataRepository.find(taxYear).map {
       case Right(userData) =>
         Right(userData)
@@ -49,10 +50,10 @@ class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataReposi
         logger.error("[GainsSessionService][getSessionData] Could not find user session. correlation id: " + correlationId)
         Left(MongoError(databaseError.message))
     }
-  }
 
-  def updateSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)
-                          (implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Unit]] = {
+  def updateSessionData[A](cyaModel: AllGainsSessionModel, taxYear: Int)(implicit
+      user: User[_],
+      ec: ExecutionContext): Future[Either[DatabaseError, Unit]] = {
 
     val userData = GainsUserDataModel(user.sessionId, user.mtditid, user.nino, taxYear, Some(cyaModel), Instant.now)
 
@@ -64,7 +65,7 @@ class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataReposi
     }
   }
 
-  def deleteSessionData[A](taxYear: Int)(implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Boolean]]  = {
+  def deleteSessionData[A](taxYear: Int)(implicit user: User[_], ec: ExecutionContext): Future[Either[DatabaseError, Boolean]] =
     gainsUserDataRepository.clear(taxYear)(user).map {
       case true =>
         Right(true)
@@ -72,6 +73,5 @@ class GainsSessionService @Inject()(gainsUserDataRepository: GainsUserDataReposi
         logger.error(s"[GainsSessionService][deleteSessionData] session delete failure. correlation id: " + correlationId)
         Left(MongoError(DataNotDeleted.message))
     }
-  }
 
 }

@@ -17,16 +17,14 @@
 package connectors
 
 import config.AppConfig
-import org.scalamock.scalatest.MockFactory
+import org.scalatestplus.mockito.MockitoSugar
 import support.providers.AppConfigStubProvider
 import support.stubs.AppConfigStub
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderNames._
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, SessionId}
 
-class IFConnectorSpec extends TestSuite
-  with MockFactory
-  with AppConfigStubProvider {
+class IFConnectorSpec extends TestSuite with MockitoSugar with AppConfigStubProvider {
 
   private val underTest = new IFConnector {
     override protected val appConfig: AppConfig = new AppConfigStub().config()
@@ -62,7 +60,7 @@ class IFConnectorSpec extends TestSuite
 
     "return correct HeaderCarrier when external host" in {
       val externalHost = "http://127.0.0.1"
-      val hc = HeaderCarrier(sessionId = Some(SessionId("sessionIdHeaderValue")))
+      val hc           = HeaderCarrier(sessionId = Some(SessionId("sessionIdHeaderValue")))
 
       val result = underTest.ifHeaderCarrier(externalHost, "some-api-version")(hc)
 

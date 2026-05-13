@@ -20,11 +20,11 @@ import support.utils.TaxYearUtils
 
 trait TaxYearProvider {
 
-  protected val taxYear: Int = TaxYearUtils.taxYear
+  protected val taxYear: Int    = TaxYearUtils.taxYear
   protected val taxYearEOY: Int = TaxYearUtils.taxYearEOY
 
   protected val taxYearEndOfYearMinusOne: Int = taxYearEOY - 1
 
   protected val validTaxYearListSingle: Seq[Int] = Seq(taxYear)
-  protected val validTaxYearList: Seq[Int] = Seq(taxYearEndOfYearMinusOne, taxYearEOY, taxYear)
+  protected val validTaxYearList: Seq[Int]       = Seq(taxYearEndOfYearMinusOne, taxYearEOY, taxYear)
 }

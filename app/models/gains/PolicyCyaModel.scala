@@ -20,19 +20,19 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.crypto.EncryptedValue
 
 case class PolicyCyaModel(
-                           sessionId: String,
-                           policyType: Option[String] = None,
-                           policyNumber: Option[String] = None,
-                           amountOfGain: Option[BigDecimal] = None,
-                           policyEvent: Option[String] = None,
-                           previousGain: Option[Boolean] = None,
-                           yearsPolicyHeld: Option[Int] = None,
-                           yearsPolicyHeldPrevious: Option[Int] = None,
-                           treatedAsTaxPaid: Option[Boolean] = None,
-                           taxPaidAmount: Option[BigDecimal] = None,
-                           entitledToDeficiencyRelief: Option[Boolean] = None,
-                           deficiencyReliefAmount: Option[BigDecimal] = None
-                         ) {
+    sessionId: String,
+    policyType: Option[String] = None,
+    policyNumber: Option[String] = None,
+    amountOfGain: Option[BigDecimal] = None,
+    policyEvent: Option[String] = None,
+    previousGain: Option[Boolean] = None,
+    yearsPolicyHeld: Option[Int] = None,
+    yearsPolicyHeldPrevious: Option[Int] = None,
+    treatedAsTaxPaid: Option[Boolean] = None,
+    taxPaidAmount: Option[BigDecimal] = None,
+    entitledToDeficiencyRelief: Option[Boolean] = None,
+    deficiencyReliefAmount: Option[BigDecimal] = None
+) {
 
   private def isFinishedGeneralPolicies: Boolean =
     policyNumber.isDefined &&
@@ -51,12 +51,11 @@ case class PolicyCyaModel(
       yearsPolicyHeld.isDefined &&
       taxPaidAmount.isDefined
 
-  def isFinished: Boolean = {
+  def isFinished: Boolean =
     policyType match {
       case Some("Voided ISA") => isFinishedVoidedIsa
-      case _ => isFinishedGeneralPolicies
+      case _                  => isFinishedGeneralPolicies
     }
-  }
 }
 
 object PolicyCyaModel {
@@ -64,19 +63,19 @@ object PolicyCyaModel {
 }
 
 case class EncryptedPolicyCyaModel(
-                                    sessionId: EncryptedValue,
-                                    policyType: Option[EncryptedValue] = None,
-                                    policyNumber: Option[EncryptedValue] = None,
-                                    amountOfGain: Option[EncryptedValue] = None,
-                                    policyEvent: Option[EncryptedValue] = None,
-                                    previousGain: Option[EncryptedValue] = None,
-                                    yearsPolicyHeld: Option[EncryptedValue] = None,
-                                    yearsPolicyHeldPrevious: Option[EncryptedValue] = None,
-                                    treatedAsTaxPaid: Option[EncryptedValue] = None,
-                                    taxPaidAmount: Option[EncryptedValue] = None,
-                                    entitledToDeficiencyRelief: Option[EncryptedValue] = None,
-                                    deficiencyReliefAmount: Option[EncryptedValue] = None
-                                  )
+    sessionId: EncryptedValue,
+    policyType: Option[EncryptedValue] = None,
+    policyNumber: Option[EncryptedValue] = None,
+    amountOfGain: Option[EncryptedValue] = None,
+    policyEvent: Option[EncryptedValue] = None,
+    previousGain: Option[EncryptedValue] = None,
+    yearsPolicyHeld: Option[EncryptedValue] = None,
+    yearsPolicyHeldPrevious: Option[EncryptedValue] = None,
+    treatedAsTaxPaid: Option[EncryptedValue] = None,
+    taxPaidAmount: Option[EncryptedValue] = None,
+    entitledToDeficiencyRelief: Option[EncryptedValue] = None,
+    deficiencyReliefAmount: Option[EncryptedValue] = None
+)
 
 object EncryptedPolicyCyaModel {
   implicit val format: OFormat[PolicyCyaModel] = Json.format[PolicyCyaModel]

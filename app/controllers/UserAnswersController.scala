@@ -27,15 +27,14 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserAnswersController @Inject()(userAnswersService: UserAnswersService,
-                                      auth: AuthorisedAction,
-                                      cc: ControllerComponents)
-                                     (implicit ec: ExecutionContext) extends BackendController(cc) {
+class UserAnswersController @Inject() (userAnswersService: UserAnswersService, auth: AuthorisedAction, cc: ControllerComponents)(implicit
+    ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def get(taxYear: Int, journey: Journey): Action[AnyContent] = auth.async { implicit user =>
     userAnswersService.get(taxYear, journey).map {
       case Some(answers) => Ok(Json.toJson(answers))
-      case _ => NoContent
+      case _             => NoContent
     }
   }
 
@@ -57,8 +56,8 @@ class UserAnswersController @Inject()(userAnswersService: UserAnswersService,
   }
 
   private def checkUser(userAnswers: UserAnswersModel)(f: => Future[Result])(implicit user: User[_]): Future[Result] =
-    if (userAnswers.mtdItId == user.mtditid) f else {
+    if (userAnswers.mtdItId == user.mtditid) f
+    else {
       Future(Forbidden("Attempting to save UserAnswers for another user"))
     }
 }
-

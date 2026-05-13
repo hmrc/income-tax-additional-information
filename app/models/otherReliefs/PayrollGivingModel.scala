@@ -19,9 +19,9 @@ package models.otherReliefs
 import play.api.libs.json.{Json, OFormat}
 
 case class PayrollGivingModel(
-                               customerReference: Option[String],
-                               reliefClaimed: BigDecimal
-                             )
+    customerReference: Option[String],
+    reliefClaimed: BigDecimal
+)
 
 object PayrollGivingModel {
   implicit val formats: OFormat[PayrollGivingModel] = Json.format[PayrollGivingModel]

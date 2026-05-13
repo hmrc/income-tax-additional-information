@@ -24,12 +24,12 @@ import testUtils.TestSuite
 class ErrorSpec extends TestSuite {
 
   private val jsonModel: JsObject = Json.obj(
-    "code" -> "SERVER_ERROR",
+    "code"   -> "SERVER_ERROR",
     "reason" -> "Service is unavailable"
   )
   private val errorsJsModel: JsObject = Json.obj(
     "failures" -> Json.arr(
-      Json.obj("code" -> "SERVICE_UNAVAILABLE", "reason" -> "The service is currently unavailable"),
+      Json.obj("code" -> "SERVICE_UNAVAILABLE", "reason"   -> "The service is currently unavailable"),
       Json.obj("code" -> "INTERNAL_SERVER_ERROR", "reason" -> "The service is currently facing issues.")
     )
   )
@@ -42,10 +42,14 @@ class ErrorSpec extends TestSuite {
     }
 
     "parse to Json for multiple errors" in {
-      val underTest = errors.Error(SERVICE_UNAVAILABLE, MultiErrorsBody(Seq(
-        SingleErrorBody("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
-        SingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
-      )))
+      val underTest = errors.Error(
+        SERVICE_UNAVAILABLE,
+        MultiErrorsBody(
+          Seq(
+            SingleErrorBody("SERVICE_UNAVAILABLE", "The service is currently unavailable"),
+            SingleErrorBody("INTERNAL_SERVER_ERROR", "The service is currently facing issues.")
+          ))
+      )
 
       underTest.toJson mustBe errorsJsModel
     }

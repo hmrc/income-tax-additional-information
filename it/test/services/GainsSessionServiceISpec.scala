@@ -20,6 +20,7 @@ import models.AllGainsSessionModel
 import models.gains.PolicyCyaModel
 import models.mongo.MongoError
 import support.IntegrationTest
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.SingleObservableFuture
 
 
 class GainsSessionServiceISpec extends IntegrationTest {

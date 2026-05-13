@@ -24,16 +24,15 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DeleteOtherEmploymentsIncomeController @Inject()(deleteOtherEmploymentsIncomeService: DeleteOtherEmploymentsIncomeService,
-                                                       cc: ControllerComponents,
-                                                       authorisedAction: AuthorisedAction)
-                                                      (implicit ec: ExecutionContext) extends BackendController(cc) {
+class DeleteOtherEmploymentsIncomeController @Inject() (deleteOtherEmploymentsIncomeService: DeleteOtherEmploymentsIncomeService,
+                                                        cc: ControllerComponents,
+                                                        authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
-  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async {
-    implicit user =>
-      deleteOtherEmploymentsIncomeService.deleteOtherEmploymentsIncomeData(nino, taxYear).map {
-        case Right(_) => NoContent
-        case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)
-      }
+  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
+    deleteOtherEmploymentsIncomeService.deleteOtherEmploymentsIncomeData(nino, taxYear).map {
+      case Right(_)         => NoContent
+      case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)
+    }
   }
 }

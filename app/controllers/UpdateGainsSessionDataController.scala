@@ -26,17 +26,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class UpdateGainsSessionDataController @Inject()(gainsSessionService: GainsSessionService,
-                                                 cc: ControllerComponents,
-                                                 authorisedAction: AuthorisedAction)
-                                                (implicit ec: ExecutionContext) extends BackendController(cc) {
+class UpdateGainsSessionDataController @Inject() (gainsSessionService: GainsSessionService,
+                                                  cc: ControllerComponents,
+                                                  authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def updateSession(taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
     user.request.body.asJson.map(_.validate[AllGainsSessionModel]) match {
       case Some(JsSuccess(model, _)) =>
         gainsSessionService.updateSessionData(model, taxYear).map {
-          case Right(_) => NoContent
+          case Right(_)            => NoContent
           case Left(databaseError) => InternalServerError(Json.toJson(databaseError.message))
         }
       case _ => Future.successful(BadRequest)

@@ -29,6 +29,6 @@ case class UserAnswersModel(mtdItId: String,
                             lastUpdated: Instant = Instant.now)
 
 object UserAnswersModel {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val instantFormat: Format[Instant]    = MongoJavatimeFormats.instantFormat
   implicit val format: OFormat[UserAnswersModel] = Json.format[UserAnswersModel]
 }

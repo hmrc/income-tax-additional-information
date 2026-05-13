@@ -24,10 +24,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class GetOtherEmploymentsIncomeService @Inject()(getOtherEmploymentsIncomeConnector: GetOtherEmploymentsIncomeConnector) {
+class GetOtherEmploymentsIncomeService @Inject() (getOtherEmploymentsIncomeConnector: GetOtherEmploymentsIncomeConnector) {
 
-  def getOtherEmploymentsIncome(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetOtherEmploymentsIncomeResponse] = {
+  def getOtherEmploymentsIncome(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetOtherEmploymentsIncomeResponse] =
     getOtherEmploymentsIncomeConnector.getOtherEmploymentsIncome(nino, taxYear)
-  }
 
 }

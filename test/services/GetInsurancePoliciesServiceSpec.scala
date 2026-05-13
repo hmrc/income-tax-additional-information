@@ -20,6 +20,8 @@ import connectors.parsers.GetInsurancePoliciesParser.GetInsurancePoliciesRespons
 import connectors.{GetInsurancePoliciesConnector, GetInsurancePoliciesTYSConnector}
 import models._
 import testUtils.TestSuite
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.TaxYearUtils.specificTaxYear
 
@@ -27,28 +29,28 @@ import scala.concurrent.Future
 
 class GetInsurancePoliciesServiceSpec extends TestSuite {
 
-  val connector: GetInsurancePoliciesConnector = mock[GetInsurancePoliciesConnector]
+  val connector: GetInsurancePoliciesConnector       = mock[GetInsurancePoliciesConnector]
   val tysConnector: GetInsurancePoliciesTYSConnector = mock[GetInsurancePoliciesTYSConnector]
-  val service: GetInsurancePoliciesService = new GetInsurancePoliciesService(connector, tysConnector)
+  val service: GetInsurancePoliciesService           = new GetInsurancePoliciesService(connector, tysConnector)
 
   val taxYear = 2023
 
   ".getInsurancePolicies" should {
 
-    val expectedResult: GetInsurancePoliciesResponse = Right(InsurancePoliciesModel(
-      submittedOn = "2020-01-04T05:01:01Z",
-      lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
-      capitalRedemption = Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), 123.45, Some(true), Some(3), Some(2), Some(0)))),
-      lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), 0, Some(true), Some(2), Some(22), Some(123.45)))),
-      voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), 123.45, Some(123.45), Some(5), Some(6)))),
-      foreign = Some(Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3))))
-    ))
+    val expectedResult: GetInsurancePoliciesResponse = Right(
+      InsurancePoliciesModel(
+        submittedOn = "2020-01-04T05:01:01Z",
+        lifeInsurance = Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), 123.45, Some(true), Some(4), Some(3), Some(123.45)))),
+        capitalRedemption = Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), 123.45, Some(true), Some(3), Some(2), Some(0)))),
+        lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), 0, Some(true), Some(2), Some(22), Some(123.45)))),
+        voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), 123.45, Some(123.45), Some(5), Some(6)))),
+        foreign = Some(Seq(ForeignModel(Some("RefNo13254687"), 123.45, Some(123.45), Some(3))))
+      ))
 
     "return the connector response" in {
 
-      (connector.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", taxYear, *)
-        .returning(Future.successful(expectedResult))
+      when(connector.getInsurancePolicies(eqTo("12345678"), eqTo(taxYear))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.getInsurancePolicies("12345678", taxYear))
 
@@ -58,9 +60,8 @@ class GetInsurancePoliciesServiceSpec extends TestSuite {
 
     "return the connector response for specific tax year" in {
 
-      (tysConnector.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", specificTaxYear, *)
-        .returning(Future.successful(expectedResult))
+      when(tysConnector.getInsurancePolicies(eqTo("12345678"), eqTo(specificTaxYear))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.getInsurancePolicies("12345678", specificTaxYear))
 
@@ -70,9 +71,8 @@ class GetInsurancePoliciesServiceSpec extends TestSuite {
 
     "return the connector response for specific tax year plus one" in {
 
-      (tysConnector.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects("12345678", specificTaxYear + 1, *)
-        .returning(Future.successful(expectedResult))
+      when(tysConnector.getInsurancePolicies(eqTo("12345678"), eqTo(specificTaxYear + 1))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(expectedResult))
 
       val result = await(service.getInsurancePolicies("12345678", specificTaxYear + 1))
 

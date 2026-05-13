@@ -33,16 +33,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
-                                      appConfig: AppConfig,
-                                      clock: Clock)(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[UserAnswersModel](
-    collectionName = "userAnswers",
-    mongoComponent = mongoComponent,
-    domainFormat   = UserAnswersModel.format,
-    indexes = UserAnswersIndexes.indexes()(appConfig),
-    replaceIndexes = appConfig.userAnswersReplaceIndexes
-  ) {
+class UserAnswersRepository @Inject() (mongoComponent: MongoComponent, appConfig: AppConfig, clock: Clock)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[UserAnswersModel](
+      collectionName = "userAnswers",
+      mongoComponent = mongoComponent,
+      domainFormat = UserAnswersModel.format,
+      indexes = UserAnswersIndexes.indexes()(appConfig),
+      replaceIndexes = appConfig.userAnswersReplaceIndexes
+    ) {
 
   private def journeyFilter(mtdItId: String, taxYear: Int, journey: Journey): Bson = and(
     equal("mtdItId", toBson(mtdItId)),
@@ -81,4 +79,3 @@ class UserAnswersRepository @Inject()(mongoComponent: MongoComponent,
         .toFuture()
     )
 }
-

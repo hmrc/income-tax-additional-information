@@ -19,7 +19,8 @@ package controllers
 import models._
 import models.gains.PolicyCyaModel
 import models.mongo.{DataNotFound, DatabaseError, MongoError}
-import org.scalamock.handlers.CallHandler4
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
@@ -35,13 +36,24 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
   val mockGainsSessionService: GainsSessionService = mock[GainsSessionService]
   val controller = new UpdateGainsSessionDataController(mockGainsSessionService, mockControllerComponents, authorisedAction)
 
-  val nino = "nino"
-  val taxYear = 2025
-  val mtditid = "1234567890"
+  val nino      = "nino"
+  val taxYear   = 2025
+  val mtditid   = "1234567890"
   val sessionId = "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe"
 
   val completePolicyCyaModel: PolicyCyaModel = PolicyCyaModel(
-    sessionId, Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true), Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+    sessionId,
+    Some("Life Insurance"),
+    Some("123"),
+    Some(0),
+    Some(""),
+    Some(true),
+    Some(0),
+    Some(0),
+    Some(true),
+    Some(123.11),
+    Some(true),
+    Some(123.11)
   )
 
   val model: AllGainsSessionModel = AllGainsSessionModel(Seq(completePolicyCyaModel), gateway = Some(true))
@@ -54,10 +66,9 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
   ".createSession" should {
 
     "Return a 204 NO_CONTENT response with valid Session Data" in {
-      def serviceCallMock(): CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Unit]]] =
-        (mockGainsSessionService.updateSessionData(_: AllGainsSessionModel, _: Int)(_: User[_], _: ExecutionContext))
-          .expects(model, taxYear, *, *)
-          .returning(Future.successful(Right(())))
+      def serviceCallMock(): Unit =
+        when(mockGainsSessionService.updateSessionData(eqTo(model), eqTo(taxYear))(any[User[?]](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Right(())))
 
       val result = {
         mockAuth()
@@ -79,13 +90,9 @@ class UpdateGainsSessionDataControllerSpec extends TestSuite {
       }
 
       "the service returns a INTERNAL_SERVER_ERROR" in {
-        def mockCreateOrAmendCreateSessionWithError(mongoError: MongoError):
-          CallHandler4[AllGainsSessionModel, Int, User[_], ExecutionContext, Future[Either[DatabaseError, Unit]]] = {
-
-          (mockGainsSessionService.updateSessionData(_: AllGainsSessionModel, _: Int)(_: User[_], _: ExecutionContext))
-            .expects(model, taxYear, *, *)
-            .returning(Future.successful(Left(mongoError)))
-        }
+        def mockCreateOrAmendCreateSessionWithError(mongoError: MongoError): Unit =
+          when(mockGainsSessionService.updateSessionData(eqTo(model), eqTo(taxYear))(any[User[?]](), any[ExecutionContext]()))
+            .thenReturn(Future.successful(Left(mongoError)))
 
         val result = {
           mockAuth()

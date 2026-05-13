@@ -23,8 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DeleteOtherEmploymentsIncomeService @Inject()(deleteOtherEmploymentIncomeConnector: DeleteOtherEmploymentsIncomeConnector){
-  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] = {
+class DeleteOtherEmploymentsIncomeService @Inject() (deleteOtherEmploymentIncomeConnector: DeleteOtherEmploymentsIncomeConnector) {
+  def deleteOtherEmploymentsIncomeData(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[DeleteOtherEmploymentsIncomeResponse] =
     deleteOtherEmploymentIncomeConnector.deleteOtherEmploymentsIncomeData(nino, taxYear)
-  }
 }

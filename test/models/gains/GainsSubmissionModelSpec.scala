@@ -78,53 +78,53 @@ class GainsSubmissionModelSpec extends TestSuite {
   val validJson: JsObject = Json.obj(
     "lifeInsurance" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "event" -> "Life",
-        "gainAmount" -> 123.45,
-        "taxPaid" -> true,
-        "yearsHeld" -> 4,
+        "customerReference"      -> "RefNo13254687",
+        "event"                  -> "Life",
+        "gainAmount"             -> 123.45,
+        "taxPaid"                -> true,
+        "yearsHeld"              -> 4,
         "yearsHeldSinceLastGain" -> 3,
-        "deficiencyRelief" -> 123.45
+        "deficiencyRelief"       -> 123.45
       )
     ),
     "capitalRedemption" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "event" -> "Capital",
-        "gainAmount" -> 123.45,
-        "taxPaid" -> true,
-        "yearsHeld" -> 3,
+        "customerReference"      -> "RefNo13254687",
+        "event"                  -> "Capital",
+        "gainAmount"             -> 123.45,
+        "taxPaid"                -> true,
+        "yearsHeld"              -> 3,
         "yearsHeldSinceLastGain" -> 2,
-        "deficiencyRelief" -> 0
+        "deficiencyRelief"       -> 0
       )
     ),
     "lifeAnnuity" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "event" -> "Life",
-        "gainAmount" -> 0,
-        "taxPaid" -> true,
-        "yearsHeld" -> 2,
+        "customerReference"      -> "RefNo13254687",
+        "event"                  -> "Life",
+        "gainAmount"             -> 0,
+        "taxPaid"                -> true,
+        "yearsHeld"              -> 2,
         "yearsHeldSinceLastGain" -> 22,
-        "deficiencyRelief" -> 123.45
+        "deficiencyRelief"       -> 123.45
       )
     ),
     "voidedIsa" -> Json.arr(
       Json.obj(
-        "customerReference" -> "RefNo13254687",
-        "event" -> "isa",
-        "gainAmount" -> 123.45,
-        "taxPaidAmount" -> 123.45,
-        "yearsHeld" -> 5,
+        "customerReference"      -> "RefNo13254687",
+        "event"                  -> "isa",
+        "gainAmount"             -> 123.45,
+        "taxPaidAmount"          -> 123.45,
+        "yearsHeld"              -> 5,
         "yearsHeldSinceLastGain" -> 6
       )
     ),
     "foreign" -> Json.arr(
       Json.obj(
         "customerReference" -> "RefNo13254687",
-        "gainAmount" -> 123.45,
-        "taxPaidAmount" -> 123.45,
-        "yearsHeld" -> 3
+        "gainAmount"        -> 123.45,
+        "taxPaidAmount"     -> 123.45,
+        "yearsHeld"         -> 3
       )
     )
   )

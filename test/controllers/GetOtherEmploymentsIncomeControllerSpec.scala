@@ -18,7 +18,8 @@ package controllers
 
 import connectors.parsers.GetOtherEmploymentsIncomeParser.GetOtherEmploymentsIncomeResponse
 import models.{OtherEmploymentsIncomeModel, _}
-import org.scalamock.handlers.CallHandler3
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import play.api.libs.json.Json
 import services.GetOtherEmploymentsIncomeService
@@ -30,36 +31,68 @@ import scala.concurrent.Future
 class GetOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
   val serviceMock: GetOtherEmploymentsIncomeService = mock[GetOtherEmploymentsIncomeService]
-  val controller = new GetOtherEmploymentsIncomeController(serviceMock, mockControllerComponents, authorisedAction)
+  val controller                                    = new GetOtherEmploymentsIncomeController(serviceMock, mockControllerComponents, authorisedAction)
 
   val notFoundModel: ErrorModel = ErrorModel(NOT_FOUND, ErrorBodyModel("NotFound", "Unable to find source"))
   val serviceUnavailableModel: ErrorModel =
     ErrorModel(SERVICE_UNAVAILABLE, ErrorBodyModel("SERVICE_UNAVAILABLE", "The service is currently unavailable"))
-  val badRequestModel: ErrorModel = ErrorModel(BAD_REQUEST, ErrorBodyModel("BAD_REQUEST", "The supplied NINO is invalid"))
+  val badRequestModel: ErrorModel          = ErrorModel(BAD_REQUEST, ErrorBodyModel("BAD_REQUEST", "The supplied NINO is invalid"))
   val unprocessableEntityModel: ErrorModel = ErrorModel(UNPROCESSABLE_ENTITY, ErrorBodyModel("UNPROCESSABLE_ENTITY", "Tax year is is not supported"))
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
 
-
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2024
   val mtditid = "someMtditid"
 
   val otherEmploymentsIncomeModel: OtherEmploymentsIncomeModel = OtherEmploymentsIncomeModel(
     submittedOn = "2019-08-24T14:15:22Z",
-    shareOption = Some(Seq(ShareOptionModel("string", Some("123/abc 001<Q>"), "EMI", "2019-08-24", "2019-08-24", Some(true),
-      99999999999.99, 0, Some("string"), 99999999999.99, 99999999999.99, 99999999999.99, 99999999999.99,
-      99999999999.99, 99999999999.99))),
-    sharesAwardedOrReceived = Some(Seq(SharesAwardedOrReceivedModel("string", Some("123/abc 001<Q>"), "SIP", "2019-08-24", 0, "string",
-      "2019-08-24", true, true, 99999999999.99, 99999999999.99, 99999999999.99,
-      99999999999.99, 99999999999.99))),
+    shareOption = Some(
+      Seq(ShareOptionModel(
+        "string",
+        Some("123/abc 001<Q>"),
+        "EMI",
+        "2019-08-24",
+        "2019-08-24",
+        Some(true),
+        99999999999.99,
+        0,
+        Some("string"),
+        99999999999.99,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99
+      ))),
+    sharesAwardedOrReceived = Some(
+      Seq(SharesAwardedOrReceivedModel(
+        "string",
+        Some("123/abc 001<Q>"),
+        "SIP",
+        "2019-08-24",
+        0,
+        "string",
+        "2019-08-24",
+        true,
+        true,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99,
+        99999999999.99
+      ))),
     disability = Some(DisabilityModel(Some("string"), 99999999999.99)),
     foreignService = Some(ForeignServiceModel(Some("string"), 99999999999.99)),
-    lumpSums = Some(Seq(LumpSumsModel("string", "123/abc 001<Q>",
-      Some(TaxableLumpSumsAndCertainIncomeModel(99999999999.99, Some(99999999999.99), Some(true))),
-      Some(BenefitFromEmployerFinancedRetirementSchemeModel(99999999999.99, Some(99999999999.99), Some(99999999999.99), Some(true))),
-      Some(RedundancyCompensationPaymentsOverExemptionModel(99999999999.99, Some(99999999999.99), Some(true))),
-      Some(RedundancyCompensationPaymentsUnderExemptionModel(99999999999.99)))))
+    lumpSums = Some(
+      Seq(LumpSumsModel(
+        "string",
+        "123/abc 001<Q>",
+        Some(TaxableLumpSumsAndCertainIncomeModel(99999999999.99, Some(99999999999.99), Some(true))),
+        Some(BenefitFromEmployerFinancedRetirementSchemeModel(99999999999.99, Some(99999999999.99), Some(99999999999.99), Some(true))),
+        Some(RedundancyCompensationPaymentsOverExemptionModel(99999999999.99, Some(99999999999.99), Some(true))),
+        Some(RedundancyCompensationPaymentsUnderExemptionModel(99999999999.99))
+      )))
   )
 
   ".getOtherEmploymentsIncome" should {
@@ -67,13 +100,11 @@ class GetOtherEmploymentsIncomeControllerSpec extends TestSuite {
     "Return a 200 OK response with valid other employments income" in {
 
       val serviceResult = Right(otherEmploymentsIncomeModel)
-      val finalResult = Json.toJson(otherEmploymentsIncomeModel).toString()
+      val finalResult   = Json.toJson(otherEmploymentsIncomeModel).toString()
 
-      def serviceCallMock(): CallHandler3[String, Int, HeaderCarrier, Future[GetOtherEmploymentsIncomeResponse]] =
-        (serviceMock.getOtherEmploymentsIncome(_: String, _: Int)(_: HeaderCarrier))
-          .expects(nino, taxYear, *)
-          .returning(Future.successful(serviceResult))
-
+      def serviceCallMock(): Unit =
+        when(serviceMock.getOtherEmploymentsIncome(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(serviceResult))
 
       val result = {
         mockAuth()
@@ -88,12 +119,9 @@ class GetOtherEmploymentsIncomeControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockGetOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel):
-        CallHandler3[String, Int, HeaderCarrier, Future[GetOtherEmploymentsIncomeResponse]] = {
-          (serviceMock.getOtherEmploymentsIncome(_: String, _: Int)(_: HeaderCarrier))
-            .expects(nino, taxYear, *)
-            .returning(Future.successful(Left(errorModel)))
-        }
+      def mockGetOtherEmploymentsIncomeDataWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.getOtherEmploymentsIncome(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

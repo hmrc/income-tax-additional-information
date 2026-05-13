@@ -19,9 +19,9 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class DisabilityModel(
-                            customerReference: Option[String],
-                            amountDeducted: BigDecimal
-                          )
+    customerReference: Option[String],
+    amountDeducted: BigDecimal
+)
 
 object DisabilityModel {
   implicit val formats: OFormat[DisabilityModel] = Json.format[DisabilityModel]

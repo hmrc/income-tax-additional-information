@@ -16,7 +16,6 @@
 
 package connectors.parsers
 
-
 import models.{ErrorModel, InsurancePoliciesModel}
 import play.api.Logging
 import play.api.http.Status._
@@ -24,15 +23,18 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import utils.PagerDutyHelper.PagerDutyKeys._
 import utils.PagerDutyHelper._
 
-object GetInsurancePoliciesParser extends APIParser with Logging{
+object GetInsurancePoliciesParser extends APIParser with Logging {
   type GetInsurancePoliciesResponse = Either[ErrorModel, InsurancePoliciesModel]
 
   implicit object InsurancePoliciesHttpReads extends HttpReads[GetInsurancePoliciesResponse] {
-    override def read(method: String, url: String, response: HttpResponse): GetInsurancePoliciesResponse = response.status match{
-      case OK => response.json.validate[InsurancePoliciesModel].fold[GetInsurancePoliciesResponse](
-        errors => badSuccessJsonFromAPIWithErrors(errors),
-        parserModel => Right(parserModel)
-      )
+    override def read(method: String, url: String, response: HttpResponse): GetInsurancePoliciesResponse = response.status match {
+      case OK =>
+        response.json
+          .validate[InsurancePoliciesModel]
+          .fold[GetInsurancePoliciesResponse](
+            errors => badSuccessJsonFromAPIWithErrors(errors),
+            parserModel => Right(parserModel)
+          )
       case BAD_REQUEST | UNPROCESSABLE_ENTITY =>
         pagerDutyLog(FOURXX_RESPONSE_FROM_API, logMessage(response))
         handleAPIError(response)

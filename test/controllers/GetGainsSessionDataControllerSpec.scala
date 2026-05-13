@@ -19,7 +19,8 @@ package controllers
 import models._
 import models.gains.PolicyCyaModel
 import models.mongo.{DataNotFound, DatabaseError, GainsUserDataModel, MongoError}
-import org.scalamock.handlers.CallHandler3
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import play.api.libs.json.Json
 import services.GainsSessionService
@@ -33,27 +34,37 @@ class GetGainsSessionDataControllerSpec extends TestSuite {
   val mockGainsSessionService: GainsSessionService = mock[GainsSessionService]
   val controller = new GetGainsSessionDataController(mockGainsSessionService, mockControllerComponents, authorisedAction)
 
-  val nino = "nino"
-  val taxYear = 2025
-  val mtditid = "someMtditid"
+  val nino      = "nino"
+  val taxYear   = 2025
+  val mtditid   = "someMtditid"
   val sessionId = "sessionId-eb3158c2-0aff-4ce8-8d1b-f2208ace52fe"
 
   val completePolicyCyaModel: PolicyCyaModel =
     PolicyCyaModel(
-      sessionId, Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true),
-      Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+      sessionId,
+      Some("Life Insurance"),
+      Some("123"),
+      Some(0),
+      Some(""),
+      Some(true),
+      Some(0),
+      Some(0),
+      Some(true),
+      Some(123.11),
+      Some(true),
+      Some(123.11)
     )
 
   val validGainsSessionModel: AllGainsSessionModel = AllGainsSessionModel(Seq(completePolicyCyaModel), gateway = Some(true))
-  val completeGainsUserDataModel: GainsUserDataModel = GainsUserDataModel(sessionId, mtditid, nino, taxYear, Some(validGainsSessionModel), Instant.now)
+  val completeGainsUserDataModel: GainsUserDataModel =
+    GainsUserDataModel(sessionId, mtditid, nino, taxYear, Some(validGainsSessionModel), Instant.now)
 
   ".getSessionData" should {
 
     "return a 200 OK response with Gains User Data Model" in {
-      def serviceCallMock(): CallHandler3[Int, User[_], ExecutionContext, Future[Either[DatabaseError, Option[GainsUserDataModel]]]] =
-        (mockGainsSessionService.getSessionData( _: Int)(_: User[_], _: ExecutionContext))
-          .expects(taxYear, *, *)
-          .returning(Future.successful(Right(Some(completeGainsUserDataModel))))
+      def serviceCallMock(): Unit =
+        when(mockGainsSessionService.getSessionData(eqTo(taxYear))(any[User[?]](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Right(Some(completeGainsUserDataModel))))
 
       val result = {
         mockAuth()
@@ -66,10 +77,9 @@ class GetGainsSessionDataControllerSpec extends TestSuite {
     }
 
     "return a 204 NO_CONTENT response with no Gains User Data Model" in {
-      def serviceCallMock(): CallHandler3[Int, User[_], ExecutionContext, Future[Either[DatabaseError, Option[GainsUserDataModel]]]] =
-        (mockGainsSessionService.getSessionData( _: Int)(_: User[_], _: ExecutionContext))
-          .expects(taxYear, *, *)
-          .returning(Future.successful(Right(None)))
+      def serviceCallMock(): Unit =
+        when(mockGainsSessionService.getSessionData(eqTo(taxYear))(any[User[?]](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Right(None)))
 
       val result = {
         mockAuth()
@@ -83,11 +93,9 @@ class GetGainsSessionDataControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockServiceGetSessionData(mongoError: MongoError):
-        CallHandler3[Int, User[_], ExecutionContext, Future[Either[DatabaseError, Option[GainsUserDataModel]]]] =
-          (mockGainsSessionService.getSessionData( _: Int)(_: User[_], _: ExecutionContext))
-            .expects(taxYear, *, *)
-            .returning(Future.successful(Left(mongoError)))
+      def mockServiceGetSessionData(mongoError: MongoError): Unit =
+        when(mockGainsSessionService.getSessionData(eqTo(taxYear))(any[User[?]](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Left(mongoError)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

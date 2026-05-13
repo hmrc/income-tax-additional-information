@@ -18,7 +18,8 @@ package controllers
 
 import connectors.parsers.CreateOrAmendInsurancePoliciesParser.CreateOrAmendInsurancePoliciesResponse
 import models._
-import org.scalamock.handlers.CallHandler4
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -41,8 +42,7 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
   val internalServerErrorModel: ErrorModel =
     ErrorModel(INTERNAL_SERVER_ERROR, ErrorBodyModel("INTERNAL_SERVER_ERROR", "There has been an unexpected error"))
 
-
-  val nino = "nino"
+  val nino    = "nino"
   val taxYear = 2023
   val mtditid = "1234567890"
 
@@ -62,10 +62,8 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
     "Return a 204 NO Content response with valid putInsurancePolicies" in {
       val serviceResult = Right(true)
 
-      def serviceCallMock(): CallHandler4[String, Int, CreateOrAmendInsurancePoliciesModel, HeaderCarrier, Future[CreateOrAmendInsurancePoliciesResponse]] =
-        (serviceMock.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-          .expects(nino, taxYear, model, *)
-          .returning(Future.successful(serviceResult))
+      def serviceCallMock(): Unit = when(serviceMock.createOrAmendInsurancePolicies(eqTo(nino), eqTo(taxYear), eqTo(model))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(serviceResult))
 
       val result: Future[Result] = {
         mockAuth()
@@ -86,12 +84,9 @@ class CreateOrAmendInsurancePoliciesControllerSpec extends TestSuite {
 
     "return a Left response" when {
 
-      def mockCreateOrAmendInsurancePoliciesWithError(errorModel: ErrorModel):
-        CallHandler4[String, Int, CreateOrAmendInsurancePoliciesModel, HeaderCarrier, Future[CreateOrAmendInsurancePoliciesResponse]] = {
-          (serviceMock.createOrAmendInsurancePolicies(_: String, _: Int, _: CreateOrAmendInsurancePoliciesModel)(_: HeaderCarrier))
-            .expects(nino, taxYear, *, *)
-            .returning(Future.successful(Left(errorModel)))
-      }
+      def mockCreateOrAmendInsurancePoliciesWithError(errorModel: ErrorModel): Unit =
+        when(serviceMock.createOrAmendInsurancePolicies(eqTo(nino), eqTo(taxYear), any[CreateOrAmendInsurancePoliciesModel]())(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(Left(errorModel)))
 
       "the service returns a NO_CONTENT" in {
         val result = {

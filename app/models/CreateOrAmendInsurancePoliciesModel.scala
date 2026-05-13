@@ -22,9 +22,9 @@ case class CreateOrAmendInsurancePoliciesModel(lifeInsurance: Option[Seq[LifeIns
                                                capitalRedemption: Option[Seq[CapitalRedemptionModel]],
                                                lifeAnnuity: Option[Seq[LifeAnnuityModel]],
                                                voidedIsa: Option[Seq[VoidedIsaModel]],
-                                               foreign: Option[Seq[ForeignModel]]){
+                                               foreign: Option[Seq[ForeignModel]]) {
 
-  def clearModel: CreateOrAmendInsurancePoliciesModel ={
+  def clearModel: CreateOrAmendInsurancePoliciesModel =
     CreateOrAmendInsurancePoliciesModel(
       lifeInsurance = if (lifeInsurance.exists(_.isEmpty)) None else lifeInsurance,
       capitalRedemption = if (capitalRedemption.exists(_.isEmpty)) None else capitalRedemption,
@@ -32,7 +32,6 @@ case class CreateOrAmendInsurancePoliciesModel(lifeInsurance: Option[Seq[LifeIns
       voidedIsa = if (voidedIsa.exists(_.isEmpty)) None else voidedIsa,
       foreign = if (foreign.exists(_.isEmpty)) None else foreign
     )
-  }
 }
 
 object CreateOrAmendInsurancePoliciesModel {

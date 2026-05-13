@@ -34,12 +34,12 @@ class GainsPriorDataModelSpec extends TestSuite {
   val modelMin: GainsPriorDataModel = GainsPriorDataModel("")
 
   val jsonMax: JsObject = Json.obj(
-    "submittedOn" -> "",
-    "lifeInsurance" -> Some(Seq[LifeInsuranceModel](LifeInsuranceModel(gainAmount = 123.11))),
+    "submittedOn"       -> "",
+    "lifeInsurance"     -> Some(Seq[LifeInsuranceModel](LifeInsuranceModel(gainAmount = 123.11))),
     "capitalRedemption" -> Some(Seq(CapitalRedemptionModel(gainAmount = 123.11))),
-    "lifeAnnuity" -> Some(Seq(LifeAnnuityModel(gainAmount = 123.11))),
-    "voidedIsa" -> Some(Seq(VoidedIsaModel(gainAmount = 123.11))),
-    "foreign" -> Some(Seq(ForeignModel(gainAmount = 123.11)))
+    "lifeAnnuity"       -> Some(Seq(LifeAnnuityModel(gainAmount = 123.11))),
+    "voidedIsa"         -> Some(Seq(VoidedIsaModel(gainAmount = 123.11))),
+    "foreign"           -> Some(Seq(ForeignModel(gainAmount = 123.11)))
   )
 
   val jsonMin: JsObject = Json.obj("submittedOn" -> "")
@@ -70,15 +70,32 @@ class GainsPriorDataModelSpec extends TestSuite {
       "each prior model has data" in {
         val result = modelMax.toPolicyCya
         val lifeInsuranceModel: PolicyCyaModel =
-          PolicyCyaModel(result.head.sessionId, Some("Life Insurance"), None, Some(123.11), None, Some(false), None, None, None, None, Some(false), None)
+          PolicyCyaModel(
+            result.head.sessionId,
+            Some("Life Insurance"),
+            None,
+            Some(123.11),
+            None,
+            Some(false),
+            None,
+            None,
+            None,
+            None,
+            Some(false),
+            None)
         result mustBe
           List(
             lifeInsuranceModel,
             lifeInsuranceModel.copy(sessionId = result(1).sessionId, policyType = Some("Capital Redemption"), treatedAsTaxPaid = Some(false)),
             lifeInsuranceModel.copy(sessionId = result(2).sessionId, policyType = Some("Life Annuity")),
             lifeInsuranceModel.copy(sessionId = result(3).sessionId, policyType = Some("Voided ISA"), treatedAsTaxPaid = Some(false)),
-            lifeInsuranceModel.copy(sessionId = result(4).sessionId, policyType =
-              Some("Foreign Policy"), policyEvent = Some(""), yearsPolicyHeldPrevious = Some(0), treatedAsTaxPaid = Some(false), deficiencyReliefAmount = Some(0)
+            lifeInsuranceModel.copy(
+              sessionId = result(4).sessionId,
+              policyType = Some("Foreign Policy"),
+              policyEvent = Some(""),
+              yearsPolicyHeldPrevious = Some(0),
+              treatedAsTaxPaid = Some(false),
+              deficiencyReliefAmount = Some(0)
             )
           )
       }

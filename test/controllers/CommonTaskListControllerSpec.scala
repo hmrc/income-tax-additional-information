@@ -17,30 +17,32 @@
 package controllers
 
 import models.tasklist.{SectionTitle, TaskListSection}
-import org.scalamock.handlers.CallHandler4
 import play.api.http.Status.OK
 import services.CommonTaskListService
 import testUtils.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.TaxYearUtils
 
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CommonTaskListControllerSpec extends TestSuite {
 
-  val nino :String = "123456789"
-  val mtdItId :String = "1234567890"
+  val nino: String         = "123456789"
+  val mtdItId: String      = "1234567890"
   val specificTaxYear: Int = TaxYearUtils.specificTaxYear
 
   val commonTaskListService: CommonTaskListService = mock[CommonTaskListService]
 
   val controller = new CommonTaskListController(commonTaskListService, authorisedAction, mockControllerComponents)
 
-  def mockGainsService(): CallHandler4[Int, String, ExecutionContext, HeaderCarrier, Future[TaskListSection]] = {
-    (commonTaskListService.get(_: Int, _: String)(_: ExecutionContext, _: HeaderCarrier))
-      .expects(*, *, *, *)
-      .returning(Future.successful(TaskListSection(SectionTitle.InsuranceGainsTitle, None)))
-  }
+  def mockGainsService(): Unit =
+    when(commonTaskListService.get(any[Int], any[String])(any(), any()))
+      .thenReturn(
+        Future.successful(TaskListSection(SectionTitle.InsuranceGainsTitle, None))
+      )
 
   ".getCommonTaskList" should {
 

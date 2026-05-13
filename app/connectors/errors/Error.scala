@@ -21,7 +21,7 @@ import play.api.libs.json.{JsValue, Json}
 case class Error(status: Int, body: ErrorBody) {
 
   def toJson: JsValue = body match {
-    case error: SingleErrorBody => Json.toJson(error)
+    case error: SingleErrorBody  => Json.toJson(error)
     case errors: MultiErrorsBody => Json.toJson(errors)
   }
 }

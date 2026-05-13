@@ -19,11 +19,11 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class BenefitFromEmployerFinancedRetirementSchemeModel(
-                                                             amount: BigDecimal,
-                                                             exemptAmount: Option[BigDecimal],
-                                                             taxPaid: Option[BigDecimal],
-                                                             taxTakenOffInEmployment: Option[Boolean]
-                                                           )
+    amount: BigDecimal,
+    exemptAmount: Option[BigDecimal],
+    taxPaid: Option[BigDecimal],
+    taxTakenOffInEmployment: Option[Boolean]
+)
 
 object BenefitFromEmployerFinancedRetirementSchemeModel {
   implicit val formats: OFormat[BenefitFromEmployerFinancedRetirementSchemeModel] = Json.format[BenefitFromEmployerFinancedRetirementSchemeModel]

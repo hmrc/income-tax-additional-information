@@ -22,6 +22,7 @@ import org.mongodb.scala.bson.BsonDocument
 import play.api.libs.json.Json
 import repositories.UserAnswersRepository
 import support.IntegrationTest
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.SingleObservableFuture
 
 
 class UserAnswersServiceISpec extends IntegrationTest {

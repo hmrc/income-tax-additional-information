@@ -25,17 +25,18 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class GetGainsSessionDataController @Inject()(gainsSessionService: GainsSessionService,
-                                              cc: ControllerComponents,
-                                              authorisedAction: AuthorisedAction)
-                                             (implicit ec: ExecutionContext) extends BackendController(cc) {
+class GetGainsSessionDataController @Inject() (gainsSessionService: GainsSessionService,
+                                               cc: ControllerComponents,
+                                               authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def getSession(taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
     gainsSessionService.getSessionData(taxYear).map {
-      case Right(optionalUserData) => optionalUserData match {
-        case Some(userData) => Ok(Json.toJson(userData))
-        case _ => NoContent
-      }
+      case Right(optionalUserData) =>
+        optionalUserData match {
+          case Some(userData) => Ok(Json.toJson(userData))
+          case _              => NoContent
+        }
       case Left(error) =>
         NotFound(Json.toJson(error.message))
     }

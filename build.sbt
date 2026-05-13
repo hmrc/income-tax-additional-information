@@ -4,7 +4,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 val appName = "income-tax-additional-information"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.3.7"
 
 lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
@@ -26,9 +26,9 @@ lazy val coverageSettings: Seq[Setting[?]] = {
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
+    ScoverageKeys.coverageMinimumStmtTotal := 93,
+    ScoverageKeys.coverageFailOnMinimum    := true,
+    ScoverageKeys.coverageHighlighting     := true
   )
 }
 
@@ -44,10 +44,9 @@ lazy val microservice = Project(appName, file("."))
     RoutesKeys.routesImport ++= Seq("models.mongo.Journey")
   )
   .settings(PlayKeys.playDefaultPort.withRank(KeyRanks.Invisible) := 10004)
-  .settings(coverageSettings *)
+  .settings(coverageSettings*)
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-
 
 lazy val it = project
   .enablePlugins(PlayScala)

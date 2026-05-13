@@ -31,7 +31,7 @@ object Journey {
   }
 
   implicit val format: Format[Journey] = new Format[Journey] {
-    override def writes(model: Journey): JsValue = JsString(model.name)
+    override def writes(model: Journey): JsValue         = JsString(model.name)
     override def reads(json: JsValue): JsResult[Journey] = json.validate[String].map(apply)
   }
 

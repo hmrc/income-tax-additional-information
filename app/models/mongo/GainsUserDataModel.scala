@@ -23,29 +23,29 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import java.time.Instant
 
 case class GainsUserDataModel(
-                               sessionId: String,
-                               mtdItId: String,
-                               nino: String,
-                               taxYear: Int,
-                               gains: Option[AllGainsSessionModel] = None,
-                               lastUpdated: Instant = Instant.now
-                             ) extends UserDataTemplate
+    sessionId: String,
+    mtdItId: String,
+    nino: String,
+    taxYear: Int,
+    gains: Option[AllGainsSessionModel] = None,
+    lastUpdated: Instant = Instant.now
+) extends UserDataTemplate
 
 object GainsUserDataModel {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val instantFormat: Format[Instant]      = MongoJavatimeFormats.instantFormat
   implicit val format: OFormat[GainsUserDataModel] = Json.format[GainsUserDataModel]
 }
 
 case class EncryptedGainsUserDataModel(
-                                        sessionId: String,
-                                        mtdItId: String,
-                                        nino: String,
-                                        taxYear: Int,
-                                        gains: Option[EncryptedAllGainsSessionModel] = None,
-                                        lastUpdated: Instant = Instant.now
-                                      ) extends UserDataTemplate
+    sessionId: String,
+    mtdItId: String,
+    nino: String,
+    taxYear: Int,
+    gains: Option[EncryptedAllGainsSessionModel] = None,
+    lastUpdated: Instant = Instant.now
+) extends UserDataTemplate
 
 object EncryptedGainsUserDataModel {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val instantFormat: Format[Instant]              = MongoJavatimeFormats.instantFormat
   implicit val format: Format[EncryptedGainsUserDataModel] = Json.format[EncryptedGainsUserDataModel]
 }

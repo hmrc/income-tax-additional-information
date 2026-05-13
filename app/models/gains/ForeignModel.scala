@@ -21,12 +21,12 @@ import play.api.libs.json.{Json, OFormat}
 import java.util.UUID
 
 case class ForeignModel(
-                         customerReference: Option[String] = None,
-                         gainAmount: BigDecimal,
-                         taxPaidAmount: Option[BigDecimal] = None,
-                         yearsHeld: Option[Int] = None
-                       ) {
-  def toPolicyCya: PolicyCyaModel = {
+    customerReference: Option[String] = None,
+    gainAmount: BigDecimal,
+    taxPaidAmount: Option[BigDecimal] = None,
+    yearsHeld: Option[Int] = None
+) {
+  def toPolicyCya: PolicyCyaModel =
     PolicyCyaModel(
       sessionId = UUID.randomUUID().toString,
       policyType = Some("Foreign Policy"),
@@ -43,7 +43,6 @@ case class ForeignModel(
       entitledToDeficiencyRelief = Some(false),
       deficiencyReliefAmount = Some(0)
     )
-  }
 }
 
 object ForeignModel {

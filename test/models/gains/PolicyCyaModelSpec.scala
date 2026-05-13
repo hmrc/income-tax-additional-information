@@ -25,25 +25,35 @@ class PolicyCyaModelSpec extends TestSuite {
 
   val sessionId: String = UUID.randomUUID().toString
   val modelMax: PolicyCyaModel = PolicyCyaModel(
-    sessionId, Some("Life Insurance"), Some("123"), Some(0), Some(""), Some(true),
-    Some(0), Some(0), Some(true), Some(123.11), Some(true), Some(123.11)
+    sessionId,
+    Some("Life Insurance"),
+    Some("123"),
+    Some(0),
+    Some(""),
+    Some(true),
+    Some(0),
+    Some(0),
+    Some(true),
+    Some(123.11),
+    Some(true),
+    Some(123.11)
   )
 
   val modelMin: PolicyCyaModel = PolicyCyaModel(sessionId, Some(""))
 
   val jsonMax: JsObject = Json.obj(
-    "sessionId" -> sessionId,
-    "policyType" -> "Life Insurance",
-    "policyNumber" -> "123",
-    "amountOfGain" -> 0,
-    "policyEvent" -> "",
-    "previousGain" -> true,
-    "yearsPolicyHeld" -> 0,
-    "yearsPolicyHeldPrevious" -> 0,
-    "treatedAsTaxPaid" -> true,
-    "taxPaidAmount" -> 123.11,
+    "sessionId"                  -> sessionId,
+    "policyType"                 -> "Life Insurance",
+    "policyNumber"               -> "123",
+    "amountOfGain"               -> 0,
+    "policyEvent"                -> "",
+    "previousGain"               -> true,
+    "yearsPolicyHeld"            -> 0,
+    "yearsPolicyHeldPrevious"    -> 0,
+    "treatedAsTaxPaid"           -> true,
+    "taxPaidAmount"              -> 123.11,
     "entitledToDeficiencyRelief" -> true,
-    "deficiencyReliefAmount" -> 123.11
+    "deficiencyReliefAmount"     -> 123.11
   )
 
   val jsonMin: JsObject = Json.obj("sessionId" -> sessionId, "policyType" -> "")

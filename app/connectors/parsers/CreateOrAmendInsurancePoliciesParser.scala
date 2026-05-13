@@ -16,18 +16,16 @@
 
 package connectors.parsers
 
-
 import models.ErrorModel
 import play.api.Logging
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-
 object CreateOrAmendInsurancePoliciesParser extends APIParser with Logging {
   type CreateOrAmendInsurancePoliciesResponse = Either[ErrorModel, Boolean]
 
   implicit object InsurancePoliciesHttpReads extends HttpReads[CreateOrAmendInsurancePoliciesResponse] {
-    override def read(method: String, url: String, response: HttpResponse): CreateOrAmendInsurancePoliciesResponse = {
+    override def read(method: String, url: String, response: HttpResponse): CreateOrAmendInsurancePoliciesResponse =
       response.status match {
         case CREATED => Right(true)
 
@@ -51,6 +49,5 @@ object CreateOrAmendInsurancePoliciesParser extends APIParser with Logging {
           logger.error(logMessage(response))
           handleAPIError(response, Some(INTERNAL_SERVER_ERROR))
       }
-    }
   }
 }

@@ -28,7 +28,7 @@ case class MultiErrorsBody(failures: Seq[SingleErrorBody]) extends ErrorBody
 
 object SingleErrorBody {
   implicit val formats: OFormat[SingleErrorBody] = Json.format[SingleErrorBody]
-  val parsingError: SingleErrorBody = SingleErrorBody("PARSING_ERROR", "Error parsing response from API")
+  val parsingError: SingleErrorBody              = SingleErrorBody("PARSING_ERROR", "Error parsing response from API")
   val invalidView: SingleErrorBody = SingleErrorBody("INVALID_VIEW", "Submission has not passed validation. Invalid query parameter view.")
 }
 

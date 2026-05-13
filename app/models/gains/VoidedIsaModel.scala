@@ -21,14 +21,14 @@ import play.api.libs.json.{Json, OFormat}
 import java.util.UUID
 
 case class VoidedIsaModel(
-                           customerReference: Option[String] = None,
-                           event: Option[String] = None,
-                           gainAmount: BigDecimal,
-                           taxPaidAmount: Option[BigDecimal] = None,
-                           yearsHeld: Option[Int] = None,
-                           yearsHeldSinceLastGain: Option[Int] = None
-                         ) {
-  def toPolicyCya: PolicyCyaModel = {
+    customerReference: Option[String] = None,
+    event: Option[String] = None,
+    gainAmount: BigDecimal,
+    taxPaidAmount: Option[BigDecimal] = None,
+    yearsHeld: Option[Int] = None,
+    yearsHeldSinceLastGain: Option[Int] = None
+) {
+  def toPolicyCya: PolicyCyaModel =
     PolicyCyaModel(
       sessionId = UUID.randomUUID().toString,
       policyType = Some("Voided ISA"),
@@ -43,7 +43,6 @@ case class VoidedIsaModel(
       entitledToDeficiencyRelief = Some(false),
       deficiencyReliefAmount = None
     )
-  }
 }
 
 object VoidedIsaModel {

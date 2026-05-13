@@ -19,14 +19,15 @@ package utils
 import support.stubs.AppConfigStub
 import testUtils.TestSuite
 import uk.gov.hmrc.crypto.{AdDecrypter, AdEncrypter, EncryptedValue}
+import org.mockito.Mockito.when
 
 class AesGcmAdCryptoSpec extends TestSuite {
 
   implicit private val associatedText: String = "some-associated-text"
-  private val mockAesGcmAdCryptoFactory = mock[AesGcmAdCryptoFactory]
-  private val nonce = "some-nonce"
-  private val valueToEncrypt = "value-to-encrypt"
-  private val decryptedValue = "decrypted-value"
+  private val mockAesGcmAdCryptoFactory       = mock[AesGcmAdCryptoFactory]
+  private val nonce                           = "some-nonce"
+  private val valueToEncrypt                  = "value-to-encrypt"
+  private val decryptedValue                  = "decrypted-value"
   private val mockAesGcmAdCrypto = new AdEncrypter with AdDecrypter {
     override def encrypt(valueToEncrypt: String, associatedText: String): EncryptedValue = EncryptedValue("some-value", nonce)
 
@@ -38,16 +39,15 @@ class AesGcmAdCryptoSpec extends TestSuite {
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(new AppConfigStub().config(), mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {
-        (() => mockAesGcmAdCryptoFactory.instance())
-          .expects()
-          .returning(mockAesGcmAdCrypto)
+        when(mockAesGcmAdCryptoFactory.instance())
+          .thenReturn(mockAesGcmAdCrypto)
 
         underTest.encrypt(valueToEncrypt) mustBe EncryptedValue("some-value", nonce)
       }
     }
 
     "useEncryption is false" should {
-      val appConfig = new AppConfigStub().noEncryptionConfig()
+      val appConfig                 = new AppConfigStub().noEncryptionConfig()
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(appConfig, mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {
@@ -61,16 +61,15 @@ class AesGcmAdCryptoSpec extends TestSuite {
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(new AppConfigStub().config(), mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {
-        (() => mockAesGcmAdCryptoFactory.instance())
-          .expects()
-          .returning(mockAesGcmAdCrypto)
+        when(mockAesGcmAdCryptoFactory.instance())
+          .thenReturn(mockAesGcmAdCrypto)
 
         underTest.decrypt(EncryptedValue("value-to-decrypt", nonce)) mustBe decryptedValue
       }
     }
 
     "useEncryption is false" should {
-      val appConfig = new AppConfigStub().noEncryptionConfig()
+      val appConfig                 = new AppConfigStub().noEncryptionConfig()
       val underTest: AesGcmAdCrypto = new AesGcmAdCrypto(appConfig, mockAesGcmAdCryptoFactory)
 
       "return encrypted value" in {

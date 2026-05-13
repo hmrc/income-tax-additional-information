@@ -22,6 +22,8 @@ import models.tasklist.{SectionTitle, TaskListSection, TaskListSectionItem, Task
 import play.api.http.Status.NOT_FOUND
 import support.providers.AppConfigStubProvider
 import testUtils.TestSuite
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -32,49 +34,59 @@ class CommonTaskListServiceSpec extends TestSuite with AppConfigStubProvider {
 
   val service: CommonTaskListService = new CommonTaskListService(appConfigStub, gainsService)
 
-  val ZERO: BigDecimal = 0
-  val nino: String = "12345678"
-  val taxYear: Int = 1234
+  val ZERO: BigDecimal          = 0
+  val nino: String              = "12345678"
+  val taxYear: Int              = 1234
   val monetaryValue: BigDecimal = 123.45
-  val years: Int = 4
+  val years: Int                = 4
 
-  val fullGainsResult: GetInsurancePoliciesResponse = Right(InsurancePoliciesModel(
-    submittedOn = "2020-01-04T05:01:01Z",
-    lifeInsurance =
-      Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), monetaryValue, Some(true), Some(years), Some(years), Some(monetaryValue)))),
-    capitalRedemption =
-      Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), monetaryValue, Some(true), Some(years), Some(years), Some(ZERO)))),
-    lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), ZERO, Some(true), Some(years), Some(years), Some(monetaryValue)))),
-    voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), monetaryValue, Some(monetaryValue), Some(years), Some(years))))
-  ))
+  val fullGainsResult: GetInsurancePoliciesResponse = Right(
+    InsurancePoliciesModel(
+      submittedOn = "2020-01-04T05:01:01Z",
+      lifeInsurance =
+        Some(Seq(LifeInsuranceModel(Some("RefNo13254687"), Some("Life"), monetaryValue, Some(true), Some(years), Some(years), Some(monetaryValue)))),
+      capitalRedemption =
+        Some(Seq(CapitalRedemptionModel(Some("RefNo13254687"), Some("Capital"), monetaryValue, Some(true), Some(years), Some(years), Some(ZERO)))),
+      lifeAnnuity = Some(Seq(LifeAnnuityModel(Some("RefNo13254687"), Some("Life"), ZERO, Some(true), Some(years), Some(years), Some(monetaryValue)))),
+      voidedIsa = Some(Seq(VoidedIsaModel(Some("RefNo13254687"), Some("isa"), monetaryValue, Some(monetaryValue), Some(years), Some(years))))
+    ))
 
   val emptyGainsResult: GetInsurancePoliciesResponse = Left(ErrorModel(NOT_FOUND, ErrorBodyModel("SOME_CODE", "reason")))
 
   val fullTaskSection: TaskListSection =
-    TaskListSection(SectionTitle.InsuranceGainsTitle,
-      Some(List(
-        TaskListSectionItem(TaskTitle.LifeInsurance, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
-        ),
-        TaskListSectionItem(TaskTitle.LifeAnnuity, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Annuity")
-        ),
-        TaskListSectionItem(TaskTitle.CapitalRedemption, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Capital+Redemption")
-        ),
-        TaskListSectionItem(TaskTitle.VoidedISA, TaskStatus.Completed,
-          Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Voided+ISA")
-        )
-      ))
+    TaskListSection(
+      SectionTitle.InsuranceGainsTitle,
+      Some(
+        List(
+          TaskListSectionItem(
+            TaskTitle.LifeInsurance,
+            TaskStatus.Completed,
+            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
+          ),
+          TaskListSectionItem(
+            TaskTitle.LifeAnnuity,
+            TaskStatus.Completed,
+            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Annuity")
+          ),
+          TaskListSectionItem(
+            TaskTitle.CapitalRedemption,
+            TaskStatus.Completed,
+            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Capital+Redemption")
+          ),
+          TaskListSectionItem(
+            TaskTitle.VoidedISA,
+            TaskStatus.Completed,
+            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Voided+ISA")
+          )
+        ))
     )
 
   "CommonTaskListService.get" should {
 
     "return a full task list section model" in {
 
-      (gainsService.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects(nino, taxYear, *)
-        .returning(Future.successful(fullGainsResult))
+      when(gainsService.getInsurancePolicies(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(fullGainsResult))
 
       val underTest = service.get(taxYear, nino)
 
@@ -83,28 +95,30 @@ class CommonTaskListServiceSpec extends TestSuite with AppConfigStubProvider {
 
     "return a minimal task list section model" in {
 
-      (gainsService.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects(nino, taxYear, *)
-        .returning(Future.successful(Right(
-          InsurancePoliciesModel("", lifeInsurance = Some(Seq(LifeInsuranceModel(Some("CR"), None, monetaryValue, Some(false), None, None, None))))
-        )))
+      when(gainsService.getInsurancePolicies(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+        .thenReturn(
+          Future.successful(Right(
+            InsurancePoliciesModel("", lifeInsurance = Some(Seq(LifeInsuranceModel(Some("CR"), None, monetaryValue, Some(false), None, None, None))))
+          )))
 
       val underTest = service.get(taxYear, nino)
 
       await(underTest) mustBe fullTaskSection.copy(
-        taskItems = Some(List(
-          TaskListSectionItem(TaskTitle.LifeInsurance, TaskStatus.Completed,
-            Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
-          )
-        ))
+        taskItems = Some(
+          List(
+            TaskListSectionItem(
+              TaskTitle.LifeInsurance,
+              TaskStatus.Completed,
+              Some("http://localhost:10007/update-and-submit-income-tax-return/additional-information/1234/gains/summary?policyType=Life+Insurance")
+            )
+          ))
       )
     }
 
     "return an empty task list section model" in {
 
-      (gainsService.getInsurancePolicies(_: String, _: Int)(_: HeaderCarrier))
-        .expects(nino, taxYear, *)
-        .returning(Future.successful(emptyGainsResult))
+      when(gainsService.getInsurancePolicies(eqTo(nino), eqTo(taxYear))(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(emptyGainsResult))
 
       val underTest = service.get(taxYear, nino)
 

@@ -26,15 +26,14 @@ import utils.TaxYearUtils.specificTaxYear
 import scala.concurrent.Future
 
 @Singleton
-class GetInsurancePoliciesService @Inject()(getInsurancePoliciesConnector: GetInsurancePoliciesConnector,
-                                            getInsurancePoliciesTYSConnector: GetInsurancePoliciesTYSConnector) {
+class GetInsurancePoliciesService @Inject() (getInsurancePoliciesConnector: GetInsurancePoliciesConnector,
+                                             getInsurancePoliciesTYSConnector: GetInsurancePoliciesTYSConnector) {
 
-  def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] = {
-    if(taxYear >= specificTaxYear) {
+  def getInsurancePolicies(nino: String, taxYear: Int)(implicit hc: HeaderCarrier): Future[GetInsurancePoliciesResponse] =
+    if (taxYear >= specificTaxYear) {
       getInsurancePoliciesTYSConnector.getInsurancePolicies(nino, taxYear)
     } else {
       getInsurancePoliciesConnector.getInsurancePolicies(nino, taxYear)
     }
-  }
 
 }

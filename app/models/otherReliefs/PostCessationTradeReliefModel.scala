@@ -19,13 +19,13 @@ package models.otherReliefs
 import play.api.libs.json.{Json, OFormat}
 
 case class PostCessationTradeReliefModel(
-                               customerReference: Option[String],
-                               businessName: Option[String],
-                               dateBusinessCeased: Option[String],
-                               natureOfTrade: Option[String],
-                               incomeSource: Option[String],
-                               amount: BigDecimal
-                             )
+    customerReference: Option[String],
+    businessName: Option[String],
+    dateBusinessCeased: Option[String],
+    natureOfTrade: Option[String],
+    incomeSource: Option[String],
+    amount: BigDecimal
+)
 
 object PostCessationTradeReliefModel {
   implicit val formats: OFormat[PostCessationTradeReliefModel] = Json.format[PostCessationTradeReliefModel]

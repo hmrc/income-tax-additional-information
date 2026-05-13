@@ -24,7 +24,7 @@ import repositories.UserAnswersRepository
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserAnswersService @Inject()(repo: UserAnswersRepository)(implicit ec: ExecutionContext) {
+class UserAnswersService @Inject() (repo: UserAnswersRepository)(implicit ec: ExecutionContext) {
 
   def get(taxYear: Int, journey: Journey)(implicit user: User[_]): Future[Option[UserAnswersModel]] =
     repo.get(user.mtditid, taxYear, journey: Journey)
@@ -33,6 +33,6 @@ class UserAnswersService @Inject()(repo: UserAnswersRepository)(implicit ec: Exe
     repo.set(userAnswersModel)
 
   def delete(taxYear: Int, journey: Journey)(implicit user: User[_]): Future[Done] =
-    repo.delete(user.mtditid, taxYear, journey).map { _ => Done }
+    repo.delete(user.mtditid, taxYear, journey).map(_ => Done)
 
 }

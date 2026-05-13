@@ -25,11 +25,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class CreateOrUpdateOtherReliefsService @Inject()(createOrUpdateOtherReliefsConnector: CreateOrUpdateOtherReliefsConnector) {
+class CreateOrUpdateOtherReliefsService @Inject() (createOrUpdateOtherReliefsConnector: CreateOrUpdateOtherReliefsConnector) {
 
-  def createOrUpdateOtherReliefs(nino: String, taxYear: Int, createOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel)
-                                    (implicit hc: HeaderCarrier): Future[CreateOrUpdateOtherReliefsResponse] = {
+  def createOrUpdateOtherReliefs(nino: String, taxYear: Int, createOrUpdateOtherReliefsModel: CreateOrUpdateOtherReliefsModel)(implicit
+      hc: HeaderCarrier): Future[CreateOrUpdateOtherReliefsResponse] =
     createOrUpdateOtherReliefsConnector.createOrUpdateOtherReliefs(nino, taxYear, createOrUpdateOtherReliefsModel)
-  }
 
 }

@@ -25,15 +25,15 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class GetOtherEmploymentsIncomeController @Inject()(getOtherEmploymentsIncomeService: GetOtherEmploymentsIncomeService,
-                                                    cc: ControllerComponents,
-                                                    authorisedAction: AuthorisedAction)
-                                                   (implicit ec: ExecutionContext) extends BackendController(cc) {
+class GetOtherEmploymentsIncomeController @Inject() (getOtherEmploymentsIncomeService: GetOtherEmploymentsIncomeService,
+                                                     cc: ControllerComponents,
+                                                     authorisedAction: AuthorisedAction)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def getOtherEmploymentsIncome(nino: String, taxYear: Int): Action[AnyContent] = authorisedAction.async { implicit user =>
     getOtherEmploymentsIncomeService.getOtherEmploymentsIncome(nino, taxYear).map {
       case Right(otherEmploymentsIncomeModel) => Ok(Json.toJson(otherEmploymentsIncomeModel))
-      case Left(errorModel) => Status(errorModel.status)(errorModel.toJson)
+      case Left(errorModel)                   => Status(errorModel.status)(errorModel.toJson)
     }
 
   }

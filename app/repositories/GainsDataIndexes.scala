@@ -31,10 +31,9 @@ private[repositories] object GainsDataIndexes {
     ascending("taxYear")
   )
 
-  def indexes(appConfig: AppConfig): Seq[IndexModel] = {
+  def indexes(appConfig: AppConfig): Seq[IndexModel] =
     Seq(
       IndexModel(lookUpIndex, IndexOptions().unique(true).name("UserDataLookupIndex")),
-      IndexModel(ascending("lastUpdated"), IndexOptions().expireAfter(appConfig.mongoTTL, TimeUnit.DAYS).name("UserDataTTL"))
+      IndexModel(ascending("lastUpdated"), IndexOptions().expireAfter(appConfig.mongoTTL.toLong, TimeUnit.DAYS).name("UserDataTTL"))
     )
-  }
 }
